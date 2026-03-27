@@ -1040,91 +1040,6 @@
       ]
     },
     {
-      "id": 1025,
-      "type": "Trellis2MeshTexturing",
-      "pos": [
-        -819.7311145491691,
-        -589.7011700188946
-      ],
-      "size": [
-        419.15234375,
-        506
-      ],
-      "flags": {},
-      "order": 34,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "pipeline",
-          "type": "TRELLIS2PIPELINE",
-          "link": 1193
-        },
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 1191
-        },
-        {
-          "name": "trimesh",
-          "type": "TRIMESH",
-          "link": 1192
-        },
-        {
-          "name": "seed",
-          "type": "INT",
-          "widget": {
-            "name": "seed"
-          },
-          "link": 1752
-        }
-      ],
-      "outputs": [
-        {
-          "name": "trimesh",
-          "type": "TRIMESH",
-          "links": [
-            1188,
-            1189
-          ]
-        },
-        {
-          "name": "base_color_texture",
-          "type": "IMAGE",
-          "links": null
-        },
-        {
-          "name": "metallic_roughness_texture",
-          "type": "IMAGE",
-          "links": null
-        }
-      ],
-      "properties": {
-        "aux_id": "visualbruno/ComfyUI-Trellis2",
-        "ver": "41a6ddb2d48c408ead711846dbbfe587d4ff7102",
-        "Node name for S&R": "Trellis2MeshTexturing"
-      },
-      "widgets_values": [
-        12345,
-        "fixed",
-        12,
-        3,
-        0.2,
-        3,
-        1024,
-        4096,
-        "OPAQUE",
-        false,
-        0,
-        0.9,
-        1,
-        false,
-        false,
-        60,
-        "heun",
-        "telea"
-      ]
-    },
-    {
       "id": 259,
       "type": "StringConcatenate",
       "pos": [
@@ -2089,6 +2004,91 @@
         "",
         "",
         ""
+      ]
+    },
+    {
+      "id": 1025,
+      "type": "Trellis2MeshTexturing",
+      "pos": [
+        -819.7311145491691,
+        -589.7011700188946
+      ],
+      "size": [
+        419.15234375,
+        506
+      ],
+      "flags": {},
+      "order": 34,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "pipeline",
+          "type": "TRELLIS2PIPELINE",
+          "link": 1193
+        },
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 1191
+        },
+        {
+          "name": "trimesh",
+          "type": "TRIMESH",
+          "link": 1192
+        },
+        {
+          "name": "seed",
+          "type": "INT",
+          "widget": {
+            "name": "seed"
+          },
+          "link": 1752
+        }
+      ],
+      "outputs": [
+        {
+          "name": "trimesh",
+          "type": "TRIMESH",
+          "links": [
+            1188,
+            1189
+          ]
+        },
+        {
+          "name": "base_color_texture",
+          "type": "IMAGE",
+          "links": null
+        },
+        {
+          "name": "metallic_roughness_texture",
+          "type": "IMAGE",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "visualbruno/ComfyUI-Trellis2",
+        "ver": "41a6ddb2d48c408ead711846dbbfe587d4ff7102",
+        "Node name for S&R": "Trellis2MeshTexturing"
+      },
+      "widgets_values": [
+        12345,
+        "fixed",
+        12,
+        3,
+        0.2,
+        3,
+        1024,
+        1024,
+        "OPAQUE",
+        false,
+        0,
+        0.9,
+        1,
+        false,
+        false,
+        60,
+        "heun",
+        "telea"
       ]
     }
   ],
@@ -8438,8 +8438,8 @@
     "ds": {
       "scale": 0.6541273155691342,
       "offset": [
-        2317.8736798413424,
-        1564.0542675462032
+        2016.1994196069336,
+        735.4693925537503
       ]
     }
   },
