@@ -4507,6 +4507,66 @@ class Trellis2CudaReset:
         reset_cuda()
         return (input_1,)          
         
+class Trellis2SaveImage:
+    def __init__(self):
+        self.output_dir = folder_paths.get_output_directory()
+        self.type = "output"
+        self.prefix_append = ""
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "images": ("IMAGE", {"tooltip": "The images to save."}),
+                "filename_prefix": ("STRING", {"default": "ComfyUI", "tooltip": "The prefix for the file to save. This may include formatting information such as %date:yyyy-MM-dd% or %Empty Latent Image.width% to include values from nodes."}),
+                "compress_level": ("INT",{"default":4,"min":1,"max":9,"step":1}),
+            },
+            "hidden": {
+                "prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"
+            },
+        }
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("images_path",)
+    FUNCTION = "save_images"
+
+    OUTPUT_NODE = True
+
+    CATEGORY = "image"
+    ESSENTIALS_CATEGORY = "Basics"
+    DESCRIPTION = "Saves the input images to your ComfyUI output directory."
+    SEARCH_ALIASES = ["save", "save image", "export image", "output image", "write image", "download"]
+
+    def save_images(self, images, filename_prefix="ComfyUI", compress_level=4, prompt=None, extra_pnginfo=None):
+        from comfy.cli_args import args
+        from PIL.PngImagePlugin import PngInfo
+        filename_prefix += self.prefix_append
+        full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0])
+        file_list = list()
+        for (batch_number, image) in enumerate(images):
+            i = 255. * image.cpu().numpy()
+            img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
+            metadata = None
+            if not args.disable_metadata:
+                metadata = PngInfo()
+                if prompt is not None:
+                    metadata.add_text("prompt", json.dumps(prompt))
+                if extra_pnginfo is not None:
+                    for x in extra_pnginfo:
+                        metadata.add_text(x, json.dumps(extra_pnginfo[x]))
+
+            filename_with_batch_num = filename.replace("%batch_num%", str(batch_number))
+            file = f"{filename_with_batch_num}_{counter:05}_.png"
+            full_path = os.path.join(full_output_folder, file)
+            file_list.append(full_path)
+            img.save(full_path, pnginfo=metadata, compress_level=compress_level)
+            counter += 1
+
+        if len(file_list)==1:
+            file_list = file_list[0]
+            
+        return (file_list,)
+        
 NODE_CLASS_MAPPINGS = {
     "Trellis2LoadModel": Trellis2LoadModel,
     "Trellis2MeshWithVoxelGenerator": Trellis2MeshWithVoxelGenerator,
@@ -4560,6 +4620,7 @@ NODE_CLASS_MAPPINGS = {
     "Trellis2CudaReset": Trellis2CudaReset,
     "Trellis2ProjectHighPolyToLowPoly": Trellis2ProjectHighPolyToLowPoly,
     "Trellis2RenderMultiView": Trellis2RenderMultiView,
+    "Trellis2SaveImage": Trellis2SaveImage,
     }
     
 
@@ -4616,4 +4677,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Trellis2CudaReset": "Trellis2 - Cuda Reset",
     "Trellis2ProjectHighPolyToLowPoly": "Trellis2 - Projection HighPoly To LowPoly",
     "Trellis2RenderMultiView": "Trellis2 - Render MultiView",
+    "Trellis2SaveImage": "Trellis2 - Save Image",
     }

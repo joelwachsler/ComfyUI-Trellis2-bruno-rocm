@@ -1,8 +1,8 @@
 {
   "id": "499e3652-9a6e-47e3-a0a9-512859406ee0",
   "revision": 0,
-  "last_node_id": 1578,
-  "last_link_id": 1898,
+  "last_node_id": 1588,
+  "last_link_id": 1933,
   "nodes": [
     {
       "id": 358,
@@ -58,7 +58,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 45,
+      "order": 50,
       "mode": 0,
       "inputs": [
         {
@@ -145,7 +145,7 @@
         102
       ],
       "flags": {},
-      "order": 44,
+      "order": 43,
       "mode": 0,
       "inputs": [
         {
@@ -360,7 +360,7 @@
         46
       ],
       "flags": {},
-      "order": 54,
+      "order": 52,
       "mode": 0,
       "inputs": [
         {
@@ -407,7 +407,7 @@
         102
       ],
       "flags": {},
-      "order": 51,
+      "order": 49,
       "mode": 0,
       "inputs": [
         {
@@ -462,7 +462,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 55,
+      "order": 54,
       "mode": 0,
       "inputs": [
         {
@@ -524,86 +524,6 @@
       ]
     },
     {
-      "id": 1026,
-      "type": "Trellis2PreProcessImage",
-      "pos": [
-        -1255.2289741520053,
-        -440.7185088501948
-      ],
-      "size": [
-        281.7837890625,
-        106
-      ],
-      "flags": {
-        "collapsed": true
-      },
-      "order": 30,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 1190
-        }
-      ],
-      "outputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "links": [
-            1191
-          ]
-        }
-      ],
-      "properties": {
-        "aux_id": "visualbruno/ComfyUI-Trellis2",
-        "ver": "7ce26deae425d114f3deb78e802d6196e5987a4a",
-        "Node name for S&R": "Trellis2PreProcessImage"
-      },
-      "widgets_values": [
-        5,
-        false,
-        1024
-      ]
-    },
-    {
-      "id": 384,
-      "type": "GetNode",
-      "pos": [
-        -1286.3199706479663,
-        -512.8766540900452
-      ],
-      "size": [
-        242.2095703125,
-        60
-      ],
-      "flags": {
-        "collapsed": true
-      },
-      "order": 4,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            1190
-          ]
-        }
-      ],
-      "title": "Get_SourceImage_Transparent",
-      "properties": {
-        "Node name for S&R": "GetNode",
-        "aux_id": "GetNode"
-      },
-      "widgets_values": [
-        "SourceImage_Transparent"
-      ],
-      "color": "#2a363b",
-      "bgcolor": "#3f5159"
-    },
-    {
       "id": 266,
       "type": "Preview3D",
       "pos": [
@@ -615,7 +535,7 @@
         1226.3422371338038
       ],
       "flags": {},
-      "order": 52,
+      "order": 51,
       "mode": 0,
       "inputs": [
         {
@@ -644,8 +564,8 @@
         "cnr_id": "comfy-core",
         "ver": "0.16.4",
         "Node name for S&R": "Preview3D",
-        "Last Time Model File": "C:/Git/ComfyUI/output/3D/ArmoredWarrior_MV_LowPoly/ArmoredWarrior_MV_LowPoly_Textured_MV_00001_.glb",
-        "Resource Folder": "Git/ComfyUI/output/3D/ArmoredWarrior_MV_LowPoly",
+        "Last Time Model File": "C:/Git/ComfyUI/output/3D/GrayManArmored_MV/GrayManArmored_MV_Textured_MV_00001_.glb",
+        "Resource Folder": "Git/ComfyUI/output/3D/GrayManArmored_MV",
         "Scene Config": {
           "showGrid": true,
           "backgroundColor": "#282828",
@@ -657,14 +577,14 @@
           "fov": 35,
           "state": {
             "position": {
-              "x": -2.9043859281042894,
-              "y": 4.577041056230959,
-              "z": 9.240514729374798
+              "x": -1.1955284762804612,
+              "y": 5.429352018220417,
+              "z": 8.965065719637373
             },
             "target": {
-              "x": 0.00047290027855694086,
-              "y": 2.5107541878491224,
-              "z": -0.0021514326401399285
+              "x": 0,
+              "y": 2.5,
+              "z": 0
             },
             "zoom": 1,
             "cameraType": "perspective"
@@ -680,7 +600,7 @@
         }
       },
       "widgets_values": [
-        "C:/Git/ComfyUI/output/3D/ArmoredWarrior_MV_LowPoly/ArmoredWarrior_MV_LowPoly_Textured_MV_00001_.glb",
+        "C:/Git/ComfyUI/output/3D/GrayManArmored_MV/GrayManArmored_MV_Textured_MV_00001_.glb",
         ""
       ]
     },
@@ -698,7 +618,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 37,
+      "order": 40,
       "mode": 0,
       "inputs": [
         {
@@ -742,7 +662,7 @@
         82
       ],
       "flags": {},
-      "order": 5,
+      "order": 4,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -779,7 +699,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 6,
+      "order": 5,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -814,7 +734,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 7,
+      "order": 6,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -849,7 +769,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 8,
+      "order": 7,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -886,7 +806,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 9,
+      "order": 8,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -923,7 +843,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 10,
+      "order": 9,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -960,7 +880,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 11,
+      "order": 10,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -1035,7 +955,7 @@
         82
       ],
       "flags": {},
-      "order": 12,
+      "order": 11,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -1112,7 +1032,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 13,
+      "order": 12,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -1149,7 +1069,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 14,
+      "order": 13,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -1173,84 +1093,6 @@
       "bgcolor": "#29699c"
     },
     {
-      "id": 416,
-      "type": "a7c4d8ae-5500-4f9b-9601-eafdb97e7a68",
-      "pos": [
-        -1042.8688928579686,
-        -1140.130946288408
-      ],
-      "size": [
-        249.978515625,
-        106
-      ],
-      "flags": {},
-      "order": 38,
-      "mode": 0,
-      "inputs": [
-        {
-          "label": "Normal_Image",
-          "name": "image",
-          "type": "IMAGE",
-          "link": 658
-        },
-        {
-          "label": "Prefix",
-          "name": "",
-          "type": "*",
-          "link": 657
-        },
-        {
-          "label": "seed",
-          "name": "_1",
-          "type": "*",
-          "link": 1751
-        },
-        {
-          "label": "high_poly_face_num",
-          "name": "_2",
-          "type": "*",
-          "link": 1824
-        },
-        {
-          "label": "low_poly_face_num",
-          "name": "_3",
-          "type": "*",
-          "link": 1825
-        }
-      ],
-      "outputs": [
-        {
-          "name": "pipeline",
-          "type": "TRELLIS2PIPELINE",
-          "links": [
-            638
-          ]
-        },
-        {
-          "label": "high_poly_mesh",
-          "name": "output_1",
-          "type": "*",
-          "links": [
-            1818
-          ]
-        },
-        {
-          "label": "low_poly_mesh",
-          "name": "output_2",
-          "type": "*",
-          "links": [
-            1819
-          ]
-        }
-      ],
-      "properties": {
-        "proxyWidgets": [],
-        "cnr_id": "comfy-core",
-        "ver": "0.16.4"
-      },
-      "widgets_values": []
-    },
-    {
       "id": 388,
       "type": "GetNode",
       "pos": [
@@ -1264,7 +1106,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 15,
+      "order": 14,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -1297,7 +1139,7 @@
         60
       ],
       "flags": {},
-      "order": 16,
+      "order": 15,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -1332,7 +1174,7 @@
       "flags": {
         "collapsed": false
       },
-      "order": 17,
+      "order": 16,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -1369,7 +1211,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 31,
+      "order": 30,
       "mode": 0,
       "inputs": [
         {
@@ -1409,7 +1251,7 @@
         506
       ],
       "flags": {},
-      "order": 41,
+      "order": 38,
       "mode": 0,
       "inputs": [
         {
@@ -1420,7 +1262,7 @@
         {
           "name": "image",
           "type": "IMAGE",
-          "link": 1191
+          "link": 1907
         },
         {
           "name": "trimesh",
@@ -1504,7 +1346,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 33,
+      "order": 32,
       "mode": 0,
       "inputs": [
         {
@@ -1546,7 +1388,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 34,
+      "order": 33,
       "mode": 0,
       "inputs": [
         {
@@ -1586,7 +1428,7 @@
         82
       ],
       "flags": {},
-      "order": 18,
+      "order": 17,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -1623,7 +1465,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 36,
+      "order": 35,
       "mode": 0,
       "inputs": [
         {
@@ -1665,7 +1507,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 19,
+      "order": 18,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -1702,7 +1544,7 @@
       "flags": {
         "collapsed": false
       },
-      "order": 20,
+      "order": 19,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -1739,7 +1581,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 21,
+      "order": 20,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -1776,7 +1618,7 @@
       "flags": {
         "collapsed": false
       },
-      "order": 22,
+      "order": 21,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -1800,41 +1642,6 @@
       ]
     },
     {
-      "id": 219,
-      "type": "PrimitiveString",
-      "pos": [
-        -2058.606314017538,
-        -1029.5385288033083
-      ],
-      "size": [
-        270,
-        58
-      ],
-      "flags": {},
-      "order": 23,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "STRING",
-          "type": "STRING",
-          "links": [
-            464,
-            465
-          ]
-        }
-      ],
-      "title": "Name -> output in 3D folder",
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.16.4",
-        "Node name for S&R": "PrimitiveString"
-      },
-      "widgets_values": [
-        "ArmoredWarrior_MV_LowPoly"
-      ]
-    },
-    {
       "id": 1536,
       "type": "Trellis2MultiViewTexturing",
       "pos": [
@@ -1846,7 +1653,7 @@
         626
       ],
       "flags": {},
-      "order": 35,
+      "order": 34,
       "mode": 0,
       "inputs": [
         {
@@ -1957,92 +1764,6 @@
       ]
     },
     {
-      "id": 420,
-      "type": "bf1edf2f-ccb7-45ac-882e-55bdd5f0be86",
-      "pos": [
-        -1063.079283663359,
-        -844.8729217359734
-      ],
-      "size": [
-        210,
-        214
-      ],
-      "flags": {},
-      "order": 32,
-      "mode": 0,
-      "inputs": [
-        {
-          "label": "prefix",
-          "name": "",
-          "type": "*",
-          "link": 661
-        },
-        {
-          "label": "white_mesh",
-          "name": "trimesh",
-          "type": "TRIMESH",
-          "link": 663
-        },
-        {
-          "label": "color_image",
-          "name": "_1",
-          "type": "*",
-          "link": 669
-        },
-        {
-          "label": "seed",
-          "name": "_2",
-          "type": "*",
-          "link": 1750
-        }
-      ],
-      "outputs": [
-        {
-          "label": "FrontView",
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            680
-          ]
-        },
-        {
-          "label": "BackView",
-          "name": "IMAGE_2",
-          "type": "IMAGE",
-          "links": [
-            682
-          ]
-        }
-      ],
-      "properties": {
-        "proxyWidgets": [
-          [
-            "366",
-            "$$canvas-image-preview"
-          ],
-          [
-            "1036",
-            "$$canvas-image-preview"
-          ],
-          [
-            "1413",
-            "$$canvas-image-preview"
-          ],
-          [
-            "1447",
-            "$$canvas-image-preview"
-          ],
-          [
-            "369",
-            "$$canvas-image-preview"
-          ]
-        ],
-        "cnr_id": "comfy-core",
-        "ver": "0.16.4"
-      },
-      "widgets_values": []
-    },
-    {
       "id": 419,
       "type": "SetNode",
       "pos": [
@@ -2096,7 +1817,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 43,
+      "order": 42,
       "mode": 0,
       "inputs": [
         {
@@ -2138,7 +1859,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 42,
+      "order": 41,
       "mode": 0,
       "inputs": [
         {
@@ -2165,82 +1886,6 @@
       ],
       "color": "#2a363b",
       "bgcolor": "#3f5159"
-    },
-    {
-      "id": 428,
-      "type": "GetNode",
-      "pos": [
-        -1267.2288279677114,
-        -1155.920307676203
-      ],
-      "size": [
-        210,
-        60
-      ],
-      "flags": {
-        "collapsed": true
-      },
-      "order": 24,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            658
-          ]
-        }
-      ],
-      "title": "Get_NormalImage",
-      "properties": {
-        "Node name for S&R": "GetNode",
-        "aux_id": "GetNode"
-      },
-      "widgets_values": [
-        "NormalImage"
-      ],
-      "color": "#2a363b",
-      "bgcolor": "#3f5159"
-    },
-    {
-      "id": 1564,
-      "type": "LoadImage",
-      "pos": [
-        -2046.4162128442308,
-        -515.4299234840769
-      ],
-      "size": [
-        635.9300595433349,
-        683.6657647091677
-      ],
-      "flags": {},
-      "order": 25,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            1867
-          ]
-        },
-        {
-          "name": "MASK",
-          "type": "MASK",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.18.1",
-        "Node name for S&R": "LoadImage"
-      },
-      "widgets_values": [
-        "ArmoredWarrior.png",
-        "image"
-      ]
     },
     {
       "id": 356,
@@ -2296,7 +1941,7 @@
         60
       ],
       "flags": {},
-      "order": 26,
+      "order": 22,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -2331,7 +1976,7 @@
         60
       ],
       "flags": {},
-      "order": 27,
+      "order": 23,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -2353,48 +1998,6 @@
       ]
     },
     {
-      "id": 1027,
-      "type": "SetNode",
-      "pos": [
-        -700.6974600362864,
-        -1438.2123861199334
-      ],
-      "size": [
-        240.7466796875,
-        60
-      ],
-      "flags": {
-        "collapsed": false
-      },
-      "order": 49,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "link": 1888
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": null
-        }
-      ],
-      "title": "Set_SourceImage_Transparent",
-      "properties": {
-        "Node name for S&R": "SetNode",
-        "aux_id": "SetNode",
-        "previousName": "SourceImage_Transparent"
-      },
-      "widgets_values": [
-        "SourceImage_Transparent"
-      ],
-      "color": "#2a363b",
-      "bgcolor": "#3f5159"
-    },
-    {
       "id": 412,
       "type": "SetNode",
       "pos": [
@@ -2408,7 +2011,7 @@
       "flags": {
         "collapsed": false
       },
-      "order": 50,
+      "order": 45,
       "mode": 0,
       "inputs": [
         {
@@ -2437,6 +2040,339 @@
       "bgcolor": "#3f5159"
     },
     {
+      "id": 428,
+      "type": "GetNode",
+      "pos": [
+        -1289.0088279677113,
+        -1150.2736163920235
+      ],
+      "size": [
+        210,
+        60
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 24,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            658
+          ]
+        }
+      ],
+      "title": "Get_NormalImage",
+      "properties": {
+        "Node name for S&R": "GetNode",
+        "aux_id": "GetNode"
+      },
+      "widgets_values": [
+        "NormalImage"
+      ],
+      "color": "#2a363b",
+      "bgcolor": "#3f5159"
+    },
+    {
+      "id": 1027,
+      "type": "SetNode",
+      "pos": [
+        -705.7062531675188,
+        -1435.9356676540776
+      ],
+      "size": [
+        240.7466796875,
+        60
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 44,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "link": 1888
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": null
+        }
+      ],
+      "title": "Set_SourceImage_Processed",
+      "properties": {
+        "Node name for S&R": "SetNode",
+        "aux_id": "SetNode",
+        "previousName": "SourceImage_Processed"
+      },
+      "widgets_values": [
+        "SourceImage_Processed"
+      ],
+      "color": "#2a363b",
+      "bgcolor": "#3f5159"
+    },
+    {
+      "id": 384,
+      "type": "GetNode",
+      "pos": [
+        -1285.7213537582186,
+        -513.1982458328935
+      ],
+      "size": [
+        242.2095703125,
+        60
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 25,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            1907
+          ]
+        }
+      ],
+      "title": "Get_SourceImage_Processed",
+      "properties": {
+        "Node name for S&R": "GetNode",
+        "aux_id": "GetNode"
+      },
+      "widgets_values": [
+        "SourceImage_Processed"
+      ],
+      "color": "#2a363b",
+      "bgcolor": "#3f5159"
+    },
+    {
+      "id": 416,
+      "type": "a7c4d8ae-5500-4f9b-9601-eafdb97e7a68",
+      "pos": [
+        -1042.8688928579686,
+        -1140.130946288408
+      ],
+      "size": [
+        249.978515625,
+        106
+      ],
+      "flags": {},
+      "order": 37,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "Normal_Image",
+          "name": "image",
+          "type": "IMAGE",
+          "link": 658
+        },
+        {
+          "label": "Prefix",
+          "name": "",
+          "type": "*",
+          "link": 657
+        },
+        {
+          "label": "seed",
+          "name": "_1",
+          "type": "*",
+          "link": 1751
+        },
+        {
+          "label": "high_poly_face_num",
+          "name": "_2",
+          "type": "*",
+          "link": 1824
+        },
+        {
+          "label": "low_poly_face_num",
+          "name": "_3",
+          "type": "*",
+          "link": 1825
+        }
+      ],
+      "outputs": [
+        {
+          "name": "pipeline",
+          "type": "TRELLIS2PIPELINE",
+          "links": [
+            638
+          ]
+        },
+        {
+          "label": "high_poly_mesh",
+          "name": "output_1",
+          "type": "*",
+          "links": [
+            1818
+          ]
+        },
+        {
+          "label": "low_poly_mesh",
+          "name": "output_2",
+          "type": "*",
+          "links": [
+            1819
+          ]
+        }
+      ],
+      "properties": {
+        "proxyWidgets": [],
+        "cnr_id": "comfy-core",
+        "ver": "0.16.4"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 420,
+      "type": "bf1edf2f-ccb7-45ac-882e-55bdd5f0be86",
+      "pos": [
+        -1038.0725923791795,
+        -836.8062304517938
+      ],
+      "size": [
+        181.554296875,
+        86
+      ],
+      "flags": {},
+      "order": 31,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "prefix",
+          "name": "",
+          "type": "*",
+          "link": 661
+        },
+        {
+          "label": "white_mesh",
+          "name": "trimesh",
+          "type": "TRIMESH",
+          "link": 663
+        },
+        {
+          "label": "color_image",
+          "name": "_1",
+          "type": "*",
+          "link": 669
+        },
+        {
+          "label": "seed",
+          "name": "_2",
+          "type": "*",
+          "link": 1750
+        }
+      ],
+      "outputs": [
+        {
+          "label": "FrontView",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            680
+          ]
+        },
+        {
+          "label": "BackView",
+          "name": "IMAGE_2",
+          "type": "IMAGE",
+          "links": [
+            682
+          ]
+        }
+      ],
+      "properties": {
+        "proxyWidgets": [],
+        "cnr_id": "comfy-core",
+        "ver": "0.16.4"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 1564,
+      "type": "LoadImage",
+      "pos": [
+        -2046.4162128442308,
+        -515.4299234840769
+      ],
+      "size": [
+        635.9300595433349,
+        683.6657647091677
+      ],
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            1867
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.18.1",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "GrayManArmored.jpg",
+        "image"
+      ]
+    },
+    {
+      "id": 219,
+      "type": "PrimitiveString",
+      "pos": [
+        -2058.606314017538,
+        -1029.5385288033083
+      ],
+      "size": [
+        270,
+        58
+      ],
+      "flags": {},
+      "order": 27,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            464,
+            465
+          ]
+        }
+      ],
+      "title": "Name -> output in 3D folder",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.16.4",
+        "Node name for S&R": "PrimitiveString"
+      },
+      "widgets_values": [
+        "GrayManArmored_MV"
+      ]
+    },
+    {
       "id": 1563,
       "type": "ecc69b0a-ac71-4ba2-81e9-02fc51ec5746",
       "pos": [
@@ -2445,10 +2381,10 @@
       ],
       "size": [
         274.330078125,
-        102
+        46
       ],
       "flags": {},
-      "order": 40,
+      "order": 36,
       "mode": 0,
       "inputs": [
         {
@@ -2466,7 +2402,7 @@
       ],
       "outputs": [
         {
-          "label": "source_image_transparent",
+          "label": "source_image",
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
@@ -2483,16 +2419,7 @@
         }
       ],
       "properties": {
-        "proxyWidgets": [
-          [
-            "1545",
-            "$$canvas-image-preview"
-          ],
-          [
-            "1573",
-            "$$canvas-image-preview"
-          ]
-        ],
+        "proxyWidgets": [],
         "cnr_id": "comfy-core",
         "ver": "0.18.1"
       },
@@ -2677,22 +2604,6 @@
       "TRIMESH"
     ],
     [
-      1190,
-      384,
-      0,
-      1026,
-      0,
-      "IMAGE"
-    ],
-    [
-      1191,
-      1026,
-      0,
-      1025,
-      1,
-      "IMAGE"
-    ],
-    [
       1192,
       388,
       0,
@@ -2875,6 +2786,14 @@
       412,
       0,
       "IMAGE"
+    ],
+    [
+      1907,
+      384,
+      0,
+      1025,
+      1,
+      "IMAGE"
     ]
   ],
   "groups": [
@@ -2964,8 +2883,8 @@
         "version": 1,
         "state": {
           "lastGroupId": 31,
-          "lastNodeId": 1578,
-          "lastLinkId": 1898,
+          "lastNodeId": 1588,
+          "lastLinkId": 1933,
           "lastRerouteId": 0
         },
         "revision": 0,
@@ -5038,8 +4957,8 @@
         "version": 1,
         "state": {
           "lastGroupId": 31,
-          "lastNodeId": 1578,
-          "lastLinkId": 1898,
+          "lastNodeId": 1588,
+          "lastLinkId": 1933,
           "lastRerouteId": 0
         },
         "revision": 0,
@@ -5057,8 +4976,8 @@
         "outputNode": {
           "id": -20,
           "bounding": [
-            2435.4059835911307,
-            -492.09012505396026,
+            2748.3926010227697,
+            -492.89681633813996,
             120,
             80
           ]
@@ -5124,12 +5043,12 @@
             "name": "IMAGE",
             "type": "IMAGE",
             "linkIds": [
-              1715
+              1926
             ],
             "label": "FrontView",
             "pos": [
-              2455.4059835911307,
-              -472.09012505396026
+              2768.3926010227697,
+              -472.89681633813996
             ]
           },
           {
@@ -5137,59 +5056,17 @@
             "name": "IMAGE_2",
             "type": "IMAGE",
             "linkIds": [
-              1716
+              1927
             ],
             "label": "BackView",
             "pos": [
-              2455.4059835911307,
-              -452.09012505396026
+              2768.3926010227697,
+              -452.89681633813996
             ]
           }
         ],
         "widgets": [],
         "nodes": [
-          {
-            "id": 366,
-            "type": "SaveImage",
-            "pos": [
-              2055.074265011987,
-              -733.0995576387195
-            ],
-            "size": [
-              270,
-              270
-            ],
-            "flags": {
-              "collapsed": true
-            },
-            "order": 21,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "images",
-                "name": "images",
-                "type": "IMAGE",
-                "link": 836
-              },
-              {
-                "localized_name": "filename_prefix",
-                "name": "filename_prefix",
-                "type": "STRING",
-                "widget": {
-                  "name": "filename_prefix"
-                },
-                "link": 568
-              }
-            ],
-            "outputs": [],
-            "properties": {
-              "cnr_id": "comfy-core",
-              "ver": "0.16.4"
-            },
-            "widgets_values": [
-              "ComfyUI"
-            ]
-          },
           {
             "id": 498,
             "type": "ImageFromBatch",
@@ -5204,7 +5081,7 @@
             "flags": {
               "collapsed": true
             },
-            "order": 29,
+            "order": 27,
             "mode": 0,
             "inputs": [
               {
@@ -5220,8 +5097,8 @@
                 "name": "IMAGE",
                 "type": "IMAGE",
                 "links": [
-                  842,
-                  1714
+                  1920,
+                  1923
                 ]
               }
             ],
@@ -5249,7 +5126,7 @@
             "flags": {
               "collapsed": true
             },
-            "order": 23,
+            "order": 21,
             "mode": 0,
             "inputs": [
               {
@@ -5268,7 +5145,7 @@
                 "name": "STRING",
                 "type": "STRING",
                 "links": [
-                  575
+                  1921
                 ]
               }
             ],
@@ -5316,7 +5193,7 @@
                 "name": "STRING",
                 "type": "STRING",
                 "links": [
-                  568
+                  1919
                 ]
               }
             ],
@@ -5329,48 +5206,6 @@
               "",
               "_FrontView",
               ""
-            ]
-          },
-          {
-            "id": 1036,
-            "type": "SaveImage",
-            "pos": [
-              -476.5756361124731,
-              124.9200165536604
-            ],
-            "size": [
-              270,
-              58
-            ],
-            "flags": {
-              "collapsed": true
-            },
-            "order": 31,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "images",
-                "name": "images",
-                "type": "IMAGE",
-                "link": 1513
-              },
-              {
-                "localized_name": "filename_prefix",
-                "name": "filename_prefix",
-                "type": "STRING",
-                "widget": {
-                  "name": "filename_prefix"
-                },
-                "link": 1205
-              }
-            ],
-            "outputs": [],
-            "properties": {
-              "cnr_id": "comfy-core",
-              "ver": "0.17.0"
-            },
-            "widgets_values": [
-              "ComfyUI"
             ]
           },
           {
@@ -5563,7 +5398,7 @@
               274
             ],
             "flags": {},
-            "order": 32,
+            "order": 29,
             "mode": 0,
             "inputs": [
               {
@@ -5620,7 +5455,7 @@
                 "links": [
                   1509,
                   1510,
-                  1513
+                  1928
                 ]
               }
             ],
@@ -5638,54 +5473,6 @@
             ]
           },
           {
-            "id": 1035,
-            "type": "StringConcatenate",
-            "pos": [
-              -882.5171881815025,
-              126.75510181592512
-            ],
-            "size": [
-              400,
-              200
-            ],
-            "flags": {
-              "collapsed": true
-            },
-            "order": 30,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "string_a",
-                "name": "string_a",
-                "type": "STRING",
-                "widget": {
-                  "name": "string_a"
-                },
-                "link": 1204
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "STRING",
-                "name": "STRING",
-                "type": "STRING",
-                "links": [
-                  1205
-                ]
-              }
-            ],
-            "properties": {
-              "cnr_id": "comfy-core",
-              "ver": "0.16.4",
-              "Node name for S&R": "StringConcatenate"
-            },
-            "widgets_values": [
-              "",
-              "_Ortho",
-              ""
-            ]
-          },
-          {
             "id": 426,
             "type": "Reroute",
             "pos": [
@@ -5697,7 +5484,7 @@
               60
             ],
             "flags": {},
-            "order": 24,
+            "order": 22,
             "mode": 0,
             "inputs": [
               {
@@ -5790,7 +5577,7 @@
               280
             ],
             "flags": {},
-            "order": 34,
+            "order": 31,
             "mode": 0,
             "inputs": [
               {
@@ -5861,48 +5648,6 @@
             ]
           },
           {
-            "id": 1413,
-            "type": "SaveImage",
-            "pos": [
-              -276.45439094583634,
-              -2870.3251878106284
-            ],
-            "size": [
-              405.0726233410379,
-              385.9304552631397
-            ],
-            "flags": {
-              "collapsed": true
-            },
-            "order": 38,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "images",
-                "name": "images",
-                "type": "IMAGE",
-                "link": 1546
-              },
-              {
-                "localized_name": "filename_prefix",
-                "name": "filename_prefix",
-                "type": "STRING",
-                "widget": {
-                  "name": "filename_prefix"
-                },
-                "link": 1551
-              }
-            ],
-            "outputs": [],
-            "properties": {
-              "cnr_id": "comfy-core",
-              "ver": "0.17.0"
-            },
-            "widgets_values": [
-              "CannyFront"
-            ]
-          },
-          {
             "id": 1406,
             "type": "VAEDecodeTiled",
             "pos": [
@@ -5914,7 +5659,7 @@
               150
             ],
             "flags": {},
-            "order": 33,
+            "order": 30,
             "mode": 0,
             "inputs": [
               {
@@ -6063,7 +5808,7 @@
               280
             ],
             "flags": {},
-            "order": 41,
+            "order": 37,
             "mode": 0,
             "inputs": [
               {
@@ -6134,48 +5879,6 @@
             ]
           },
           {
-            "id": 1447,
-            "type": "SaveImage",
-            "pos": [
-              -331.83775944517055,
-              -1576.3648320325285
-            ],
-            "size": [
-              405.0726233410379,
-              385.9304552631397
-            ],
-            "flags": {
-              "collapsed": true
-            },
-            "order": 44,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "images",
-                "name": "images",
-                "type": "IMAGE",
-                "link": 1591
-              },
-              {
-                "localized_name": "filename_prefix",
-                "name": "filename_prefix",
-                "type": "STRING",
-                "widget": {
-                  "name": "filename_prefix"
-                },
-                "link": 1592
-              }
-            ],
-            "outputs": [],
-            "properties": {
-              "cnr_id": "comfy-core",
-              "ver": "0.17.0"
-            },
-            "widgets_values": [
-              "CannyFront"
-            ]
-          },
-          {
             "id": 1451,
             "type": "VAEDecodeTiled",
             "pos": [
@@ -6187,7 +5890,7 @@
               150
             ],
             "flags": {},
-            "order": 47,
+            "order": 42,
             "mode": 0,
             "inputs": [
               {
@@ -6238,7 +5941,7 @@
               26
             ],
             "flags": {},
-            "order": 35,
+            "order": 32,
             "mode": 0,
             "inputs": [
               {
@@ -6276,7 +5979,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 27,
+            "order": 25,
             "mode": 0,
             "inputs": [
               {
@@ -6328,54 +6031,6 @@
             ],
             "color": "#222e40",
             "bgcolor": "#364254"
-          },
-          {
-            "id": 1448,
-            "type": "StringConcatenate",
-            "pos": [
-              -795.9094176853481,
-              -1881.7945473752582
-            ],
-            "size": [
-              400,
-              200
-            ],
-            "flags": {
-              "collapsed": false
-            },
-            "order": 45,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "string_a",
-                "name": "string_a",
-                "type": "STRING",
-                "widget": {
-                  "name": "string_a"
-                },
-                "link": 1597
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "STRING",
-                "name": "STRING",
-                "type": "STRING",
-                "links": [
-                  1592
-                ]
-              }
-            ],
-            "properties": {
-              "cnr_id": "comfy-core",
-              "ver": "0.17.0",
-              "Node name for S&R": "StringConcatenate"
-            },
-            "widgets_values": [
-              "",
-              "_BackCanny",
-              ""
-            ]
           },
           {
             "id": 297,
@@ -6432,7 +6087,7 @@
               46
             ],
             "flags": {},
-            "order": 50,
+            "order": 45,
             "mode": 0,
             "inputs": [
               {
@@ -6485,7 +6140,7 @@
               26
             ],
             "flags": {},
-            "order": 48,
+            "order": 43,
             "mode": 0,
             "inputs": [
               {
@@ -6524,7 +6179,7 @@
               26
             ],
             "flags": {},
-            "order": 49,
+            "order": 44,
             "mode": 0,
             "inputs": [
               {
@@ -6563,7 +6218,7 @@
               46
             ],
             "flags": {},
-            "order": 51,
+            "order": 46,
             "mode": 0,
             "inputs": [
               {
@@ -6616,7 +6271,7 @@
               86
             ],
             "flags": {},
-            "order": 26,
+            "order": 24,
             "mode": 0,
             "inputs": [
               {
@@ -6660,101 +6315,6 @@
             "widgets_values": []
           },
           {
-            "id": 1477,
-            "type": "Trellis2Continue",
-            "pos": [
-              2139.382368013818,
-              -490.04044321477
-            ],
-            "size": [
-              161.33359375,
-              46
-            ],
-            "flags": {},
-            "order": 52,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "input_1",
-                "name": "input_1",
-                "type": "*",
-                "link": 1713
-              },
-              {
-                "localized_name": "input_2",
-                "name": "input_2",
-                "type": "*",
-                "link": 1714
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "output_1",
-                "name": "output_1",
-                "type": "*",
-                "links": [
-                  1715
-                ]
-              },
-              {
-                "localized_name": "output_2",
-                "name": "output_2",
-                "type": "*",
-                "links": [
-                  1716
-                ]
-              }
-            ],
-            "properties": {
-              "aux_id": "visualbruno/ComfyUI-Trellis2",
-              "ver": "3bceb25d1c232e7ab8536e462e21d1ed451be977",
-              "Node name for S&R": "Trellis2Continue"
-            },
-            "widgets_values": []
-          },
-          {
-            "id": 369,
-            "type": "SaveImage",
-            "pos": [
-              2047.6028391128737,
-              -225.99622101583702
-            ],
-            "size": [
-              270,
-              58
-            ],
-            "flags": {
-              "collapsed": true
-            },
-            "order": 22,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "images",
-                "name": "images",
-                "type": "IMAGE",
-                "link": 842
-              },
-              {
-                "localized_name": "filename_prefix",
-                "name": "filename_prefix",
-                "type": "STRING",
-                "widget": {
-                  "name": "filename_prefix"
-                },
-                "link": 575
-              }
-            ],
-            "outputs": [],
-            "properties": {
-              "cnr_id": "comfy-core",
-              "ver": "0.16.4"
-            },
-            "widgets_values": [
-              "ComfyUI"
-            ]
-          },
-          {
             "id": 496,
             "type": "ImageFromBatch",
             "pos": [
@@ -6768,7 +6328,7 @@
             "flags": {
               "collapsed": true
             },
-            "order": 28,
+            "order": 26,
             "mode": 0,
             "inputs": [
               {
@@ -6784,8 +6344,8 @@
                 "name": "IMAGE",
                 "type": "IMAGE",
                 "links": [
-                  836,
-                  1713
+                  1918,
+                  1922
                 ]
               }
             ],
@@ -6895,7 +6455,7 @@
               60
             ],
             "flags": {},
-            "order": 53,
+            "order": 47,
             "mode": 0,
             "inputs": [
               {
@@ -6933,7 +6493,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 54,
+            "order": 48,
             "mode": 0,
             "inputs": [
               {
@@ -6988,7 +6548,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 55,
+            "order": 49,
             "mode": 0,
             "inputs": [
               {
@@ -7129,7 +6689,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 56,
+            "order": 50,
             "mode": 0,
             "inputs": [
               {
@@ -7182,7 +6742,7 @@
               239.91270427521232
             ],
             "flags": {},
-            "order": 39,
+            "order": 35,
             "mode": 0,
             "inputs": [
               {
@@ -7262,7 +6822,7 @@
               168
             ],
             "flags": {},
-            "order": 40,
+            "order": 36,
             "mode": 0,
             "inputs": [
               {
@@ -7343,7 +6903,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 58,
+            "order": 52,
             "mode": 0,
             "inputs": [
               {
@@ -7398,7 +6958,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 59,
+            "order": 53,
             "mode": 0,
             "inputs": [
               {
@@ -7490,7 +7050,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 57,
+            "order": 51,
             "mode": 0,
             "inputs": [
               {
@@ -7545,7 +7105,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 61,
+            "order": 55,
             "mode": 0,
             "inputs": [
               {
@@ -7600,7 +7160,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 63,
+            "order": 57,
             "mode": 0,
             "inputs": [
               {
@@ -7655,7 +7215,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 62,
+            "order": 56,
             "mode": 0,
             "inputs": [
               {
@@ -7708,7 +7268,7 @@
               239.91270427521232
             ],
             "flags": {},
-            "order": 42,
+            "order": 38,
             "mode": 0,
             "inputs": [
               {
@@ -7788,7 +7348,7 @@
               168
             ],
             "flags": {},
-            "order": 43,
+            "order": 39,
             "mode": 0,
             "inputs": [
               {
@@ -7869,7 +7429,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 64,
+            "order": 58,
             "mode": 0,
             "inputs": [
               {
@@ -7924,7 +7484,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 65,
+            "order": 59,
             "mode": 0,
             "inputs": [
               {
@@ -7977,7 +7537,7 @@
               60
             ],
             "flags": {},
-            "order": 25,
+            "order": 23,
             "mode": 0,
             "inputs": [
               {
@@ -8012,49 +7572,6 @@
             }
           },
           {
-            "id": 1450,
-            "type": "Canny",
-            "pos": [
-              -679.68475361583,
-              -1602.9487977730457
-            ],
-            "size": [
-              270,
-              82
-            ],
-            "flags": {},
-            "order": 46,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "image",
-                "name": "image",
-                "type": "IMAGE",
-                "link": 1729
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "IMAGE",
-                "name": "IMAGE",
-                "type": "IMAGE",
-                "links": [
-                  1591,
-                  1792
-                ]
-              }
-            ],
-            "properties": {
-              "cnr_id": "comfy-core",
-              "ver": "0.17.0",
-              "Node name for S&R": "Canny"
-            },
-            "widgets_values": [
-              0.01,
-              0.2
-            ]
-          },
-          {
             "id": 1504,
             "type": "VAEEncode",
             "pos": [
@@ -8068,7 +7585,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 60,
+            "order": 54,
             "mode": 0,
             "inputs": [
               {
@@ -8108,99 +7625,6 @@
               "secondTabWidth": 65
             },
             "widgets_values": []
-          },
-          {
-            "id": 1411,
-            "type": "Canny",
-            "pos": [
-              -560.2093933640518,
-              -2858.6203906287415
-            ],
-            "size": [
-              270,
-              82
-            ],
-            "flags": {
-              "collapsed": true
-            },
-            "order": 37,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "image",
-                "name": "image",
-                "type": "IMAGE",
-                "link": 1552
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "IMAGE",
-                "name": "IMAGE",
-                "type": "IMAGE",
-                "links": [
-                  1546,
-                  1770
-                ]
-              }
-            ],
-            "properties": {
-              "cnr_id": "comfy-core",
-              "ver": "0.17.0",
-              "Node name for S&R": "Canny"
-            },
-            "widgets_values": [
-              0.01,
-              0.2
-            ]
-          },
-          {
-            "id": 1410,
-            "type": "StringConcatenate",
-            "pos": [
-              -542.3148951019465,
-              -2913.3548011305047
-            ],
-            "size": [
-              400,
-              200
-            ],
-            "flags": {
-              "collapsed": true
-            },
-            "order": 36,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "string_a",
-                "name": "string_a",
-                "type": "STRING",
-                "widget": {
-                  "name": "string_a"
-                },
-                "link": 1550
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "STRING",
-                "name": "STRING",
-                "type": "STRING",
-                "links": [
-                  1551
-                ]
-              }
-            ],
-            "properties": {
-              "cnr_id": "comfy-core",
-              "ver": "0.17.0",
-              "Node name for S&R": "StringConcatenate"
-            },
-            "widgets_values": [
-              "",
-              "_FrontCanny",
-              ""
-            ]
           },
           {
             "id": 1419,
@@ -8599,6 +8023,563 @@
             "widgets_values": [
               "qwen_image_vae.safetensors"
             ]
+          },
+          {
+            "id": 1583,
+            "type": "Trellis2SaveImage",
+            "pos": [
+              1900.8722968891655,
+              -793.8219973598414
+            ],
+            "size": [
+              270,
+              82
+            ],
+            "flags": {},
+            "order": 60,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "images",
+                "name": "images",
+                "type": "IMAGE",
+                "link": 1918
+              },
+              {
+                "localized_name": "filename_prefix",
+                "name": "filename_prefix",
+                "type": "STRING",
+                "widget": {
+                  "name": "filename_prefix"
+                },
+                "link": 1919
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "images_path",
+                "name": "images_path",
+                "type": "STRING",
+                "links": [
+                  1924
+                ]
+              }
+            ],
+            "properties": {
+              "aux_id": "visualbruno/ComfyUI-Trellis2",
+              "ver": "0afaab3723ed18c15303f44c7aaea1bc8df61268",
+              "Node name for S&R": "Trellis2SaveImage"
+            },
+            "widgets_values": [
+              "ComfyUI",
+              1
+            ]
+          },
+          {
+            "id": 1585,
+            "type": "Trellis2Continue4",
+            "pos": [
+              2276.2213947895552,
+              -489.7086517177516
+            ],
+            "size": [
+              174.3150390625,
+              86
+            ],
+            "flags": {},
+            "order": 62,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "input_1",
+                "name": "input_1",
+                "type": "*",
+                "link": 1922
+              },
+              {
+                "localized_name": "input_2",
+                "name": "input_2",
+                "type": "*",
+                "link": 1923
+              },
+              {
+                "localized_name": "input_3",
+                "name": "input_3",
+                "type": "*",
+                "link": 1924
+              },
+              {
+                "localized_name": "input_4",
+                "name": "input_4",
+                "type": "*",
+                "link": 1925
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "output_1",
+                "name": "output_1",
+                "type": "*",
+                "links": [
+                  1926
+                ]
+              },
+              {
+                "localized_name": "output_2",
+                "name": "output_2",
+                "type": "*",
+                "links": [
+                  1927
+                ]
+              },
+              {
+                "localized_name": "output_3",
+                "name": "output_3",
+                "type": "*",
+                "links": null
+              },
+              {
+                "localized_name": "output_4",
+                "name": "output_4",
+                "type": "*",
+                "links": null
+              }
+            ],
+            "properties": {
+              "aux_id": "visualbruno/ComfyUI-Trellis2",
+              "ver": "0afaab3723ed18c15303f44c7aaea1bc8df61268",
+              "Node name for S&R": "Trellis2Continue4"
+            }
+          },
+          {
+            "id": 1035,
+            "type": "StringConcatenate",
+            "pos": [
+              -858.3171881815025,
+              3.5551018159251737
+            ],
+            "size": [
+              400,
+              200
+            ],
+            "flags": {
+              "collapsed": true
+            },
+            "order": 28,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "string_a",
+                "name": "string_a",
+                "type": "STRING",
+                "widget": {
+                  "name": "string_a"
+                },
+                "link": 1204
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "STRING",
+                "name": "STRING",
+                "type": "STRING",
+                "links": [
+                  1929
+                ]
+              }
+            ],
+            "properties": {
+              "cnr_id": "comfy-core",
+              "ver": "0.16.4",
+              "Node name for S&R": "StringConcatenate"
+            },
+            "widgets_values": [
+              "",
+              "_Ortho",
+              ""
+            ]
+          },
+          {
+            "id": 1448,
+            "type": "StringConcatenate",
+            "pos": [
+              -795.9094176853481,
+              -1881.7945473752582
+            ],
+            "size": [
+              400,
+              200
+            ],
+            "flags": {
+              "collapsed": false
+            },
+            "order": 40,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "string_a",
+                "name": "string_a",
+                "type": "STRING",
+                "widget": {
+                  "name": "string_a"
+                },
+                "link": 1597
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "STRING",
+                "name": "STRING",
+                "type": "STRING",
+                "links": [
+                  1930
+                ]
+              }
+            ],
+            "properties": {
+              "cnr_id": "comfy-core",
+              "ver": "0.17.0",
+              "Node name for S&R": "StringConcatenate"
+            },
+            "widgets_values": [
+              "",
+              "_BackCanny",
+              ""
+            ]
+          },
+          {
+            "id": 1450,
+            "type": "Canny",
+            "pos": [
+              -679.68475361583,
+              -1602.9487977730457
+            ],
+            "size": [
+              270,
+              82
+            ],
+            "flags": {},
+            "order": 41,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "image",
+                "name": "image",
+                "type": "IMAGE",
+                "link": 1729
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "IMAGE",
+                "name": "IMAGE",
+                "type": "IMAGE",
+                "links": [
+                  1792,
+                  1931
+                ]
+              }
+            ],
+            "properties": {
+              "cnr_id": "comfy-core",
+              "ver": "0.17.0",
+              "Node name for S&R": "Canny"
+            },
+            "widgets_values": [
+              0.01,
+              0.2
+            ]
+          },
+          {
+            "id": 1587,
+            "type": "Trellis2SaveImage",
+            "pos": [
+              -367.63671229258625,
+              -1540.8050155239935
+            ],
+            "size": [
+              270,
+              82
+            ],
+            "flags": {},
+            "order": 64,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "images",
+                "name": "images",
+                "type": "IMAGE",
+                "link": 1931
+              },
+              {
+                "localized_name": "filename_prefix",
+                "name": "filename_prefix",
+                "type": "STRING",
+                "widget": {
+                  "name": "filename_prefix"
+                },
+                "link": 1930
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "images_path",
+                "name": "images_path",
+                "type": "STRING",
+                "links": null
+              }
+            ],
+            "properties": {
+              "aux_id": "visualbruno/ComfyUI-Trellis2",
+              "ver": "0afaab3723ed18c15303f44c7aaea1bc8df61268",
+              "Node name for S&R": "Trellis2SaveImage"
+            },
+            "widgets_values": [
+              "ComfyUI",
+              1
+            ]
+          },
+          {
+            "id": 1586,
+            "type": "Trellis2SaveImage",
+            "pos": [
+              -422.6950504328272,
+              -39.70301563162156
+            ],
+            "size": [
+              270,
+              82
+            ],
+            "flags": {},
+            "order": 63,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "images",
+                "name": "images",
+                "type": "IMAGE",
+                "link": 1928
+              },
+              {
+                "localized_name": "filename_prefix",
+                "name": "filename_prefix",
+                "type": "STRING",
+                "widget": {
+                  "name": "filename_prefix"
+                },
+                "link": 1929
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "images_path",
+                "name": "images_path",
+                "type": "STRING",
+                "links": null
+              }
+            ],
+            "properties": {
+              "aux_id": "visualbruno/ComfyUI-Trellis2",
+              "ver": "0afaab3723ed18c15303f44c7aaea1bc8df61268",
+              "Node name for S&R": "Trellis2SaveImage"
+            },
+            "widgets_values": [
+              "ComfyUI",
+              1
+            ]
+          },
+          {
+            "id": 1584,
+            "type": "Trellis2SaveImage",
+            "pos": [
+              1952.4987666157265,
+              -256.5820342861108
+            ],
+            "size": [
+              270,
+              82
+            ],
+            "flags": {},
+            "order": 61,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "images",
+                "name": "images",
+                "type": "IMAGE",
+                "link": 1920
+              },
+              {
+                "localized_name": "filename_prefix",
+                "name": "filename_prefix",
+                "type": "STRING",
+                "widget": {
+                  "name": "filename_prefix"
+                },
+                "link": 1921
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "images_path",
+                "name": "images_path",
+                "type": "STRING",
+                "links": [
+                  1925
+                ]
+              }
+            ],
+            "properties": {
+              "aux_id": "visualbruno/ComfyUI-Trellis2",
+              "ver": "0afaab3723ed18c15303f44c7aaea1bc8df61268",
+              "Node name for S&R": "Trellis2SaveImage"
+            },
+            "widgets_values": [
+              "ComfyUI",
+              1
+            ]
+          },
+          {
+            "id": 1410,
+            "type": "StringConcatenate",
+            "pos": [
+              -562.9209187170035,
+              -2933.960824745562
+            ],
+            "size": [
+              400,
+              200
+            ],
+            "flags": {
+              "collapsed": true
+            },
+            "order": 33,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "string_a",
+                "name": "string_a",
+                "type": "STRING",
+                "widget": {
+                  "name": "string_a"
+                },
+                "link": 1550
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "STRING",
+                "name": "STRING",
+                "type": "STRING",
+                "links": [
+                  1933
+                ]
+              }
+            ],
+            "properties": {
+              "cnr_id": "comfy-core",
+              "ver": "0.17.0",
+              "Node name for S&R": "StringConcatenate"
+            },
+            "widgets_values": [
+              "",
+              "_FrontCanny",
+              ""
+            ]
+          },
+          {
+            "id": 1411,
+            "type": "Canny",
+            "pos": [
+              -579.6033697489951,
+              -2821.6506751635425
+            ],
+            "size": [
+              270,
+              82
+            ],
+            "flags": {
+              "collapsed": true
+            },
+            "order": 34,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "image",
+                "name": "image",
+                "type": "IMAGE",
+                "link": 1552
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "IMAGE",
+                "name": "IMAGE",
+                "type": "IMAGE",
+                "links": [
+                  1770,
+                  1932
+                ]
+              }
+            ],
+            "properties": {
+              "cnr_id": "comfy-core",
+              "ver": "0.17.0",
+              "Node name for S&R": "Canny"
+            },
+            "widgets_values": [
+              0.01,
+              0.2
+            ]
+          },
+          {
+            "id": 1588,
+            "type": "Trellis2SaveImage",
+            "pos": [
+              -351.83288291846054,
+              -2872.5959810398804
+            ],
+            "size": [
+              270,
+              82
+            ],
+            "flags": {},
+            "order": 65,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "images",
+                "name": "images",
+                "type": "IMAGE",
+                "link": 1932
+              },
+              {
+                "localized_name": "filename_prefix",
+                "name": "filename_prefix",
+                "type": "STRING",
+                "widget": {
+                  "name": "filename_prefix"
+                },
+                "link": 1933
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "images_path",
+                "name": "images_path",
+                "type": "STRING",
+                "links": null
+              }
+            ],
+            "properties": {
+              "aux_id": "visualbruno/ComfyUI-Trellis2",
+              "ver": "0afaab3723ed18c15303f44c7aaea1bc8df61268",
+              "Node name for S&R": "Trellis2SaveImage"
+            },
+            "widgets_values": [
+              "ComfyUI",
+              1
+            ]
           }
         ],
         "groups": [
@@ -8630,22 +8611,6 @@
           }
         ],
         "links": [
-          {
-            "id": 568,
-            "origin_id": 364,
-            "origin_slot": 0,
-            "target_id": 366,
-            "target_slot": 1,
-            "type": "STRING"
-          },
-          {
-            "id": 575,
-            "origin_id": 371,
-            "origin_slot": 0,
-            "target_id": 369,
-            "target_slot": 1,
-            "type": "STRING"
-          },
           {
             "id": 546,
             "origin_id": 298,
@@ -8711,26 +8676,10 @@
             "type": "IMAGE"
           },
           {
-            "id": 836,
-            "origin_id": 496,
-            "origin_slot": 0,
-            "target_id": 366,
-            "target_slot": 0,
-            "type": "IMAGE"
-          },
-          {
             "id": 841,
             "origin_id": 494,
             "origin_slot": 0,
             "target_id": 498,
-            "target_slot": 0,
-            "type": "IMAGE"
-          },
-          {
-            "id": 842,
-            "origin_id": 498,
-            "origin_slot": 0,
-            "target_id": 369,
             "target_slot": 0,
             "type": "IMAGE"
           },
@@ -8740,14 +8689,6 @@
             "origin_slot": 0,
             "target_id": 1035,
             "target_slot": 0,
-            "type": "STRING"
-          },
-          {
-            "id": 1205,
-            "origin_id": 1035,
-            "origin_slot": 0,
-            "target_id": 1036,
-            "target_slot": 1,
             "type": "STRING"
           },
           {
@@ -8875,14 +8816,6 @@
             "origin_id": 1326,
             "origin_slot": 0,
             "target_id": 299,
-            "target_slot": 0,
-            "type": "IMAGE"
-          },
-          {
-            "id": 1513,
-            "origin_id": 1326,
-            "origin_slot": 0,
-            "target_id": 1036,
             "target_slot": 0,
             "type": "IMAGE"
           },
@@ -9039,14 +8972,6 @@
             "type": "IMAGE"
           },
           {
-            "id": 1546,
-            "origin_id": 1411,
-            "origin_slot": 0,
-            "target_id": 1413,
-            "target_slot": 0,
-            "type": "IMAGE"
-          },
-          {
             "id": 1549,
             "origin_id": 426,
             "origin_slot": 0,
@@ -9060,14 +8985,6 @@
             "origin_slot": 0,
             "target_id": 1410,
             "target_slot": 0,
-            "type": "STRING"
-          },
-          {
-            "id": 1551,
-            "origin_id": 1410,
-            "origin_slot": 0,
-            "target_id": 1413,
-            "target_slot": 1,
             "type": "STRING"
           },
           {
@@ -9101,22 +9018,6 @@
             "target_id": 1443,
             "target_slot": 3,
             "type": "LATENT"
-          },
-          {
-            "id": 1591,
-            "origin_id": 1450,
-            "origin_slot": 0,
-            "target_id": 1447,
-            "target_slot": 0,
-            "type": "IMAGE"
-          },
-          {
-            "id": 1592,
-            "origin_id": 1448,
-            "origin_slot": 0,
-            "target_id": 1447,
-            "target_slot": 1,
-            "type": "STRING"
           },
           {
             "id": 1596,
@@ -9221,38 +9122,6 @@
             "target_id": 492,
             "target_slot": 1,
             "type": "IMAGE"
-          },
-          {
-            "id": 1713,
-            "origin_id": 496,
-            "origin_slot": 0,
-            "target_id": 1477,
-            "target_slot": 0,
-            "type": "IMAGE"
-          },
-          {
-            "id": 1714,
-            "origin_id": 498,
-            "origin_slot": 0,
-            "target_id": 1477,
-            "target_slot": 1,
-            "type": "IMAGE"
-          },
-          {
-            "id": 1715,
-            "origin_id": 1477,
-            "origin_slot": 0,
-            "target_id": -20,
-            "target_slot": 0,
-            "type": "*"
-          },
-          {
-            "id": 1716,
-            "origin_id": 1477,
-            "origin_slot": 1,
-            "target_id": -20,
-            "target_slot": 1,
-            "type": "*"
           },
           {
             "id": 1729,
@@ -9565,6 +9434,134 @@
             "target_id": 1451,
             "target_slot": 1,
             "type": "VAE"
+          },
+          {
+            "id": 1918,
+            "origin_id": 496,
+            "origin_slot": 0,
+            "target_id": 1583,
+            "target_slot": 0,
+            "type": "IMAGE"
+          },
+          {
+            "id": 1919,
+            "origin_id": 364,
+            "origin_slot": 0,
+            "target_id": 1583,
+            "target_slot": 1,
+            "type": "STRING"
+          },
+          {
+            "id": 1920,
+            "origin_id": 498,
+            "origin_slot": 0,
+            "target_id": 1584,
+            "target_slot": 0,
+            "type": "IMAGE"
+          },
+          {
+            "id": 1921,
+            "origin_id": 371,
+            "origin_slot": 0,
+            "target_id": 1584,
+            "target_slot": 1,
+            "type": "STRING"
+          },
+          {
+            "id": 1922,
+            "origin_id": 496,
+            "origin_slot": 0,
+            "target_id": 1585,
+            "target_slot": 0,
+            "type": "IMAGE"
+          },
+          {
+            "id": 1923,
+            "origin_id": 498,
+            "origin_slot": 0,
+            "target_id": 1585,
+            "target_slot": 1,
+            "type": "IMAGE"
+          },
+          {
+            "id": 1924,
+            "origin_id": 1583,
+            "origin_slot": 0,
+            "target_id": 1585,
+            "target_slot": 2,
+            "type": "STRING"
+          },
+          {
+            "id": 1925,
+            "origin_id": 1584,
+            "origin_slot": 0,
+            "target_id": 1585,
+            "target_slot": 3,
+            "type": "STRING"
+          },
+          {
+            "id": 1926,
+            "origin_id": 1585,
+            "origin_slot": 0,
+            "target_id": -20,
+            "target_slot": 0,
+            "type": "*"
+          },
+          {
+            "id": 1927,
+            "origin_id": 1585,
+            "origin_slot": 1,
+            "target_id": -20,
+            "target_slot": 1,
+            "type": "*"
+          },
+          {
+            "id": 1928,
+            "origin_id": 1326,
+            "origin_slot": 0,
+            "target_id": 1586,
+            "target_slot": 0,
+            "type": "IMAGE"
+          },
+          {
+            "id": 1929,
+            "origin_id": 1035,
+            "origin_slot": 0,
+            "target_id": 1586,
+            "target_slot": 1,
+            "type": "STRING"
+          },
+          {
+            "id": 1930,
+            "origin_id": 1448,
+            "origin_slot": 0,
+            "target_id": 1587,
+            "target_slot": 1,
+            "type": "STRING"
+          },
+          {
+            "id": 1931,
+            "origin_id": 1450,
+            "origin_slot": 0,
+            "target_id": 1587,
+            "target_slot": 0,
+            "type": "IMAGE"
+          },
+          {
+            "id": 1932,
+            "origin_id": 1411,
+            "origin_slot": 0,
+            "target_id": 1588,
+            "target_slot": 0,
+            "type": "IMAGE"
+          },
+          {
+            "id": 1933,
+            "origin_id": 1410,
+            "origin_slot": 0,
+            "target_id": 1588,
+            "target_slot": 1,
+            "type": "STRING"
           }
         ],
         "extra": {
@@ -9576,8 +9573,8 @@
         "version": 1,
         "state": {
           "lastGroupId": 31,
-          "lastNodeId": 1578,
-          "lastLinkId": 1898,
+          "lastNodeId": 1588,
+          "lastLinkId": 1933,
           "lastRerouteId": 0
         },
         "revision": 0,
@@ -9586,8 +9583,8 @@
         "inputNode": {
           "id": -10,
           "bounding": [
-            -2681.18281532774,
-            -1902.5700046856837,
+            -3817.1162130023004,
+            -1898.1700046856838,
             120,
             80
           ]
@@ -9607,12 +9604,12 @@
             "name": "image",
             "type": "IMAGE",
             "linkIds": [
-              1871
+              1900
             ],
             "label": "source_image",
             "pos": [
-              -2581.18281532774,
-              -1882.5700046856837
+              -3717.1162130023004,
+              -1878.1700046856838
             ]
           },
           {
@@ -9624,8 +9621,8 @@
             ],
             "label": "prefix",
             "pos": [
-              -2581.18281532774,
-              -1862.5700046856837
+              -3717.1162130023004,
+              -1858.1700046856838
             ]
           }
         ],
@@ -9637,7 +9634,7 @@
             "linkIds": [
               1898
             ],
-            "label": "source_image_transparent",
+            "label": "source_image",
             "pos": [
               1876.3953075122079,
               -2015.1527997843789
@@ -9648,7 +9645,7 @@
             "name": "IMAGE_1",
             "type": "IMAGE",
             "linkIds": [
-              1895
+              1917
             ],
             "label": "normal_image_transparent",
             "pos": [
@@ -9782,48 +9779,6 @@
             ]
           },
           {
-            "id": 1545,
-            "type": "SaveImage",
-            "pos": [
-              -582.0839503025965,
-              -1439.489024279554
-            ],
-            "size": [
-              405.0726233410379,
-              385.9304552631397
-            ],
-            "flags": {
-              "collapsed": true
-            },
-            "order": 8,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "images",
-                "name": "images",
-                "type": "IMAGE",
-                "link": null
-              },
-              {
-                "localized_name": "filename_prefix",
-                "name": "filename_prefix",
-                "type": "STRING",
-                "widget": {
-                  "name": "filename_prefix"
-                },
-                "link": 1847
-              }
-            ],
-            "outputs": [],
-            "properties": {
-              "cnr_id": "comfy-core",
-              "ver": "0.17.0"
-            },
-            "widgets_values": [
-              "CannyFront"
-            ]
-          },
-          {
             "id": 1549,
             "type": "CFGNorm",
             "pos": [
@@ -9921,7 +9876,7 @@
               168
             ],
             "flags": {},
-            "order": 13,
+            "order": 12,
             "mode": 0,
             "inputs": [
               {
@@ -10187,124 +10142,6 @@
             ]
           },
           {
-            "id": 1566,
-            "type": "Trellis2PreProcessImage",
-            "pos": [
-              -2434.357644543909,
-              -1910.6844512924836
-            ],
-            "size": [
-              281.7837890625,
-              106
-            ],
-            "flags": {},
-            "order": 16,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "image",
-                "name": "image",
-                "type": "IMAGE",
-                "link": 1871
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "image",
-                "name": "image",
-                "type": "IMAGE",
-                "links": [
-                  1869
-                ]
-              }
-            ],
-            "properties": {
-              "aux_id": "visualbruno/ComfyUI-Trellis2",
-              "ver": "e8098f5641702e74133c2dea0b45a13a3ab19985",
-              "Node name for S&R": "Trellis2PreProcessImage"
-            },
-            "widgets_values": [
-              10,
-              false,
-              1024
-            ]
-          },
-          {
-            "id": 1567,
-            "type": "ImageResizeKJv2",
-            "pos": [
-              -2083.8581267132977,
-              -1882.8289862537963
-            ],
-            "size": [
-              270,
-              360
-            ],
-            "flags": {
-              "collapsed": true
-            },
-            "order": 17,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "image",
-                "name": "image",
-                "type": "IMAGE",
-                "link": 1869
-              },
-              {
-                "localized_name": "mask",
-                "name": "mask",
-                "shape": 7,
-                "type": "MASK",
-                "link": null
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "IMAGE",
-                "name": "IMAGE",
-                "type": "IMAGE",
-                "links": [
-                  1870
-                ]
-              },
-              {
-                "localized_name": "width",
-                "name": "width",
-                "type": "INT",
-                "links": null
-              },
-              {
-                "localized_name": "height",
-                "name": "height",
-                "type": "INT",
-                "links": null
-              },
-              {
-                "localized_name": "mask",
-                "name": "mask",
-                "type": "MASK",
-                "links": null
-              }
-            ],
-            "properties": {
-              "cnr_id": "comfyui-kjnodes",
-              "ver": "1.1.7",
-              "Node name for S&R": "ImageResizeKJv2"
-            },
-            "widgets_values": [
-              1024,
-              1024,
-              "lanczos",
-              "stretch",
-              "0, 0, 0",
-              "center",
-              2,
-              "cpu"
-            ]
-          },
-          {
             "id": 1569,
             "type": "ImageResizeKJv2",
             "pos": [
@@ -10316,14 +10153,14 @@
               288.0639521984865
             ],
             "flags": {},
-            "order": 19,
+            "order": 16,
             "mode": 0,
             "inputs": [
               {
                 "localized_name": "image",
                 "name": "image",
                 "type": "IMAGE",
-                "link": 1873
+                "link": 1903
               },
               {
                 "localized_name": "mask",
@@ -10393,7 +10230,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 14,
+            "order": 13,
             "mode": 0,
             "inputs": [
               {
@@ -10448,7 +10285,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 11,
+            "order": 10,
             "mode": 0,
             "inputs": [
               {
@@ -10503,7 +10340,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 10,
+            "order": 9,
             "mode": 0,
             "inputs": [
               {
@@ -10556,7 +10393,7 @@
               239.91270427521232
             ],
             "flags": {},
-            "order": 12,
+            "order": 11,
             "mode": 0,
             "inputs": [
               {
@@ -10636,7 +10473,7 @@
               150
             ],
             "flags": {},
-            "order": 9,
+            "order": 8,
             "mode": 0,
             "inputs": [
               {
@@ -10676,54 +10513,6 @@
             ]
           },
           {
-            "id": 1558,
-            "type": "StringConcatenate",
-            "pos": [
-              -1134.3443415931074,
-              -1471.550031500187
-            ],
-            "size": [
-              400,
-              200
-            ],
-            "flags": {
-              "collapsed": false
-            },
-            "order": 15,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "string_a",
-                "name": "string_a",
-                "type": "STRING",
-                "widget": {
-                  "name": "string_a"
-                },
-                "link": 1877
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "STRING",
-                "name": "STRING",
-                "type": "STRING",
-                "links": [
-                  1847
-                ]
-              }
-            ],
-            "properties": {
-              "cnr_id": "comfy-core",
-              "ver": "0.17.0",
-              "Node name for S&R": "StringConcatenate"
-            },
-            "widgets_values": [
-              "",
-              "_SourceImage",
-              ""
-            ]
-          },
-          {
             "id": 1570,
             "type": "Reroute",
             "pos": [
@@ -10735,7 +10524,7 @@
               60
             ],
             "flags": {},
-            "order": 20,
+            "order": 17,
             "mode": 0,
             "inputs": [
               {
@@ -10760,11 +10549,159 @@
             }
           },
           {
-            "id": 1572,
+            "id": 1577,
+            "type": "UnloadAllModels",
+            "pos": [
+              1447.9470179112147,
+              -2042.9135859133257
+            ],
+            "size": [
+              151.941015625,
+              26
+            ],
+            "flags": {},
+            "order": 20,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "value",
+                "name": "value",
+                "type": "*",
+                "link": 1916
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "*",
+                "name": "*",
+                "type": "*",
+                "links": [
+                  1897
+                ]
+              }
+            ],
+            "properties": {
+              "cnr_id": "comfyui-unload-model",
+              "ver": "ac5ffb4ed05546545ce7cf38e7b69b5152714eed",
+              "Node name for S&R": "UnloadAllModels"
+            },
+            "widgets_values": []
+          },
+          {
+            "id": 1566,
+            "type": "Trellis2PreProcessImage",
+            "pos": [
+              -1870.0791130251707,
+              -2030.3378240287504
+            ],
+            "size": [
+              281.7837890625,
+              106
+            ],
+            "flags": {},
+            "order": 15,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "image",
+                "name": "image",
+                "type": "IMAGE",
+                "link": 1901
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "image",
+                "name": "image",
+                "type": "IMAGE",
+                "links": [
+                  1903,
+                  1912
+                ]
+              }
+            ],
+            "properties": {
+              "aux_id": "visualbruno/ComfyUI-Trellis2",
+              "ver": "e8098f5641702e74133c2dea0b45a13a3ab19985",
+              "Node name for S&R": "Trellis2PreProcessImage"
+            },
+            "widgets_values": [
+              10,
+              false,
+              1024
+            ]
+          },
+          {
+            "id": 1579,
+            "type": "RMBG",
+            "pos": [
+              -2391.9355550426676,
+              -2025.8660535759227
+            ],
+            "size": [
+              320,
+              320.546875
+            ],
+            "flags": {},
+            "order": 22,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "Image",
+                "name": "image",
+                "type": "IMAGE",
+                "link": 1900
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "IMAGE",
+                "name": "IMAGE",
+                "type": "IMAGE",
+                "links": [
+                  1901,
+                  1908
+                ]
+              },
+              {
+                "localized_name": "MASK",
+                "name": "MASK",
+                "type": "MASK",
+                "links": null
+              },
+              {
+                "localized_name": "MASK IMAGE",
+                "name": "MASK_IMAGE",
+                "type": "IMAGE",
+                "links": null
+              }
+            ],
+            "properties": {
+              "cnr_id": "comfyui-rmbg",
+              "ver": "2.3.2",
+              "Node name for S&R": "RMBG",
+              "widget_ue_connectable": {}
+            },
+            "widgets_values": [
+              "RMBG-2.0",
+              1,
+              1024,
+              0,
+              0,
+              false,
+              false,
+              "Alpha",
+              "#000000"
+            ],
+            "color": "#222e40",
+            "bgcolor": "#364254"
+          },
+          {
+            "id": 1558,
             "type": "StringConcatenate",
             "pos": [
-              671.9940764559894,
-              -1444.7788299024298
+              -1905.0159643022744,
+              -1418.6616489185215
             ],
             "size": [
               400,
@@ -10773,7 +10710,298 @@
             "flags": {
               "collapsed": false
             },
-            "order": 22,
+            "order": 14,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "string_a",
+                "name": "string_a",
+                "type": "STRING",
+                "widget": {
+                  "name": "string_a"
+                },
+                "link": 1877
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "STRING",
+                "name": "STRING",
+                "type": "STRING",
+                "links": [
+                  1909
+                ]
+              }
+            ],
+            "properties": {
+              "cnr_id": "comfy-core",
+              "ver": "0.17.0",
+              "Node name for S&R": "StringConcatenate"
+            },
+            "widgets_values": [
+              "",
+              "_SourceImage",
+              ""
+            ]
+          },
+          {
+            "id": 1571,
+            "type": "RMBG",
+            "pos": [
+              801.1227972789899,
+              -2357.1958642043965
+            ],
+            "size": [
+              320,
+              320.546875
+            ],
+            "flags": {},
+            "order": 18,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "Image",
+                "name": "image",
+                "type": "IMAGE",
+                "link": 1881
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "IMAGE",
+                "name": "IMAGE",
+                "type": "IMAGE",
+                "links": [
+                  1910,
+                  1913
+                ]
+              },
+              {
+                "localized_name": "MASK",
+                "name": "MASK",
+                "type": "MASK",
+                "links": null
+              },
+              {
+                "localized_name": "MASK IMAGE",
+                "name": "MASK_IMAGE",
+                "type": "IMAGE",
+                "links": null
+              }
+            ],
+            "properties": {
+              "cnr_id": "comfyui-rmbg",
+              "ver": "2.3.2",
+              "Node name for S&R": "RMBG",
+              "widget_ue_connectable": {}
+            },
+            "widgets_values": [
+              "RMBG-2.0",
+              1,
+              1024,
+              0,
+              0,
+              false,
+              false,
+              "Alpha",
+              "#000000"
+            ],
+            "color": "#222e40",
+            "bgcolor": "#364254"
+          },
+          {
+            "id": 1580,
+            "type": "Trellis2SaveImage",
+            "pos": [
+              -1393.5546159526318,
+              -1449.641997359841
+            ],
+            "size": [
+              270,
+              82
+            ],
+            "flags": {},
+            "order": 23,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "images",
+                "name": "images",
+                "type": "IMAGE",
+                "link": 1908
+              },
+              {
+                "localized_name": "filename_prefix",
+                "name": "filename_prefix",
+                "type": "STRING",
+                "widget": {
+                  "name": "filename_prefix"
+                },
+                "link": 1909
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "images_path",
+                "name": "images_path",
+                "type": "STRING",
+                "links": [
+                  1914
+                ]
+              }
+            ],
+            "properties": {
+              "aux_id": "visualbruno/ComfyUI-Trellis2",
+              "ver": "0afaab3723ed18c15303f44c7aaea1bc8df61268",
+              "Node name for S&R": "Trellis2SaveImage"
+            },
+            "widgets_values": [
+              "ComfyUI",
+              1
+            ]
+          },
+          {
+            "id": 1582,
+            "type": "Trellis2Continue4",
+            "pos": [
+              1242.7251622931112,
+              -1969.5284258048368
+            ],
+            "size": [
+              174.3150390625,
+              86
+            ],
+            "flags": {},
+            "order": 25,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "input_1",
+                "name": "input_1",
+                "type": "*",
+                "link": 1912
+              },
+              {
+                "localized_name": "input_2",
+                "name": "input_2",
+                "type": "*",
+                "link": 1913
+              },
+              {
+                "localized_name": "input_3",
+                "name": "input_3",
+                "type": "*",
+                "link": 1914
+              },
+              {
+                "localized_name": "input_4",
+                "name": "input_4",
+                "type": "*",
+                "link": 1915
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "output_1",
+                "name": "output_1",
+                "type": "*",
+                "links": [
+                  1916
+                ]
+              },
+              {
+                "localized_name": "output_2",
+                "name": "output_2",
+                "type": "*",
+                "links": [
+                  1917
+                ]
+              },
+              {
+                "localized_name": "output_3",
+                "name": "output_3",
+                "type": "*",
+                "links": null
+              },
+              {
+                "localized_name": "output_4",
+                "name": "output_4",
+                "type": "*",
+                "links": null
+              }
+            ],
+            "properties": {
+              "aux_id": "visualbruno/ComfyUI-Trellis2",
+              "ver": "0afaab3723ed18c15303f44c7aaea1bc8df61268",
+              "Node name for S&R": "Trellis2Continue4"
+            }
+          },
+          {
+            "id": 1581,
+            "type": "Trellis2SaveImage",
+            "pos": [
+              1221.4525526830735,
+              -1497.1011446614482
+            ],
+            "size": [
+              270,
+              82
+            ],
+            "flags": {},
+            "order": 24,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "images",
+                "name": "images",
+                "type": "IMAGE",
+                "link": 1910
+              },
+              {
+                "localized_name": "filename_prefix",
+                "name": "filename_prefix",
+                "type": "STRING",
+                "widget": {
+                  "name": "filename_prefix"
+                },
+                "link": 1911
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "images_path",
+                "name": "images_path",
+                "type": "STRING",
+                "links": [
+                  1915
+                ]
+              }
+            ],
+            "properties": {
+              "aux_id": "visualbruno/ComfyUI-Trellis2",
+              "ver": "0afaab3723ed18c15303f44c7aaea1bc8df61268",
+              "Node name for S&R": "Trellis2SaveImage"
+            },
+            "widgets_values": [
+              "ComfyUI",
+              1
+            ]
+          },
+          {
+            "id": 1572,
+            "type": "StringConcatenate",
+            "pos": [
+              714.1324446088805,
+              -1512.6780555515054
+            ],
+            "size": [
+              400,
+              200
+            ],
+            "flags": {
+              "collapsed": false
+            },
+            "order": 19,
             "mode": 0,
             "inputs": [
               {
@@ -10792,7 +11020,7 @@
                 "name": "STRING",
                 "type": "STRING",
                 "links": [
-                  1882
+                  1911
                 ]
               }
             ],
@@ -10808,243 +11036,18 @@
             ]
           },
           {
-            "id": 1573,
-            "type": "SaveImage",
-            "pos": [
-              1204.7674156867522,
-              -1424.4102442220492
-            ],
-            "size": [
-              405.0726233410379,
-              385.9304552631397
-            ],
-            "flags": {
-              "collapsed": true
-            },
-            "order": 23,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "images",
-                "name": "images",
-                "type": "IMAGE",
-                "link": 1884
-              },
-              {
-                "localized_name": "filename_prefix",
-                "name": "filename_prefix",
-                "type": "STRING",
-                "widget": {
-                  "name": "filename_prefix"
-                },
-                "link": 1882
-              }
-            ],
-            "outputs": [],
-            "properties": {
-              "cnr_id": "comfy-core",
-              "ver": "0.17.0"
-            },
-            "widgets_values": [
-              "CannyFront"
-            ]
-          },
-          {
-            "id": 1571,
-            "type": "RMBG",
-            "pos": [
-              801.1227972789899,
-              -2357.1958642043965
-            ],
-            "size": [
-              320,
-              320.546875
-            ],
-            "flags": {},
-            "order": 21,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "Image",
-                "name": "image",
-                "type": "IMAGE",
-                "link": 1881
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "IMAGE",
-                "name": "IMAGE",
-                "type": "IMAGE",
-                "links": [
-                  1884,
-                  1892
-                ]
-              },
-              {
-                "localized_name": "MASK",
-                "name": "MASK",
-                "type": "MASK",
-                "links": null
-              },
-              {
-                "localized_name": "MASK IMAGE",
-                "name": "MASK_IMAGE",
-                "type": "IMAGE",
-                "links": null
-              }
-            ],
-            "properties": {
-              "cnr_id": "comfyui-rmbg",
-              "ver": "2.3.2",
-              "Node name for S&R": "RMBG",
-              "widget_ue_connectable": {}
-            },
-            "widgets_values": [
-              "RMBG-2.0",
-              1,
-              1024,
-              0,
-              0,
-              false,
-              false,
-              "Alpha",
-              "#000000"
-            ],
-            "color": "#222e40",
-            "bgcolor": "#364254"
-          },
-          {
-            "id": 1568,
-            "type": "RMBG",
-            "pos": [
-              -1892.2950781311504,
-              -2029.8410306481048
-            ],
-            "size": [
-              320,
-              320.546875
-            ],
-            "flags": {},
-            "order": 18,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "Image",
-                "name": "image",
-                "type": "IMAGE",
-                "link": 1870
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "IMAGE",
-                "name": "IMAGE",
-                "type": "IMAGE",
-                "links": [
-                  1873,
-                  1893
-                ]
-              },
-              {
-                "localized_name": "MASK",
-                "name": "MASK",
-                "type": "MASK",
-                "links": null
-              },
-              {
-                "localized_name": "MASK IMAGE",
-                "name": "MASK_IMAGE",
-                "type": "IMAGE",
-                "links": null
-              }
-            ],
-            "properties": {
-              "cnr_id": "comfyui-rmbg",
-              "ver": "2.3.2",
-              "Node name for S&R": "RMBG",
-              "widget_ue_connectable": {}
-            },
-            "widgets_values": [
-              "RMBG-2.0",
-              1,
-              1024,
-              0,
-              0,
-              false,
-              false,
-              "Alpha",
-              "#000000"
-            ],
-            "color": "#222e40",
-            "bgcolor": "#364254"
-          },
-          {
-            "id": 1576,
-            "type": "Trellis2Continue",
-            "pos": [
-              1155.7472274916474,
-              -2024.4471538235941
-            ],
-            "size": [
-              161.33359375,
-              46
-            ],
-            "flags": {},
-            "order": 24,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "input_1",
-                "name": "input_1",
-                "type": "*",
-                "link": 1893
-              },
-              {
-                "localized_name": "input_2",
-                "name": "input_2",
-                "type": "*",
-                "link": 1892
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "output_1",
-                "name": "output_1",
-                "type": "*",
-                "links": [
-                  1896
-                ]
-              },
-              {
-                "localized_name": "output_2",
-                "name": "output_2",
-                "type": "*",
-                "links": [
-                  1895
-                ]
-              }
-            ],
-            "properties": {
-              "aux_id": "visualbruno/ComfyUI-Trellis2",
-              "ver": "63fe7ecf14006a8f4f2c91e7e0b1d39feaba4a74",
-              "Node name for S&R": "Trellis2Continue"
-            },
-            "widgets_values": []
-          },
-          {
             "id": 1578,
             "type": "Trellis2CudaReset",
             "pos": [
-              1585.870327139445,
-              -2049.321005307176
+              1644.461580167075,
+              -2046.46286508813
             ],
             "size": [
               177.7330078125,
               26
             ],
             "flags": {},
-            "order": 26,
+            "order": 21,
             "mode": 0,
             "inputs": [
               {
@@ -11068,45 +11071,6 @@
               "aux_id": "visualbruno/ComfyUI-Trellis2",
               "ver": "63fe7ecf14006a8f4f2c91e7e0b1d39feaba4a74",
               "Node name for S&R": "Trellis2CudaReset"
-            },
-            "widgets_values": []
-          },
-          {
-            "id": 1577,
-            "type": "UnloadAllModels",
-            "pos": [
-              1389.3557648835847,
-              -2045.771726132372
-            ],
-            "size": [
-              151.941015625,
-              26
-            ],
-            "flags": {},
-            "order": 25,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "value",
-                "name": "value",
-                "type": "*",
-                "link": 1896
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "*",
-                "name": "*",
-                "type": "*",
-                "links": [
-                  1897
-                ]
-              }
-            ],
-            "properties": {
-              "cnr_id": "comfyui-unload-model",
-              "ver": "ac5ffb4ed05546545ce7cf38e7b69b5152714eed",
-              "Node name for S&R": "UnloadAllModels"
             },
             "widgets_values": []
           }
@@ -11150,14 +11114,6 @@
             "target_id": 1544,
             "target_slot": 3,
             "type": "LATENT"
-          },
-          {
-            "id": 1847,
-            "origin_id": 1558,
-            "origin_slot": 0,
-            "target_id": 1545,
-            "target_slot": 1,
-            "type": "STRING"
           },
           {
             "id": 1848,
@@ -11264,38 +11220,6 @@
             "type": "MODEL"
           },
           {
-            "id": 1869,
-            "origin_id": 1566,
-            "origin_slot": 0,
-            "target_id": 1567,
-            "target_slot": 0,
-            "type": "IMAGE"
-          },
-          {
-            "id": 1870,
-            "origin_id": 1567,
-            "origin_slot": 0,
-            "target_id": 1568,
-            "target_slot": 0,
-            "type": "IMAGE"
-          },
-          {
-            "id": 1871,
-            "origin_id": -10,
-            "origin_slot": 0,
-            "target_id": 1566,
-            "target_slot": 0,
-            "type": "IMAGE"
-          },
-          {
-            "id": 1873,
-            "origin_id": 1568,
-            "origin_slot": 0,
-            "target_id": 1569,
-            "target_slot": 0,
-            "type": "IMAGE"
-          },
-          {
             "id": 1874,
             "origin_id": 1569,
             "origin_slot": 0,
@@ -11360,60 +11284,12 @@
             "type": "IMAGE"
           },
           {
-            "id": 1882,
-            "origin_id": 1572,
-            "origin_slot": 0,
-            "target_id": 1573,
-            "target_slot": 1,
-            "type": "STRING"
-          },
-          {
             "id": 1883,
             "origin_id": 1570,
             "origin_slot": 0,
             "target_id": 1572,
             "target_slot": 0,
             "type": "STRING"
-          },
-          {
-            "id": 1884,
-            "origin_id": 1571,
-            "origin_slot": 0,
-            "target_id": 1573,
-            "target_slot": 0,
-            "type": "IMAGE"
-          },
-          {
-            "id": 1892,
-            "origin_id": 1571,
-            "origin_slot": 0,
-            "target_id": 1576,
-            "target_slot": 1,
-            "type": "IMAGE"
-          },
-          {
-            "id": 1893,
-            "origin_id": 1568,
-            "origin_slot": 0,
-            "target_id": 1576,
-            "target_slot": 0,
-            "type": "IMAGE"
-          },
-          {
-            "id": 1895,
-            "origin_id": 1576,
-            "origin_slot": 1,
-            "target_id": -20,
-            "target_slot": 1,
-            "type": "*"
-          },
-          {
-            "id": 1896,
-            "origin_id": 1576,
-            "origin_slot": 0,
-            "target_id": 1577,
-            "target_slot": 0,
-            "type": "*"
           },
           {
             "id": 1897,
@@ -11429,6 +11305,110 @@
             "origin_slot": 0,
             "target_id": -20,
             "target_slot": 0,
+            "type": "*"
+          },
+          {
+            "id": 1900,
+            "origin_id": -10,
+            "origin_slot": 0,
+            "target_id": 1579,
+            "target_slot": 0,
+            "type": "IMAGE"
+          },
+          {
+            "id": 1901,
+            "origin_id": 1579,
+            "origin_slot": 0,
+            "target_id": 1566,
+            "target_slot": 0,
+            "type": "IMAGE"
+          },
+          {
+            "id": 1903,
+            "origin_id": 1566,
+            "origin_slot": 0,
+            "target_id": 1569,
+            "target_slot": 0,
+            "type": "IMAGE"
+          },
+          {
+            "id": 1908,
+            "origin_id": 1579,
+            "origin_slot": 0,
+            "target_id": 1580,
+            "target_slot": 0,
+            "type": "IMAGE"
+          },
+          {
+            "id": 1909,
+            "origin_id": 1558,
+            "origin_slot": 0,
+            "target_id": 1580,
+            "target_slot": 1,
+            "type": "STRING"
+          },
+          {
+            "id": 1910,
+            "origin_id": 1571,
+            "origin_slot": 0,
+            "target_id": 1581,
+            "target_slot": 0,
+            "type": "IMAGE"
+          },
+          {
+            "id": 1911,
+            "origin_id": 1572,
+            "origin_slot": 0,
+            "target_id": 1581,
+            "target_slot": 1,
+            "type": "STRING"
+          },
+          {
+            "id": 1912,
+            "origin_id": 1566,
+            "origin_slot": 0,
+            "target_id": 1582,
+            "target_slot": 0,
+            "type": "IMAGE"
+          },
+          {
+            "id": 1913,
+            "origin_id": 1571,
+            "origin_slot": 0,
+            "target_id": 1582,
+            "target_slot": 1,
+            "type": "IMAGE"
+          },
+          {
+            "id": 1914,
+            "origin_id": 1580,
+            "origin_slot": 0,
+            "target_id": 1582,
+            "target_slot": 2,
+            "type": "STRING"
+          },
+          {
+            "id": 1915,
+            "origin_id": 1581,
+            "origin_slot": 0,
+            "target_id": 1582,
+            "target_slot": 3,
+            "type": "STRING"
+          },
+          {
+            "id": 1916,
+            "origin_id": 1582,
+            "origin_slot": 0,
+            "target_id": 1577,
+            "target_slot": 0,
+            "type": "*"
+          },
+          {
+            "id": 1917,
+            "origin_id": 1582,
+            "origin_slot": 1,
+            "target_id": -20,
+            "target_slot": 1,
             "type": "*"
           }
         ],
@@ -11447,10 +11427,10 @@
     "VHS_MetadataImage": true,
     "VHS_KeepIntermediate": true,
     "ds": {
-      "scale": 0.6209213230591555,
+      "scale": 0.46650738020973365,
       "offset": [
-        2583.8314012484057,
-        1155.4577865770466
+        2367.0530915412337,
+        1286.0407405439637
       ]
     }
   },

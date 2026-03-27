@@ -1,8 +1,8 @@
 {
   "id": "30ffb777-b31e-4f60-b0fe-7af8dbebd3e2",
   "revision": 0,
-  "last_node_id": 1542,
-  "last_link_id": 1840,
+  "last_node_id": 1548,
+  "last_link_id": 1856,
   "nodes": [
     {
       "id": 358,
@@ -2050,92 +2050,6 @@
       "bgcolor": "#29699c"
     },
     {
-      "id": 420,
-      "type": "bf1edf2f-ccb7-45ac-882e-55bdd5f0be86",
-      "pos": [
-        -1063.079283663359,
-        -844.8729217359734
-      ],
-      "size": [
-        210,
-        214
-      ],
-      "flags": {},
-      "order": 31,
-      "mode": 0,
-      "inputs": [
-        {
-          "label": "prefix",
-          "name": "",
-          "type": "*",
-          "link": 661
-        },
-        {
-          "label": "white_mesh",
-          "name": "trimesh",
-          "type": "TRIMESH",
-          "link": 663
-        },
-        {
-          "label": "color_image",
-          "name": "_1",
-          "type": "*",
-          "link": 669
-        },
-        {
-          "label": "seed",
-          "name": "_2",
-          "type": "*",
-          "link": 1750
-        }
-      ],
-      "outputs": [
-        {
-          "label": "FrontView",
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            680
-          ]
-        },
-        {
-          "label": "BackView",
-          "name": "IMAGE_2",
-          "type": "IMAGE",
-          "links": [
-            682
-          ]
-        }
-      ],
-      "properties": {
-        "proxyWidgets": [
-          [
-            "366",
-            "$$canvas-image-preview"
-          ],
-          [
-            "1036",
-            "$$canvas-image-preview"
-          ],
-          [
-            "1413",
-            "$$canvas-image-preview"
-          ],
-          [
-            "1447",
-            "$$canvas-image-preview"
-          ],
-          [
-            "369",
-            "$$canvas-image-preview"
-          ]
-        ],
-        "cnr_id": "comfy-core",
-        "ver": "0.16.4"
-      },
-      "widgets_values": []
-    },
-    {
       "id": 1537,
       "type": "PrimitiveInt",
       "pos": [
@@ -2420,6 +2334,71 @@
         "",
         ""
       ]
+    },
+    {
+      "id": 420,
+      "type": "bf1edf2f-ccb7-45ac-882e-55bdd5f0be86",
+      "pos": [
+        -1063.079283663359,
+        -844.8729217359734
+      ],
+      "size": [
+        181.554296875,
+        86
+      ],
+      "flags": {},
+      "order": 31,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "prefix",
+          "name": "",
+          "type": "*",
+          "link": 661
+        },
+        {
+          "label": "white_mesh",
+          "name": "trimesh",
+          "type": "TRIMESH",
+          "link": 663
+        },
+        {
+          "label": "color_image",
+          "name": "_1",
+          "type": "*",
+          "link": 669
+        },
+        {
+          "label": "seed",
+          "name": "_2",
+          "type": "*",
+          "link": 1750
+        }
+      ],
+      "outputs": [
+        {
+          "label": "FrontView",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            680
+          ]
+        },
+        {
+          "label": "BackView",
+          "name": "IMAGE_2",
+          "type": "IMAGE",
+          "links": [
+            682
+          ]
+        }
+      ],
+      "properties": {
+        "proxyWidgets": [],
+        "cnr_id": "comfy-core",
+        "ver": "0.16.4"
+      },
+      "widgets_values": []
     }
   ],
   "links": [
@@ -2858,8 +2837,8 @@
         "version": 1,
         "state": {
           "lastGroupId": 28,
-          "lastNodeId": 1542,
-          "lastLinkId": 1840,
+          "lastNodeId": 1548,
+          "lastLinkId": 1856,
           "lastRerouteId": 0
         },
         "revision": 0,
@@ -4932,8 +4911,8 @@
         "version": 1,
         "state": {
           "lastGroupId": 28,
-          "lastNodeId": 1542,
-          "lastLinkId": 1840,
+          "lastNodeId": 1548,
+          "lastLinkId": 1856,
           "lastRerouteId": 0
         },
         "revision": 0,
@@ -4951,8 +4930,8 @@
         "outputNode": {
           "id": -20,
           "bounding": [
-            2435.4059835911307,
-            -492.09012505396026,
+            2632.6726950169113,
+            -495.02348076685087,
             120,
             80
           ]
@@ -5018,12 +4997,12 @@
             "name": "IMAGE",
             "type": "IMAGE",
             "linkIds": [
-              1715
+              1853
             ],
             "label": "FrontView",
             "pos": [
-              2455.4059835911307,
-              -472.09012505396026
+              2652.6726950169113,
+              -475.02348076685087
             ]
           },
           {
@@ -5031,59 +5010,17 @@
             "name": "IMAGE_2",
             "type": "IMAGE",
             "linkIds": [
-              1716
+              1854
             ],
             "label": "BackView",
             "pos": [
-              2455.4059835911307,
-              -452.09012505396026
+              2652.6726950169113,
+              -455.02348076685087
             ]
           }
         ],
         "widgets": [],
         "nodes": [
-          {
-            "id": 366,
-            "type": "SaveImage",
-            "pos": [
-              2055.074265011987,
-              -733.0995576387195
-            ],
-            "size": [
-              270,
-              270
-            ],
-            "flags": {
-              "collapsed": true
-            },
-            "order": 21,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "images",
-                "name": "images",
-                "type": "IMAGE",
-                "link": 836
-              },
-              {
-                "localized_name": "filename_prefix",
-                "name": "filename_prefix",
-                "type": "STRING",
-                "widget": {
-                  "name": "filename_prefix"
-                },
-                "link": 568
-              }
-            ],
-            "outputs": [],
-            "properties": {
-              "cnr_id": "comfy-core",
-              "ver": "0.16.4"
-            },
-            "widgets_values": [
-              "ComfyUI"
-            ]
-          },
           {
             "id": 498,
             "type": "ImageFromBatch",
@@ -5098,7 +5035,7 @@
             "flags": {
               "collapsed": true
             },
-            "order": 29,
+            "order": 27,
             "mode": 0,
             "inputs": [
               {
@@ -5114,8 +5051,8 @@
                 "name": "IMAGE",
                 "type": "IMAGE",
                 "links": [
-                  842,
-                  1714
+                  1849,
+                  1852
                 ]
               }
             ],
@@ -5143,7 +5080,7 @@
             "flags": {
               "collapsed": true
             },
-            "order": 23,
+            "order": 21,
             "mode": 0,
             "inputs": [
               {
@@ -5162,7 +5099,7 @@
                 "name": "STRING",
                 "type": "STRING",
                 "links": [
-                  575
+                  1850
                 ]
               }
             ],
@@ -5210,7 +5147,7 @@
                 "name": "STRING",
                 "type": "STRING",
                 "links": [
-                  568
+                  1848
                 ]
               }
             ],
@@ -5223,48 +5160,6 @@
               "",
               "_FrontView",
               ""
-            ]
-          },
-          {
-            "id": 1036,
-            "type": "SaveImage",
-            "pos": [
-              -476.5756361124731,
-              124.9200165536604
-            ],
-            "size": [
-              270,
-              58
-            ],
-            "flags": {
-              "collapsed": true
-            },
-            "order": 31,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "images",
-                "name": "images",
-                "type": "IMAGE",
-                "link": 1513
-              },
-              {
-                "localized_name": "filename_prefix",
-                "name": "filename_prefix",
-                "type": "STRING",
-                "widget": {
-                  "name": "filename_prefix"
-                },
-                "link": 1205
-              }
-            ],
-            "outputs": [],
-            "properties": {
-              "cnr_id": "comfy-core",
-              "ver": "0.17.0"
-            },
-            "widgets_values": [
-              "ComfyUI"
             ]
           },
           {
@@ -5457,7 +5352,7 @@
               274
             ],
             "flags": {},
-            "order": 32,
+            "order": 29,
             "mode": 0,
             "inputs": [
               {
@@ -5514,7 +5409,7 @@
                 "links": [
                   1509,
                   1510,
-                  1513
+                  1845
                 ]
               }
             ],
@@ -5545,7 +5440,7 @@
             "flags": {
               "collapsed": true
             },
-            "order": 30,
+            "order": 28,
             "mode": 0,
             "inputs": [
               {
@@ -5564,7 +5459,7 @@
                 "name": "STRING",
                 "type": "STRING",
                 "links": [
-                  1205
+                  1846
                 ]
               }
             ],
@@ -5591,7 +5486,7 @@
               60
             ],
             "flags": {},
-            "order": 24,
+            "order": 22,
             "mode": 0,
             "inputs": [
               {
@@ -5684,7 +5579,7 @@
               280
             ],
             "flags": {},
-            "order": 34,
+            "order": 31,
             "mode": 0,
             "inputs": [
               {
@@ -5755,48 +5650,6 @@
             ]
           },
           {
-            "id": 1413,
-            "type": "SaveImage",
-            "pos": [
-              -276.45439094583634,
-              -2870.3251878106284
-            ],
-            "size": [
-              405.0726233410379,
-              385.9304552631397
-            ],
-            "flags": {
-              "collapsed": true
-            },
-            "order": 38,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "images",
-                "name": "images",
-                "type": "IMAGE",
-                "link": 1546
-              },
-              {
-                "localized_name": "filename_prefix",
-                "name": "filename_prefix",
-                "type": "STRING",
-                "widget": {
-                  "name": "filename_prefix"
-                },
-                "link": 1551
-              }
-            ],
-            "outputs": [],
-            "properties": {
-              "cnr_id": "comfy-core",
-              "ver": "0.17.0"
-            },
-            "widgets_values": [
-              "CannyFront"
-            ]
-          },
-          {
             "id": 1406,
             "type": "VAEDecodeTiled",
             "pos": [
@@ -5808,7 +5661,7 @@
               150
             ],
             "flags": {},
-            "order": 33,
+            "order": 30,
             "mode": 0,
             "inputs": [
               {
@@ -5957,7 +5810,7 @@
               280
             ],
             "flags": {},
-            "order": 41,
+            "order": 37,
             "mode": 0,
             "inputs": [
               {
@@ -6028,48 +5881,6 @@
             ]
           },
           {
-            "id": 1447,
-            "type": "SaveImage",
-            "pos": [
-              -331.83775944517055,
-              -1576.3648320325285
-            ],
-            "size": [
-              405.0726233410379,
-              385.9304552631397
-            ],
-            "flags": {
-              "collapsed": true
-            },
-            "order": 44,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "images",
-                "name": "images",
-                "type": "IMAGE",
-                "link": 1591
-              },
-              {
-                "localized_name": "filename_prefix",
-                "name": "filename_prefix",
-                "type": "STRING",
-                "widget": {
-                  "name": "filename_prefix"
-                },
-                "link": 1592
-              }
-            ],
-            "outputs": [],
-            "properties": {
-              "cnr_id": "comfy-core",
-              "ver": "0.17.0"
-            },
-            "widgets_values": [
-              "CannyFront"
-            ]
-          },
-          {
             "id": 1451,
             "type": "VAEDecodeTiled",
             "pos": [
@@ -6081,7 +5892,7 @@
               150
             ],
             "flags": {},
-            "order": 47,
+            "order": 42,
             "mode": 0,
             "inputs": [
               {
@@ -6132,7 +5943,7 @@
               26
             ],
             "flags": {},
-            "order": 35,
+            "order": 32,
             "mode": 0,
             "inputs": [
               {
@@ -6170,7 +5981,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 27,
+            "order": 25,
             "mode": 0,
             "inputs": [
               {
@@ -6237,7 +6048,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 45,
+            "order": 40,
             "mode": 0,
             "inputs": [
               {
@@ -6256,7 +6067,7 @@
                 "name": "STRING",
                 "type": "STRING",
                 "links": [
-                  1592
+                  1844
                 ]
               }
             ],
@@ -6326,7 +6137,7 @@
               46
             ],
             "flags": {},
-            "order": 50,
+            "order": 45,
             "mode": 0,
             "inputs": [
               {
@@ -6379,7 +6190,7 @@
               26
             ],
             "flags": {},
-            "order": 48,
+            "order": 43,
             "mode": 0,
             "inputs": [
               {
@@ -6418,7 +6229,7 @@
               26
             ],
             "flags": {},
-            "order": 49,
+            "order": 44,
             "mode": 0,
             "inputs": [
               {
@@ -6457,7 +6268,7 @@
               46
             ],
             "flags": {},
-            "order": 51,
+            "order": 46,
             "mode": 0,
             "inputs": [
               {
@@ -6510,7 +6321,7 @@
               86
             ],
             "flags": {},
-            "order": 26,
+            "order": 24,
             "mode": 0,
             "inputs": [
               {
@@ -6554,101 +6365,6 @@
             "widgets_values": []
           },
           {
-            "id": 1477,
-            "type": "Trellis2Continue",
-            "pos": [
-              2139.382368013818,
-              -490.04044321477
-            ],
-            "size": [
-              161.33359375,
-              46
-            ],
-            "flags": {},
-            "order": 52,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "input_1",
-                "name": "input_1",
-                "type": "*",
-                "link": 1713
-              },
-              {
-                "localized_name": "input_2",
-                "name": "input_2",
-                "type": "*",
-                "link": 1714
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "output_1",
-                "name": "output_1",
-                "type": "*",
-                "links": [
-                  1715
-                ]
-              },
-              {
-                "localized_name": "output_2",
-                "name": "output_2",
-                "type": "*",
-                "links": [
-                  1716
-                ]
-              }
-            ],
-            "properties": {
-              "aux_id": "visualbruno/ComfyUI-Trellis2",
-              "ver": "3bceb25d1c232e7ab8536e462e21d1ed451be977",
-              "Node name for S&R": "Trellis2Continue"
-            },
-            "widgets_values": []
-          },
-          {
-            "id": 369,
-            "type": "SaveImage",
-            "pos": [
-              2047.6028391128737,
-              -225.99622101583702
-            ],
-            "size": [
-              270,
-              58
-            ],
-            "flags": {
-              "collapsed": true
-            },
-            "order": 22,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "images",
-                "name": "images",
-                "type": "IMAGE",
-                "link": 842
-              },
-              {
-                "localized_name": "filename_prefix",
-                "name": "filename_prefix",
-                "type": "STRING",
-                "widget": {
-                  "name": "filename_prefix"
-                },
-                "link": 575
-              }
-            ],
-            "outputs": [],
-            "properties": {
-              "cnr_id": "comfy-core",
-              "ver": "0.16.4"
-            },
-            "widgets_values": [
-              "ComfyUI"
-            ]
-          },
-          {
             "id": 496,
             "type": "ImageFromBatch",
             "pos": [
@@ -6662,7 +6378,7 @@
             "flags": {
               "collapsed": true
             },
-            "order": 28,
+            "order": 26,
             "mode": 0,
             "inputs": [
               {
@@ -6678,8 +6394,8 @@
                 "name": "IMAGE",
                 "type": "IMAGE",
                 "links": [
-                  836,
-                  1713
+                  1847,
+                  1851
                 ]
               }
             ],
@@ -6789,7 +6505,7 @@
               60
             ],
             "flags": {},
-            "order": 53,
+            "order": 47,
             "mode": 0,
             "inputs": [
               {
@@ -6827,7 +6543,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 54,
+            "order": 48,
             "mode": 0,
             "inputs": [
               {
@@ -6882,7 +6598,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 55,
+            "order": 49,
             "mode": 0,
             "inputs": [
               {
@@ -7023,7 +6739,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 56,
+            "order": 50,
             "mode": 0,
             "inputs": [
               {
@@ -7076,7 +6792,7 @@
               239.91270427521232
             ],
             "flags": {},
-            "order": 39,
+            "order": 35,
             "mode": 0,
             "inputs": [
               {
@@ -7156,7 +6872,7 @@
               168
             ],
             "flags": {},
-            "order": 40,
+            "order": 36,
             "mode": 0,
             "inputs": [
               {
@@ -7237,7 +6953,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 58,
+            "order": 52,
             "mode": 0,
             "inputs": [
               {
@@ -7292,7 +7008,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 59,
+            "order": 53,
             "mode": 0,
             "inputs": [
               {
@@ -7384,7 +7100,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 57,
+            "order": 51,
             "mode": 0,
             "inputs": [
               {
@@ -7439,7 +7155,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 61,
+            "order": 55,
             "mode": 0,
             "inputs": [
               {
@@ -7494,7 +7210,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 63,
+            "order": 57,
             "mode": 0,
             "inputs": [
               {
@@ -7549,7 +7265,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 62,
+            "order": 56,
             "mode": 0,
             "inputs": [
               {
@@ -7602,7 +7318,7 @@
               239.91270427521232
             ],
             "flags": {},
-            "order": 42,
+            "order": 38,
             "mode": 0,
             "inputs": [
               {
@@ -7682,7 +7398,7 @@
               168
             ],
             "flags": {},
-            "order": 43,
+            "order": 39,
             "mode": 0,
             "inputs": [
               {
@@ -7763,7 +7479,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 64,
+            "order": 58,
             "mode": 0,
             "inputs": [
               {
@@ -7818,7 +7534,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 65,
+            "order": 59,
             "mode": 0,
             "inputs": [
               {
@@ -7871,7 +7587,7 @@
               60
             ],
             "flags": {},
-            "order": 25,
+            "order": 23,
             "mode": 0,
             "inputs": [
               {
@@ -7917,7 +7633,7 @@
               82
             ],
             "flags": {},
-            "order": 46,
+            "order": 41,
             "mode": 0,
             "inputs": [
               {
@@ -7933,8 +7649,8 @@
                 "name": "IMAGE",
                 "type": "IMAGE",
                 "links": [
-                  1591,
-                  1792
+                  1792,
+                  1843
                 ]
               }
             ],
@@ -7962,7 +7678,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 60,
+            "order": 54,
             "mode": 0,
             "inputs": [
               {
@@ -8017,7 +7733,7 @@
             "flags": {
               "collapsed": true
             },
-            "order": 37,
+            "order": 34,
             "mode": 0,
             "inputs": [
               {
@@ -8033,8 +7749,8 @@
                 "name": "IMAGE",
                 "type": "IMAGE",
                 "links": [
-                  1546,
-                  1770
+                  1770,
+                  1841
                 ]
               }
             ],
@@ -8062,7 +7778,7 @@
             "flags": {
               "collapsed": true
             },
-            "order": 36,
+            "order": 33,
             "mode": 0,
             "inputs": [
               {
@@ -8081,7 +7797,7 @@
                 "name": "STRING",
                 "type": "STRING",
                 "links": [
-                  1551
+                  1842
                 ]
               }
             ],
@@ -8493,6 +8209,331 @@
             "widgets_values": [
               "qwen_image_vae.safetensors"
             ]
+          },
+          {
+            "id": 1543,
+            "type": "Trellis2SaveImage",
+            "pos": [
+              -344.454377724334,
+              -2864.3655739492137
+            ],
+            "size": [
+              270,
+              82
+            ],
+            "flags": {},
+            "order": 60,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "images",
+                "name": "images",
+                "type": "IMAGE",
+                "link": 1841
+              },
+              {
+                "localized_name": "filename_prefix",
+                "name": "filename_prefix",
+                "type": "STRING",
+                "widget": {
+                  "name": "filename_prefix"
+                },
+                "link": 1842
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "images_path",
+                "name": "images_path",
+                "type": "STRING",
+                "links": null
+              }
+            ],
+            "properties": {
+              "aux_id": "visualbruno/ComfyUI-Trellis2",
+              "ver": "0afaab3723ed18c15303f44c7aaea1bc8df61268",
+              "Node name for S&R": "Trellis2SaveImage"
+            },
+            "widgets_values": [
+              "ComfyUI",
+              1
+            ]
+          },
+          {
+            "id": 1544,
+            "type": "Trellis2SaveImage",
+            "pos": [
+              -293.4838253295112,
+              -1526.8488760142936
+            ],
+            "size": [
+              270,
+              82
+            ],
+            "flags": {},
+            "order": 61,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "images",
+                "name": "images",
+                "type": "IMAGE",
+                "link": 1843
+              },
+              {
+                "localized_name": "filename_prefix",
+                "name": "filename_prefix",
+                "type": "STRING",
+                "widget": {
+                  "name": "filename_prefix"
+                },
+                "link": 1844
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "images_path",
+                "name": "images_path",
+                "type": "STRING",
+                "links": null
+              }
+            ],
+            "properties": {
+              "aux_id": "visualbruno/ComfyUI-Trellis2",
+              "ver": "0afaab3723ed18c15303f44c7aaea1bc8df61268",
+              "Node name for S&R": "Trellis2SaveImage"
+            },
+            "widgets_values": [
+              "ComfyUI",
+              1
+            ]
+          },
+          {
+            "id": 1545,
+            "type": "Trellis2SaveImage",
+            "pos": [
+              -474.07862388056475,
+              30.680294247225664
+            ],
+            "size": [
+              270,
+              82
+            ],
+            "flags": {},
+            "order": 62,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "images",
+                "name": "images",
+                "type": "IMAGE",
+                "link": 1845
+              },
+              {
+                "localized_name": "filename_prefix",
+                "name": "filename_prefix",
+                "type": "STRING",
+                "widget": {
+                  "name": "filename_prefix"
+                },
+                "link": 1846
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "images_path",
+                "name": "images_path",
+                "type": "STRING",
+                "links": null
+              }
+            ],
+            "properties": {
+              "aux_id": "visualbruno/ComfyUI-Trellis2",
+              "ver": "0afaab3723ed18c15303f44c7aaea1bc8df61268",
+              "Node name for S&R": "Trellis2SaveImage"
+            },
+            "widgets_values": [
+              "ComfyUI",
+              1
+            ]
+          },
+          {
+            "id": 1548,
+            "type": "Trellis2Continue4",
+            "pos": [
+              2362.9185279277403,
+              -487.4651228448373
+            ],
+            "size": [
+              174.3150390625,
+              86
+            ],
+            "flags": {},
+            "order": 65,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "input_1",
+                "name": "input_1",
+                "type": "*",
+                "link": 1851
+              },
+              {
+                "localized_name": "input_2",
+                "name": "input_2",
+                "type": "*",
+                "link": 1852
+              },
+              {
+                "localized_name": "input_3",
+                "name": "input_3",
+                "type": "*",
+                "link": 1855
+              },
+              {
+                "localized_name": "input_4",
+                "name": "input_4",
+                "type": "*",
+                "link": 1856
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "output_1",
+                "name": "output_1",
+                "type": "*",
+                "links": [
+                  1853
+                ]
+              },
+              {
+                "localized_name": "output_2",
+                "name": "output_2",
+                "type": "*",
+                "links": [
+                  1854
+                ]
+              },
+              {
+                "localized_name": "output_3",
+                "name": "output_3",
+                "type": "*",
+                "links": null
+              },
+              {
+                "localized_name": "output_4",
+                "name": "output_4",
+                "type": "*",
+                "links": null
+              }
+            ],
+            "properties": {
+              "aux_id": "visualbruno/ComfyUI-Trellis2",
+              "ver": "0afaab3723ed18c15303f44c7aaea1bc8df61268",
+              "Node name for S&R": "Trellis2Continue4"
+            }
+          },
+          {
+            "id": 1546,
+            "type": "Trellis2SaveImage",
+            "pos": [
+              2087.7426917461,
+              -732.3985456964001
+            ],
+            "size": [
+              270,
+              82
+            ],
+            "flags": {},
+            "order": 63,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "images",
+                "name": "images",
+                "type": "IMAGE",
+                "link": 1847
+              },
+              {
+                "localized_name": "filename_prefix",
+                "name": "filename_prefix",
+                "type": "STRING",
+                "widget": {
+                  "name": "filename_prefix"
+                },
+                "link": 1848
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "images_path",
+                "name": "images_path",
+                "type": "STRING",
+                "links": [
+                  1855
+                ]
+              }
+            ],
+            "properties": {
+              "aux_id": "visualbruno/ComfyUI-Trellis2",
+              "ver": "0afaab3723ed18c15303f44c7aaea1bc8df61268",
+              "Node name for S&R": "Trellis2SaveImage"
+            },
+            "widgets_values": [
+              "ComfyUI",
+              1
+            ]
+          },
+          {
+            "id": 1547,
+            "type": "Trellis2SaveImage",
+            "pos": [
+              2037.1426246074284,
+              -249.13183427061858
+            ],
+            "size": [
+              270,
+              82
+            ],
+            "flags": {},
+            "order": 64,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "images",
+                "name": "images",
+                "type": "IMAGE",
+                "link": 1849
+              },
+              {
+                "localized_name": "filename_prefix",
+                "name": "filename_prefix",
+                "type": "STRING",
+                "widget": {
+                  "name": "filename_prefix"
+                },
+                "link": 1850
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "images_path",
+                "name": "images_path",
+                "type": "STRING",
+                "links": [
+                  1856
+                ]
+              }
+            ],
+            "properties": {
+              "aux_id": "visualbruno/ComfyUI-Trellis2",
+              "ver": "0afaab3723ed18c15303f44c7aaea1bc8df61268",
+              "Node name for S&R": "Trellis2SaveImage"
+            },
+            "widgets_values": [
+              "ComfyUI",
+              4
+            ]
           }
         ],
         "groups": [
@@ -8524,22 +8565,6 @@
           }
         ],
         "links": [
-          {
-            "id": 568,
-            "origin_id": 364,
-            "origin_slot": 0,
-            "target_id": 366,
-            "target_slot": 1,
-            "type": "STRING"
-          },
-          {
-            "id": 575,
-            "origin_id": 371,
-            "origin_slot": 0,
-            "target_id": 369,
-            "target_slot": 1,
-            "type": "STRING"
-          },
           {
             "id": 546,
             "origin_id": 298,
@@ -8605,26 +8630,10 @@
             "type": "IMAGE"
           },
           {
-            "id": 836,
-            "origin_id": 496,
-            "origin_slot": 0,
-            "target_id": 366,
-            "target_slot": 0,
-            "type": "IMAGE"
-          },
-          {
             "id": 841,
             "origin_id": 494,
             "origin_slot": 0,
             "target_id": 498,
-            "target_slot": 0,
-            "type": "IMAGE"
-          },
-          {
-            "id": 842,
-            "origin_id": 498,
-            "origin_slot": 0,
-            "target_id": 369,
             "target_slot": 0,
             "type": "IMAGE"
           },
@@ -8634,14 +8643,6 @@
             "origin_slot": 0,
             "target_id": 1035,
             "target_slot": 0,
-            "type": "STRING"
-          },
-          {
-            "id": 1205,
-            "origin_id": 1035,
-            "origin_slot": 0,
-            "target_id": 1036,
-            "target_slot": 1,
             "type": "STRING"
           },
           {
@@ -8769,14 +8770,6 @@
             "origin_id": 1326,
             "origin_slot": 0,
             "target_id": 299,
-            "target_slot": 0,
-            "type": "IMAGE"
-          },
-          {
-            "id": 1513,
-            "origin_id": 1326,
-            "origin_slot": 0,
-            "target_id": 1036,
             "target_slot": 0,
             "type": "IMAGE"
           },
@@ -8933,14 +8926,6 @@
             "type": "IMAGE"
           },
           {
-            "id": 1546,
-            "origin_id": 1411,
-            "origin_slot": 0,
-            "target_id": 1413,
-            "target_slot": 0,
-            "type": "IMAGE"
-          },
-          {
             "id": 1549,
             "origin_id": 426,
             "origin_slot": 0,
@@ -8954,14 +8939,6 @@
             "origin_slot": 0,
             "target_id": 1410,
             "target_slot": 0,
-            "type": "STRING"
-          },
-          {
-            "id": 1551,
-            "origin_id": 1410,
-            "origin_slot": 0,
-            "target_id": 1413,
-            "target_slot": 1,
             "type": "STRING"
           },
           {
@@ -8995,22 +8972,6 @@
             "target_id": 1443,
             "target_slot": 3,
             "type": "LATENT"
-          },
-          {
-            "id": 1591,
-            "origin_id": 1450,
-            "origin_slot": 0,
-            "target_id": 1447,
-            "target_slot": 0,
-            "type": "IMAGE"
-          },
-          {
-            "id": 1592,
-            "origin_id": 1448,
-            "origin_slot": 0,
-            "target_id": 1447,
-            "target_slot": 1,
-            "type": "STRING"
           },
           {
             "id": 1596,
@@ -9115,38 +9076,6 @@
             "target_id": 492,
             "target_slot": 1,
             "type": "IMAGE"
-          },
-          {
-            "id": 1713,
-            "origin_id": 496,
-            "origin_slot": 0,
-            "target_id": 1477,
-            "target_slot": 0,
-            "type": "IMAGE"
-          },
-          {
-            "id": 1714,
-            "origin_id": 498,
-            "origin_slot": 0,
-            "target_id": 1477,
-            "target_slot": 1,
-            "type": "IMAGE"
-          },
-          {
-            "id": 1715,
-            "origin_id": 1477,
-            "origin_slot": 0,
-            "target_id": -20,
-            "target_slot": 0,
-            "type": "*"
-          },
-          {
-            "id": 1716,
-            "origin_id": 1477,
-            "origin_slot": 1,
-            "target_id": -20,
-            "target_slot": 1,
-            "type": "*"
           },
           {
             "id": 1729,
@@ -9459,6 +9388,134 @@
             "target_id": 1451,
             "target_slot": 1,
             "type": "VAE"
+          },
+          {
+            "id": 1841,
+            "origin_id": 1411,
+            "origin_slot": 0,
+            "target_id": 1543,
+            "target_slot": 0,
+            "type": "IMAGE"
+          },
+          {
+            "id": 1842,
+            "origin_id": 1410,
+            "origin_slot": 0,
+            "target_id": 1543,
+            "target_slot": 1,
+            "type": "STRING"
+          },
+          {
+            "id": 1843,
+            "origin_id": 1450,
+            "origin_slot": 0,
+            "target_id": 1544,
+            "target_slot": 0,
+            "type": "IMAGE"
+          },
+          {
+            "id": 1844,
+            "origin_id": 1448,
+            "origin_slot": 0,
+            "target_id": 1544,
+            "target_slot": 1,
+            "type": "STRING"
+          },
+          {
+            "id": 1845,
+            "origin_id": 1326,
+            "origin_slot": 0,
+            "target_id": 1545,
+            "target_slot": 0,
+            "type": "IMAGE"
+          },
+          {
+            "id": 1846,
+            "origin_id": 1035,
+            "origin_slot": 0,
+            "target_id": 1545,
+            "target_slot": 1,
+            "type": "STRING"
+          },
+          {
+            "id": 1847,
+            "origin_id": 496,
+            "origin_slot": 0,
+            "target_id": 1546,
+            "target_slot": 0,
+            "type": "IMAGE"
+          },
+          {
+            "id": 1848,
+            "origin_id": 364,
+            "origin_slot": 0,
+            "target_id": 1546,
+            "target_slot": 1,
+            "type": "STRING"
+          },
+          {
+            "id": 1849,
+            "origin_id": 498,
+            "origin_slot": 0,
+            "target_id": 1547,
+            "target_slot": 0,
+            "type": "IMAGE"
+          },
+          {
+            "id": 1850,
+            "origin_id": 371,
+            "origin_slot": 0,
+            "target_id": 1547,
+            "target_slot": 1,
+            "type": "STRING"
+          },
+          {
+            "id": 1851,
+            "origin_id": 496,
+            "origin_slot": 0,
+            "target_id": 1548,
+            "target_slot": 0,
+            "type": "IMAGE"
+          },
+          {
+            "id": 1852,
+            "origin_id": 498,
+            "origin_slot": 0,
+            "target_id": 1548,
+            "target_slot": 1,
+            "type": "IMAGE"
+          },
+          {
+            "id": 1853,
+            "origin_id": 1548,
+            "origin_slot": 0,
+            "target_id": -20,
+            "target_slot": 0,
+            "type": "*"
+          },
+          {
+            "id": 1854,
+            "origin_id": 1548,
+            "origin_slot": 1,
+            "target_id": -20,
+            "target_slot": 1,
+            "type": "*"
+          },
+          {
+            "id": 1855,
+            "origin_id": 1546,
+            "origin_slot": 0,
+            "target_id": 1548,
+            "target_slot": 2,
+            "type": "STRING"
+          },
+          {
+            "id": 1856,
+            "origin_id": 1547,
+            "origin_slot": 0,
+            "target_id": 1548,
+            "target_slot": 3,
+            "type": "STRING"
           }
         ],
         "extra": {
@@ -9478,10 +9535,10 @@
     "VHS_MetadataImage": true,
     "VHS_KeepIntermediate": true,
     "ds": {
-      "scale": 0.46650738020973354,
+      "scale": 0.620921323059155,
       "offset": [
-        2442.832634934065,
-        1308.77009277857
+        2249.2956945310375,
+        1541.929756189721
       ]
     }
   },
