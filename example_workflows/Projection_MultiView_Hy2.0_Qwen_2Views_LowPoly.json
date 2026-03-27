@@ -18,7 +18,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 50,
+      "order": 51,
       "mode": 0,
       "inputs": [
         {
@@ -58,7 +58,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 47,
+      "order": 48,
       "mode": 0,
       "inputs": [
         {
@@ -102,8 +102,8 @@
       "id": 419,
       "type": "SetNode",
       "pos": [
-        -739.9574201750787,
-        -1112.229109838585
+        -732.1625517750787,
+        -1109.630830283606
       ],
       "size": [
         210,
@@ -142,8 +142,8 @@
       "id": 428,
       "type": "GetNode",
       "pos": [
-        -1308.489597242288,
-        -1148.073348303721
+        -1300.694728842288,
+        -1145.4750687487422
       ],
       "size": [
         210,
@@ -179,8 +179,8 @@
       "id": 417,
       "type": "GetNode",
       "pos": [
-        -1304.5894219699264,
-        -1100.6129999035786
+        -1296.7945535699264,
+        -1098.0147203485997
       ],
       "size": [
         210,
@@ -222,7 +222,7 @@
         102
       ],
       "flags": {},
-      "order": 48,
+      "order": 47,
       "mode": 0,
       "inputs": [
         {
@@ -569,8 +569,8 @@
       "id": 422,
       "type": "SetNode",
       "pos": [
-        -698.4597325564522,
-        -872.6640862670608
+        -695.8614827365363,
+        -859.6726587571029
       ],
       "size": [
         210,
@@ -611,8 +611,8 @@
       "id": 424,
       "type": "SetNode",
       "pos": [
-        -694.752858254821,
-        -779.8208472080955
+        -692.1546084349052,
+        -766.8294196981376
       ],
       "size": [
         210,
@@ -776,7 +776,7 @@
         1226.3422371338038
       ],
       "flags": {},
-      "order": 51,
+      "order": 50,
       "mode": 0,
       "inputs": [
         {
@@ -818,9 +818,9 @@
           "fov": 35,
           "state": {
             "position": {
-              "x": -3.6431134467049633,
-              "y": 5.486204200349581,
-              "z": 13.38057824279709
+              "x": -3.846244531119141,
+              "y": 5.87150678100253,
+              "z": 8.483747347147204
             },
             "target": {
               "x": -3.494663156506598e-204,
@@ -859,7 +859,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 34,
+      "order": 40,
       "mode": 0,
       "inputs": [
         {
@@ -930,8 +930,8 @@
       "id": 432,
       "type": "GetNode",
       "pos": [
-        -1298.5755039841658,
-        -866.4767142851342
+        -1295.97725416425,
+        -853.4852867751763
       ],
       "size": [
         210,
@@ -965,8 +965,8 @@
       "id": 433,
       "type": "GetNode",
       "pos": [
-        -1304.5711986279814,
-        -823.7118773224342
+        -1301.9729488080657,
+        -810.7204498124763
       ],
       "size": [
         210,
@@ -1000,8 +1000,8 @@
       "id": 435,
       "type": "GetNode",
       "pos": [
-        -1305.5025610089172,
-        -779.6841227499173
+        -1302.9043111890014,
+        -766.6926952399593
       ],
       "size": [
         210,
@@ -1037,8 +1037,8 @@
       "id": 1491,
       "type": "GetNode",
       "pos": [
-        -1292.6228608134838,
-        -736.9150016359132
+        -1290.024610993568,
+        -723.9235741259553
       ],
       "size": [
         210,
@@ -1074,8 +1074,8 @@
       "id": 1492,
       "type": "GetNode",
       "pos": [
-        -1307.7278498263233,
-        -1059.1249604240388
+        -1299.9329814263233,
+        -1056.5266808690599
       ],
       "size": [
         210,
@@ -1148,8 +1148,8 @@
       "id": 418,
       "type": "SetNode",
       "pos": [
-        -740.0841416101808,
-        -1070.5917121950931
+        -732.2892732101808,
+        -1067.9934326401142
       ],
       "size": [
         210,
@@ -1198,7 +1198,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 37,
+      "order": 39,
       "mode": 0,
       "inputs": [
         {
@@ -1240,7 +1240,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 36,
+      "order": 38,
       "mode": 0,
       "inputs": [
         {
@@ -1307,8 +1307,8 @@
       "id": 1523,
       "type": "SetNode",
       "pos": [
-        -748.0745857930016,
-        -1021.5258412813495
+        -740.2797173930015,
+        -1018.9275617263705
       ],
       "size": [
         210,
@@ -1347,8 +1347,8 @@
       "id": 1524,
       "type": "GetNode",
       "pos": [
-        -1301.1282253601044,
-        -973.6994843435854
+        -1293.3333569601043,
+        -971.1012047886064
       ],
       "size": [
         210,
@@ -1384,8 +1384,8 @@
       "id": 436,
       "type": "GetNode",
       "pos": [
-        -1303.5818325942232,
-        -1015.4119022782475
+        -1295.7869641942232,
+        -1012.8136227232685
       ],
       "size": [
         210,
@@ -1418,46 +1418,11 @@
       "bgcolor": "#29699c"
     },
     {
-      "id": 219,
-      "type": "PrimitiveString",
-      "pos": [
-        -2058.606314017538,
-        -1029.5385288033083
-      ],
-      "size": [
-        270,
-        58
-      ],
-      "flags": {},
-      "order": 16,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "STRING",
-          "type": "STRING",
-          "links": [
-            464,
-            465
-          ]
-        }
-      ],
-      "title": "Name -> output in 3D folder",
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.16.4",
-        "Node name for S&R": "PrimitiveString"
-      },
-      "widgets_values": [
-        "DwarfWarror_MV_LowPoly"
-      ]
-    },
-    {
       "id": 416,
       "type": "a7c4d8ae-5500-4f9b-9601-eafdb97e7a68",
       "pos": [
-        -1050.6637612579686,
-        -1142.729225843387
+        -1042.8688928579686,
+        -1140.130946288408
       ],
       "size": [
         249.978515625,
@@ -1544,7 +1509,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 17,
+      "order": 16,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -1577,7 +1542,7 @@
         60
       ],
       "flags": {},
-      "order": 18,
+      "order": 17,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -1612,7 +1577,7 @@
       "flags": {
         "collapsed": false
       },
-      "order": 19,
+      "order": 18,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -1634,53 +1599,6 @@
       ],
       "color": "#2a363b",
       "bgcolor": "#3f5159"
-    },
-    {
-      "id": 239,
-      "type": "Trellis2LoadImageWithTransparency",
-      "pos": [
-        -2048.8215353520336,
-        -527.0330637185876
-      ],
-      "size": [
-        627.638044195148,
-        672.4931923313359
-      ],
-      "flags": {},
-      "order": 20,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "links": [
-            1196
-          ]
-        },
-        {
-          "name": "mask",
-          "type": "MASK",
-          "links": null
-        },
-        {
-          "name": "image_with_alpha",
-          "type": "IMAGE",
-          "links": [
-            1195
-          ]
-        }
-      ],
-      "title": "Color Image",
-      "properties": {
-        "aux_id": "visualbruno/ComfyUI-Trellis2",
-        "ver": "e8098f5641702e74133c2dea0b45a13a3ab19985",
-        "Node name for S&R": "Trellis2LoadImageWithTransparency"
-      },
-      "widgets_values": [
-        "DwarfWarrior_1024_00001_.png",
-        "image"
-      ]
     },
     {
       "id": 1490,
@@ -1738,7 +1656,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 35,
+      "order": 37,
       "mode": 0,
       "inputs": [
         {
@@ -1765,51 +1683,6 @@
       ],
       "color": "#2a363b",
       "bgcolor": "#3f5159"
-    },
-    {
-      "id": 411,
-      "type": "Trellis2LoadImageWithTransparency",
-      "pos": [
-        -2044.3589736162207,
-        266.782275009605
-      ],
-      "size": [
-        627.638044195148,
-        672.4931923313359
-      ],
-      "flags": {},
-      "order": 21,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "links": []
-        },
-        {
-          "name": "mask",
-          "type": "MASK",
-          "links": null
-        },
-        {
-          "name": "image_with_alpha",
-          "type": "IMAGE",
-          "links": [
-            627
-          ]
-        }
-      ],
-      "title": "Normal Image",
-      "properties": {
-        "aux_id": "visualbruno/ComfyUI-Trellis2",
-        "ver": "e8098f5641702e74133c2dea0b45a13a3ab19985",
-        "Node name for S&R": "Trellis2LoadImageWithTransparency"
-      },
-      "widgets_values": [
-        "Image_1024_00060_.png",
-        "image"
-      ]
     },
     {
       "id": 1025,
@@ -1960,7 +1833,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 38,
+      "order": 34,
       "mode": 0,
       "inputs": [
         {
@@ -2000,7 +1873,7 @@
         82
       ],
       "flags": {},
-      "order": 22,
+      "order": 19,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -2037,7 +1910,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 40,
+      "order": 36,
       "mode": 0,
       "inputs": [
         {
@@ -2079,7 +1952,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 23,
+      "order": 20,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -2116,7 +1989,7 @@
       "flags": {
         "collapsed": false
       },
-      "order": 24,
+      "order": 21,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -2153,7 +2026,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 25,
+      "order": 22,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -2180,8 +2053,8 @@
       "id": 420,
       "type": "bf1edf2f-ccb7-45ac-882e-55bdd5f0be86",
       "pos": [
-        -1065.6775334832748,
-        -857.8643492459313
+        -1063.079283663359,
+        -844.8729217359734
       ],
       "size": [
         210,
@@ -2263,6 +2136,170 @@
       "widgets_values": []
     },
     {
+      "id": 1537,
+      "type": "PrimitiveInt",
+      "pos": [
+        -2055.610222418953,
+        -662.2048047788862
+      ],
+      "size": [
+        270,
+        82
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 23,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": [
+            1838
+          ]
+        }
+      ],
+      "title": "Texture Resolution",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.18.1",
+        "Node name for S&R": "PrimitiveInt"
+      },
+      "widgets_values": [
+        1024,
+        "fixed"
+      ]
+    },
+    {
+      "id": 239,
+      "type": "Trellis2LoadImageWithTransparency",
+      "pos": [
+        -2048.8215353520336,
+        -527.0330637185876
+      ],
+      "size": [
+        627.638044195148,
+        672.4931923313359
+      ],
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            1196
+          ]
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "links": null
+        },
+        {
+          "name": "image_with_alpha",
+          "type": "IMAGE",
+          "links": [
+            1195
+          ]
+        }
+      ],
+      "title": "Color Image",
+      "properties": {
+        "aux_id": "visualbruno/ComfyUI-Trellis2",
+        "ver": "e8098f5641702e74133c2dea0b45a13a3ab19985",
+        "Node name for S&R": "Trellis2LoadImageWithTransparency"
+      },
+      "widgets_values": [
+        "ArmoredWarrior.png",
+        "image"
+      ]
+    },
+    {
+      "id": 411,
+      "type": "Trellis2LoadImageWithTransparency",
+      "pos": [
+        -2044.3589736162207,
+        266.782275009605
+      ],
+      "size": [
+        627.638044195148,
+        672.4931923313359
+      ],
+      "flags": {},
+      "order": 25,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": []
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "links": null
+        },
+        {
+          "name": "image_with_alpha",
+          "type": "IMAGE",
+          "links": [
+            627
+          ]
+        }
+      ],
+      "title": "Normal Image",
+      "properties": {
+        "aux_id": "visualbruno/ComfyUI-Trellis2",
+        "ver": "e8098f5641702e74133c2dea0b45a13a3ab19985",
+        "Node name for S&R": "Trellis2LoadImageWithTransparency"
+      },
+      "widgets_values": [
+        "Image_1024_00114_.png",
+        "image"
+      ]
+    },
+    {
+      "id": 219,
+      "type": "PrimitiveString",
+      "pos": [
+        -2058.606314017538,
+        -1029.5385288033083
+      ],
+      "size": [
+        270,
+        58
+      ],
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            464,
+            465
+          ]
+        }
+      ],
+      "title": "Name -> output in 3D folder",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.16.4",
+        "Node name for S&R": "PrimitiveString"
+      },
+      "widgets_values": [
+        "ArmoredWarrior_MV_LowPoly"
+      ]
+    },
+    {
       "id": 1536,
       "type": "Trellis2MultiViewTexturing",
       "pos": [
@@ -2274,7 +2311,7 @@
         626
       ],
       "flags": {},
-      "order": 39,
+      "order": 35,
       "mode": 0,
       "inputs": [
         {
@@ -2366,7 +2403,7 @@
       "widgets_values": [
         4096,
         true,
-        1,
+        2,
         1.2,
         1.15,
         true,
@@ -2382,43 +2419,6 @@
         "",
         "",
         ""
-      ]
-    },
-    {
-      "id": 1537,
-      "type": "PrimitiveInt",
-      "pos": [
-        -2055.610222418953,
-        -662.2048047788862
-      ],
-      "size": [
-        270,
-        82
-      ],
-      "flags": {
-        "collapsed": false
-      },
-      "order": 26,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "INT",
-          "type": "INT",
-          "links": [
-            1838
-          ]
-        }
-      ],
-      "title": "Texture Resolution",
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.18.1",
-        "Node name for S&R": "PrimitiveInt"
-      },
-      "widgets_values": [
-        1024,
-        "fixed"
       ]
     }
   ],
@@ -2828,8 +2828,8 @@
       "id": 8,
       "title": "Mesh Generation",
       "bounding": [
-        -1328.4530352923466,
-        -1235.6463000888773,
+        -1320.6581668923466,
+        -1233.0480205338984,
         819.1168878180857,
         277.19932162124667
       ],
@@ -2841,8 +2841,8 @@
       "id": 9,
       "title": "MultiView Generation with Qwen",
       "bounding": [
-        -1323.154487850866,
-        -951.3040396288977,
+        -1320.5562380309502,
+        -938.3126121189398,
         824.8010670728474,
         237.95206130144413
       ],
@@ -9478,10 +9478,10 @@
     "VHS_MetadataImage": true,
     "VHS_KeepIntermediate": true,
     "ds": {
-      "scale": 0.38554328942953164,
+      "scale": 0.46650738020973354,
       "offset": [
-        3012.257866754192,
-        1165.9134004795685
+        2442.832634934065,
+        1308.77009277857
       ]
     }
   },
