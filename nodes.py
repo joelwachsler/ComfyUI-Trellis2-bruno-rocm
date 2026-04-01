@@ -39,6 +39,7 @@ import comfy.utils
 from .trellis2.pipelines import Trellis2ImageTo3DPipeline
 from .trellis2.representations import Mesh, MeshWithVoxel
 from .trellis2.modules.attention import config
+from .trellis2.modules.sparse import config as sparseconfig
 from .trellis2.pipelines import samplers
 from .trellis2.modules.sparse import SparseTensor
 
@@ -329,6 +330,8 @@ class Trellis2LoadModel:
                 "low_vram": ("BOOLEAN",{"default":True}),
                 "keep_models_loaded": ("BOOLEAN", {"default":True}),
                 "fix_blackwell": ("BOOLEAN",{"default":False}),
+                "conv_backend": (["spconv","torchsparse","flex_gemm"],{"default":"flex_gemm"}),
+                "sparse_backend": (["xformers","flash_attn"],{"default":"flash_attn"}),
             },
         }
 
@@ -338,11 +341,15 @@ class Trellis2LoadModel:
     CATEGORY = "Trellis2Wrapper"
     OUTPUT_NODE = True
 
-    def process(self, modelname, backend, device, low_vram, keep_models_loaded, fix_blackwell):
+    def process(self, modelname, backend, device, low_vram, keep_models_loaded, fix_blackwell, conv_backend, sparse_backend):
         if fix_blackwell:
             from .blackwell_fix import patch_all
-            patch_all()        
-        
+            patch_all()
+            print('conv_backend is forced to spconv')
+            sparseconfig.set_conv_backend('spconv')
+        else:
+            sparseconfig.set_conv_backend(conv_backend)
+            
         os.environ['OPENCV_IO_ENABLE_OPENEXR'] = '1'
         os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"  # Can save GPU memory
         #os.environ["FLEX_GEMM_AUTOTUNE_CACHE_PATH"] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'autotune_cache.json')
@@ -350,6 +357,7 @@ class Trellis2LoadModel:
         os.environ['ATTN_BACKEND'] = backend
         
         config.set_backend(backend)
+        sparseconfig.set_attn_backend(sparse_backend)
         
         reset_cuda()
         
