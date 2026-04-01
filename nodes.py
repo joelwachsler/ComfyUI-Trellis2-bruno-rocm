@@ -4580,7 +4580,7 @@ class Trellis2VoxelToMesh:
                 "mesh": ("MESHWITHVOXEL",),
                 "target_height_mm": ("FLOAT",{"default":0.0,"min":0.0,"max":500.0,"step":0.1}),
                 "sigma": ("FLOAT",{"default":0.0,"min":0.0,"max":9.9,"step":0.1}),
-                "coarse_downsample": ("INT",{"default":1,"min":1,"max":9,"step":1}),
+                "coarse_downsample": ("FLOAT",{"default":1.00,"min":1.00,"max":9.00,"step":0.01}),
                 "taubin_iterations": ("INT",{"default":0,"min":0,"max":999,"step":1}),
             },
         }

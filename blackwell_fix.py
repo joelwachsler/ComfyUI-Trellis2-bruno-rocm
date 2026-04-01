@@ -182,7 +182,7 @@ def voxel_to_mesh(
     mesh_output,
     target_height_mm: float = 100.0,
     sigma: float = 1.5,
-    coarse_downsample: int = 4,
+    coarse_downsample: float = 4,
     taubin_iterations: int = 50,
     verbose: bool = True,
 ):
@@ -239,7 +239,7 @@ def voxel_coords_to_mesh(
     voxel_size: float,
     target_height_mm: float = 100.0,
     sigma: float = 1.5,
-    coarse_downsample: int = 4,
+    coarse_downsample: float = 4,
     taubin_iterations: int = 50,
     verbose: bool = True,
 ):
