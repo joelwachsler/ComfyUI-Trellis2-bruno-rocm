@@ -329,7 +329,6 @@ class Trellis2LoadModel:
                 "device": (["cpu","cuda"],{"default":"cuda"}),
                 "low_vram": ("BOOLEAN",{"default":True}),
                 "keep_models_loaded": ("BOOLEAN", {"default":True}),
-                "fix_blackwell": ("BOOLEAN",{"default":False}),
                 "conv_backend": (["spconv","torchsparse","flex_gemm"],{"default":"flex_gemm"}),
                 "sparse_backend": (["xformers","flash_attn"],{"default":"flash_attn"}),
             },
@@ -341,15 +340,7 @@ class Trellis2LoadModel:
     CATEGORY = "Trellis2Wrapper"
     OUTPUT_NODE = True
 
-    def process(self, modelname, backend, device, low_vram, keep_models_loaded, fix_blackwell, conv_backend, sparse_backend):
-        if fix_blackwell:
-            from .blackwell_fix import patch_all
-            patch_all()
-            print('conv_backend is forced to spconv')
-            sparseconfig.set_conv_backend('spconv')
-        else:
-            sparseconfig.set_conv_backend(conv_backend)
-            
+    def process(self, modelname, backend, device, low_vram, keep_models_loaded, conv_backend, sparse_backend):    
         os.environ['OPENCV_IO_ENABLE_OPENEXR'] = '1'
         os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"  # Can save GPU memory
         #os.environ["FLEX_GEMM_AUTOTUNE_CACHE_PATH"] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'autotune_cache.json')
@@ -358,6 +349,7 @@ class Trellis2LoadModel:
         
         config.set_backend(backend)
         sparseconfig.set_attn_backend(sparse_backend)
+        sparseconfig.set_conv_backend(conv_backend)
         
         reset_cuda()
         

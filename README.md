@@ -14,7 +14,7 @@
 
 | Date | Description |
 | --- | --- |
-| **2026-04-01** | Added node "Voxel to Mesh"<br>It replaces Remeshing to make watertight mesh<br>Added "Blackwell Fix" in "Load Model" node |
+| **2026-04-01** | Added node "Voxel to Mesh"<br>It replaces Remeshing to make watertight mesh |
 | **2026-03-21** | Added node "Projection HighPoly to LowPoly"<br>Added node "Render MultiView" |
 | **2026-03-17** | Added Inpainting Choice NS and TELEA |
 | **2026-03-14** | Added Experimental node "Projection MultiView Texturing"<br>Check in example_workflows folder |
