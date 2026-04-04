@@ -5,7 +5,6 @@ from ..attention import MultiHeadAttention
 from ..norm import LayerNorm32
 from .blocks import FeedForwardNet
 
-
 class ModulatedTransformerBlock(nn.Module):
     """
     Transformer block (MSA + FFN) with adaptive layer norm conditioning.
@@ -163,3 +162,72 @@ class ModulatedTransformerCrossBlock(nn.Module):
         else:
             return self._forward(x, mod, context, phases)
         
+class ModulatedTransformerCrossBlock_woT(nn.Module):
+    """
+    Transformer cross-attention block (MSA + MCA + FFN) with adaptive layer norm conditioning.
+    """
+    def __init__(
+        self,
+        channels: int,
+        ctx_channels: int,
+        num_heads: int,
+        mlp_ratio: float = 4.0,
+        attn_mode: Literal["full", "windowed"] = "full",
+        window_size: Optional[int] = None,
+        shift_window: Optional[Tuple[int, int, int]] = None,
+        use_checkpoint: bool = False,
+        use_rope: bool = False,
+        qk_rms_norm: bool = False,
+        qk_rms_norm_cross: bool = False,
+        qkv_bias: bool = True,
+        share_mod: bool = False,
+    ):
+        super().__init__()
+        self.use_checkpoint = use_checkpoint
+        self.share_mod = share_mod
+        self.norm1 = LayerNorm32(channels, elementwise_affine=False, eps=1e-6)
+        self.norm2 = LayerNorm32(channels, elementwise_affine=True, eps=1e-6)
+        self.norm3 = LayerNorm32(channels, elementwise_affine=False, eps=1e-6)
+        self.self_attn = MultiHeadAttention(
+            channels,
+            num_heads=num_heads,
+            type="self",
+            attn_mode=attn_mode,
+            window_size=window_size,
+            shift_window=shift_window,
+            qkv_bias=qkv_bias,
+            use_rope=use_rope,
+            qk_rms_norm=qk_rms_norm,
+        )
+        self.cross_attn = MultiHeadAttention(
+            channels,
+            ctx_channels=ctx_channels,
+            num_heads=num_heads,
+            type="cross",
+            attn_mode="full",
+            qkv_bias=qkv_bias,
+            qk_rms_norm=qk_rms_norm_cross,
+        )
+        self.mlp = FeedForwardNet(
+            channels,
+            mlp_ratio=mlp_ratio,
+        )
+
+    def _forward(self, x: torch.Tensor, context: torch.Tensor):
+
+        h = self.norm1(x)
+        h = self.self_attn(h)
+        x = x + h
+        h = self.norm2(x)
+        h = self.cross_attn(h, context)
+        x = x + h
+        h = self.norm3(x)
+        h = self.mlp(h)
+        x = x + h
+        return x
+
+    def forward(self, x: torch.Tensor, context: torch.Tensor):
+        if self.use_checkpoint:
+            return torch.utils.checkpoint.checkpoint(self._forward, x, context, use_reentrant=False)
+        else:
+            return self._forward(x, context)        

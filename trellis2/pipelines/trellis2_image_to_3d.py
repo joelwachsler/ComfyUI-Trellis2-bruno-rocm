@@ -26,6 +26,8 @@ import random
 
 from comfy.utils import ProgressBar
 
+script_directory = os.path.dirname(os.path.abspath(__file__))
+
 def pil2tensor(image):
     return torch.from_numpy(np.array(image).astype(np.float32) / 255.0)[None,]
 
@@ -98,6 +100,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         self.rembg_model = rembg_model
         self._low_vram = low_vram
         self.default_pipeline_type = default_pipeline_type
+        self.VGGT_model = None
         self.pbr_attr_layout = {
             'base_color': slice(0, 3),
             'metallic': slice(3, 4),
@@ -148,14 +151,16 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             torch.cuda.empty_cache()
 
     @classmethod
-    def from_pretrained(cls, path: str, config_file: str = "pipeline.json", keep_models_loaded = True, use_fp8 = False) -> "Trellis2ImageTo3DPipeline":
+    def from_pretrained(cls, path: str, config_file: str = "pipeline.json", keep_models_loaded = True, use_fp8 = False, use_reconviagen = False) -> "Trellis2ImageTo3DPipeline":
         """
         Load a pretrained model.
 
         Args:
             path (str): The path to the model. Can be either local path or a Hugging Face repository.
         """
-        if use_fp8:
+        if use_reconviagen:
+            config_file = "reconviagen_pipeline.json"
+        elif use_fp8:
             config_file = "pipeline_fp8.json"
             
         pipeline = super().from_pretrained(path, config_file)
@@ -212,6 +217,45 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             self.models['sparse_structure_decoder'].to(self._device)
             if hasattr(self.models['sparse_structure_decoder'], 'low_vram'):
                 self.models['sparse_structure_decoder'].low_vram = self.low_vram
+                
+    def load_sparse_structure_vggt_model(self):        
+        if self.models['sparse_structure_flow_vggt_model'] is None:
+            print('Loading Sparse Structure VGGT model ...')
+            self.models['sparse_structure_flow_vggt_model'] = models.from_pretrained(f"{self.path}/{self._pretrained_args['models']['sparse_structure_flow_vggt_model']}")
+            self.models['sparse_structure_flow_vggt_model'].eval()
+            self.models['sparse_structure_flow_vggt_model'].to(self._device)
+        
+        if self.models['sparse_structure_decoder'] is None:            
+            self.models['sparse_structure_decoder'] = models.from_pretrained(self._pretrained_args['models']['sparse_structure_decoder'])
+            self.models['sparse_structure_decoder'].eval()        
+            self.models['sparse_structure_decoder'].to(self._device)
+            if hasattr(self.models['sparse_structure_decoder'], 'low_vram'):
+                self.models['sparse_structure_decoder'].low_vram = self.low_vram                
+                
+    def unload_sparse_structure_vggt_model(self):
+        if self.models['sparse_structure_flow_vggt_model']:
+            del self.models['sparse_structure_flow_vggt_model']
+            self.models['sparse_structure_flow_vggt_model'] = None            
+            
+        if self.models['sparse_structure_decoder']:
+            del self.models['sparse_structure_decoder']
+            self.models['sparse_structure_decoder'] = None
+        
+        self._cleanup_cuda()                
+                
+    def load_sparse_structure_vggt_cond(self):        
+        if self.models['sparse_structure_vggt_cond'] is None:
+            print('Loading Sparse Structure VGGT cond ...')
+            self.models['sparse_structure_vggt_cond'] = models.from_pretrained(f"{self.path}/{self._pretrained_args['models']['sparse_structure_vggt_cond']}")
+            self.models['sparse_structure_vggt_cond'].eval()
+            self.models['sparse_structure_vggt_cond'].to(self._device)  
+
+    def unload_sparse_structure_vggt_cond(self):
+        if self.models['sparse_structure_vggt_cond']:
+            del self.models['sparse_structure_vggt_cond']
+            self.models['sparse_structure_vggt_cond'] = None
+        
+        self._cleanup_cuda()            
     
     def unload_sparse_structure_model(self):
         if self.models['sparse_structure_flow_model']:

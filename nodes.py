@@ -331,6 +331,7 @@ class Trellis2LoadModel:
                 "keep_models_loaded": ("BOOLEAN", {"default":True}),
                 "conv_backend": (["spconv","torchsparse","flex_gemm"],{"default":"flex_gemm"}),
                 "sparse_backend": (["xformers","flash_attn"],{"default":"flash_attn"}),
+                "use_reconviagen": ("BOOLEAN",{"default":False}),
             },
         }
 
@@ -340,7 +341,9 @@ class Trellis2LoadModel:
     CATEGORY = "Trellis2Wrapper"
     OUTPUT_NODE = True
 
-    def process(self, modelname, backend, device, low_vram, keep_models_loaded, conv_backend, sparse_backend):    
+    def process(self, modelname, backend, device, low_vram, keep_models_loaded, conv_backend, sparse_backend, use_reconviagen):    
+        import requests
+        
         os.environ['OPENCV_IO_ENABLE_OPENEXR'] = '1'
         os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"  # Can save GPU memory
         #os.environ["FLEX_GEMM_AUTOTUNE_CACHE_PATH"] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'autotune_cache.json')
@@ -365,15 +368,19 @@ class Trellis2LoadModel:
                 local_dir=model_path,
                 local_dir_use_symlinks=False,
             )
-            
+        
+        reconviagen_pipeline_file = os.path.join(folder_paths.models_dir,'microsoft','TRELLIS.2-4B','reconviagen_pipeline.json')
+        if not os.path.exists(reconviagen_pipeline_file):
+            source_reconviagen_pipeline_file = os.path.join(script_directory,'reconviagen_pipeline.json')
+            shutil.copyfile(source_reconviagen_pipeline_file,reconviagen_pipeline_file)
+        
         dinov3_model_path = os.path.join(folder_paths.models_dir,"facebook","dinov3-vitl16-pretrain-lvd1689m","model.safetensors")
         if not os.path.exists(dinov3_model_path):
             raise Exception("Facebook Dinov3 model not found in models/facebook/dinov3-vitl16-pretrain-lvd1689m folder")
         
         trellis_image_large_path = os.path.join(folder_paths.models_dir,"microsoft","TRELLIS-image-large","ckpts","ss_dec_conv3d_16l8_fp16.safetensors")
         if not os.path.exists(trellis_image_large_path):
-            print('Trellis-Image-Large ss_dec_conv3d_16l8_fp16 files not found. Trying to download the files from huggingface ...')
-            import requests
+            print('Trellis-Image-Large ss_dec_conv3d_16l8_fp16 files not found. Trying to download the files from huggingface ...')            
             url = "https://huggingface.co/microsoft/TRELLIS-image-large/resolve/main/ckpts/ss_dec_conv3d_16l8_fp16.json?download=true"
             filename = os.path.join(folder_paths.models_dir,"microsoft","TRELLIS-image-large","ckpts","ss_dec_conv3d_16l8_fp16.json")
             path = Path(filename)
@@ -398,12 +405,79 @@ class Trellis2LoadModel:
             else:
                 raise Exception("Cannot download Trellis-Image-Large file ss_dec_conv3d_16l8_fp16.safetensors")
         
+        if use_reconviagen:
+            reconviagen_file = os.path.join(folder_paths.models_dir,'microsoft','TRELLIS.2-4B','ckpts','ss_vggt_cond.safetensors')
+            if not os.path.exists(reconviagen_file):
+                print('ReconViaGen file ss_vggt_cond.safetensors not found. Trying to download the files from huggingface ...')            
+                url = "https://huggingface.co/Stable-X/trellis-vggt-v0-2/resolve/main/ckpts/ss_vggt_cond.safetensors?download=true"
+                filename = os.path.join(folder_paths.models_dir,"microsoft","TRELLIS.2-4B","ckpts","ss_vggt_cond.safetensors")
+                path = Path(filename)
+                path.parent.mkdir(parents=True, exist_ok=True)
+                
+                response = requests.get(url)
+                if response.status_code == 200:
+                    with open(filename, "wb") as f:
+                        f.write(response.content)
+                    print("Download ss_vggt_cond.safetensors complete!")
+                else:
+                    raise Exception("Cannot download ReconViaGen file ss_vggt_cond.safetensors")
+            
+            reconviagen_file = os.path.join(folder_paths.models_dir,'microsoft','TRELLIS.2-4B','ckpts','ss_vggt_cond.json')
+            if not os.path.exists(reconviagen_file):
+                print('ReconViaGen file ss_vggt_cond.json not found. Trying to download the files from huggingface ...')            
+                url = "https://huggingface.co/Stable-X/trellis-vggt-v0-2/resolve/main/ckpts/ss_vggt_cond.json?download=true"
+                filename = os.path.join(folder_paths.models_dir,"microsoft","TRELLIS.2-4B","ckpts","ss_vggt_cond.json")
+                path = Path(filename)
+                path.parent.mkdir(parents=True, exist_ok=True)
+                
+                response = requests.get(url)
+                if response.status_code == 200:
+                    with open(filename, "wb") as f:
+                        f.write(response.content)
+                    print("Download ss_vggt_cond.json complete!")
+                else:
+                    raise Exception("Cannot download ReconViaGen file ss_vggt_cond.json") 
+
+            reconviagen_file = os.path.join(folder_paths.models_dir,'microsoft','TRELLIS.2-4B','ckpts','ss_flow_img_dit_L_16l8_fp16.safetensors')
+            if not os.path.exists(reconviagen_file):
+                print('ReconViaGen file ss_flow_img_dit_L_16l8_fp16.safetensors not found. Trying to download the files from huggingface ...')            
+                url = "https://huggingface.co/Stable-X/trellis-vggt-v0-2/resolve/main/ckpts/ss_flow_img_dit_L_16l8_fp16.safetensors?download=true"
+                filename = os.path.join(folder_paths.models_dir,"microsoft","TRELLIS.2-4B","ckpts","ss_flow_img_dit_L_16l8_fp16.safetensors")
+                path = Path(filename)
+                path.parent.mkdir(parents=True, exist_ok=True)
+                
+                response = requests.get(url)
+                if response.status_code == 200:
+                    with open(filename, "wb") as f:
+                        f.write(response.content)
+                    print("Download ss_flow_img_dit_L_16l8_fp16.safetensors complete!")
+                else:
+                    raise Exception("Cannot download ReconViaGen file ss_flow_img_dit_L_16l8_fp16.safetensors")      
+
+            reconviagen_file = os.path.join(folder_paths.models_dir,'microsoft','TRELLIS.2-4B','ckpts','ss_flow_img_dit_L_16l8_fp16.json')
+            if not os.path.exists(reconviagen_file):
+                print('ReconViaGen file ss_flow_img_dit_L_16l8_fp16.json not found. Trying to download the files from huggingface ...')            
+                url = "https://huggingface.co/Stable-X/trellis-vggt-v0-2/resolve/main/ckpts/ss_flow_img_dit_L_16l8_fp16.json?download=true"
+                filename = os.path.join(folder_paths.models_dir,"microsoft","TRELLIS.2-4B","ckpts","ss_flow_img_dit_L_16l8_fp16.json")
+                path = Path(filename)
+                path.parent.mkdir(parents=True, exist_ok=True)
+                
+                response = requests.get(url)
+                if response.status_code == 200:
+                    with open(filename, "wb") as f:
+                        f.write(response.content)
+                    print("Download ss_flow_img_dit_L_16l8_fp16.json complete!")
+                else:
+                    raise Exception("Cannot download ReconViaGen file ss_flow_img_dit_L_16l8_fp16.json")                       
+        
         if modelname == "visualbruno/TRELLIS.2-4B-FP8":
             use_fp8 = True
+            if use_reconviagen:
+                raise Exception("ReconViaGen cannot be used with TRELLIS.2-4B-FP8. Select microsoft/TRELLIS.2-4B")
         else:
             use_fp8 = False
                 
-        pipeline = Trellis2ImageTo3DPipeline.from_pretrained(model_path, keep_models_loaded = keep_models_loaded, use_fp8=use_fp8)
+        pipeline = Trellis2ImageTo3DPipeline.from_pretrained(model_path, keep_models_loaded = keep_models_loaded, use_fp8=use_fp8, use_reconviagen=use_reconviagen)
         pipeline.low_vram = low_vram
         
         if device=="cuda":
@@ -4613,6 +4687,380 @@ class Trellis2VoxelToMesh:
         
         return (mesh_copy,)
         
+class Trellis2UnloadAllModels:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "input_1": (any,)
+            },
+        }
+
+    RETURN_TYPES = (any,)
+    RETURN_NAMES = ("output_1",)
+    FUNCTION = "process"
+    CATEGORY = "Trellis2Wrapper"
+    OUTPUT_NODE = True
+
+    def process(self, input_1):
+        print('Unloading all models ...')
+        if hasattr(mm, 'current_loaded_models'):
+            # Iterate backwards to safely remove items
+            for i in range(len(mm.current_loaded_models) - 1, -1, -1):
+                loaded_model = mm.current_loaded_models[i]
+                
+                print(f"[AbsoluteUnload] Force-killing: {loaded_model.model.model.__class__.__name__}")
+                
+                # Force VRAM unload
+                loaded_model.model_unload(1e32)
+                
+                # Force System RAM unpinning (This is what the standard loop skipped)
+                if hasattr(loaded_model.model, 'partially_unload_ram'):
+                    loaded_model.model.partially_unload_ram(1e32)
+                    
+            # Clear ComfyUI's intermediate cross-attention and tensor caches
+            if hasattr(mm, 'current_loaded_models'):
+                mm.current_loaded_models.clear()            
+
+            import comfy.controlnet
+            if hasattr(comfy.controlnet, 'controlnet_loaded_models'):
+                comfy.controlnet.controlnet_loaded_models.clear() 
+                
+        mm.free_memory(memory_required = 1e30, 
+                       device = mm.get_torch_device(),
+                       ram_required = 1e30)
+                       
+        print('Clearing cache ...')
+        mm.soft_empty_cache()
+
+        gc.collect()
+        gc.collect()
+        
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+            torch.cuda.ipc_collect()
+
+        print('Memory cleared')
+        
+        return (input_1,)    
+
+class Trellis2SparseGeneratorWithReconViaGen:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "pipeline": ("TRELLIS2PIPELINE",),
+                "images": ("IMAGE",),
+                "seed": ("INT", {"default": 0, "min": 0, "max": 0x7fffffff}),
+                "sparse_structure_steps": ("INT",{"default":12, "min":1, "max":100},),
+                "sparse_structure_guidance_strength": ("FLOAT",{"default":6.50,"min":0.00,"max":99.99,"step":0.01}),
+                "sparse_structure_guidance_rescale": ("FLOAT",{"default":0.05,"min":0.00,"max":1.00,"step":0.01}),
+                "sparse_structure_rescale_t": ("FLOAT",{"default":4.00,"min":0.00,"max":9.99,"step":0.01}),
+                "sparse_structure_sampler": (["euler", "heun", "rk4", "rk5"], {"default": "euler"}),
+                "sparse_structure_resolution": ("INT", {"default":32,"min":32,"max":128,"step":4}),
+                "sparse_structure_guidance_interval_start": ("FLOAT",{"default":0.10,"min":0.00,"max":1.00,"step":0.01}),
+                "sparse_structure_guidance_interval_end": ("FLOAT",{"default":1.00,"min":0.00,"max":1.00,"step":0.01}),
+            },
+        }
+
+    RETURN_TYPES = ("COORDS", "INT", "TRELLIS2PIPELINE",)
+    RETURN_NAMES = ("coords", "sparse_structure_resolution", "pipeline",)
+    FUNCTION = "process"
+    CATEGORY = "Trellis2Wrapper"
+    OUTPUT_NODE = True
+
+    def process(self, pipeline, images, seed, 
+        # sparse
+        sparse_structure_steps, 
+        sparse_structure_guidance_strength, 
+        sparse_structure_guidance_rescale,
+        sparse_structure_rescale_t,
+        sparse_structure_sampler,
+        sparse_structure_resolution,
+        sparse_structure_guidance_interval_start,
+        sparse_structure_guidance_interval_end,
+        ):
+        
+        self.seed_all(seed)
+        
+        self.load_vggt_model(pipeline)
+        
+        sparse_structure_guidance_interval = [sparse_structure_guidance_interval_start,sparse_structure_guidance_interval_end]        
+        sparse_structure_sampler_params = {"steps":sparse_structure_steps,"guidance_strength":sparse_structure_guidance_strength,"guidance_rescale":sparse_structure_guidance_rescale,"guidance_interval":sparse_structure_guidance_interval,"rescale_t":sparse_structure_rescale_t}                    
+
+        args = pipeline._pretrained_args
+        sparse_sampler_prefix = pipeline.GetSamplerName(sparse_structure_sampler)
+        pipeline.sparse_structure_sampler = getattr(samplers, f"Flow{sparse_sampler_prefix}GuidanceIntervalSampler")(**args['sparse_structure_sampler']['args'])
+        pipeline.load_sparse_structure_vggt_model()
+        pipeline.load_sparse_structure_vggt_cond()
+        
+        if images.ndim == 3:
+            images = images.unsqueeze(0)
+        
+        coords = self._run_ss_stage_direct(pipeline, images, sparse_structure_resolution, sparse_structure_sampler_params)
+        
+        if not pipeline.keep_models_loaded:
+            pipeline.unload_sparse_structure_vggt_model()            
+            pipeline.unload_sparse_structure_vggt_cond()
+            self.unload_vggt_model(pipeline)
+
+        return (coords, sparse_structure_resolution, pipeline,)
+        
+    def load_vggt_model(self, pipeline):
+        if pipeline.VGGT_model is None:
+            from .vggt.vggt.models.vggt import VGGT
+            pipeline.VGGT_dtype = torch.bfloat16 if torch.cuda.get_device_capability()[0] >= 8 else torch.float16            
+            model_path = os.path.join(folder_paths.models_dir,'recongenvia')
+            pipeline.VGGT_model = VGGT.from_pretrained(model_path)
+            pipeline.VGGT_model.to('cuda')
+            del pipeline.VGGT_model.depth_head
+            del pipeline.VGGT_model.track_head
+            pipeline.VGGT_model.eval()
+                
+            self._init_image_cond_model(pipeline)
+            
+        
+    def unload_vggt_model(self, pipeline):
+        del pipeline.VGGT_model
+        pipeline.VGGT_model = None
+        
+        del pipeline.models['image_cond_model_vggt']
+        pipeline.models['image_cond_model_vggt'] = None
+        pipeline.image_cond_model_transform = None          
+        
+        gc.collect()
+        
+        if torch.cuda.is_available():
+            torch.cuda.synchronize()
+            torch.cuda.empty_cache()        
+        
+        
+    def seed_all(self, seed: int = 0):
+        import random
+        """
+        Set random seeds of all components.
+        """
+        random.seed(seed)
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed) 
+
+    @torch.no_grad()
+    def _run_ss_stage_direct(
+        self,
+        pipeline,
+        images,
+        target_ss_res: int,
+        ss_sampler_params: dict,
+    ) -> torch.Tensor:
+        """
+        Run only ReconViaGen's sparse structure diffusion stage to obtain coords
+        directly, without proceeding to the SLAT/mesh stage.
+
+        Returns:
+            coords : (N, 4) int tensor  [batch_idx, x, y, z]  in [0, target_ss_res)
+        """           
+            
+        cuda_device = torch.device('cuda')
+
+        if pipeline.low_vram:
+            pipeline.VGGT_model.to(cuda_device)
+
+        with torch.no_grad():
+            with torch.cuda.amp.autocast(dtype=pipeline.VGGT_dtype):
+                aggregated_tokens_list, _ = self.vggt_feat(pipeline, images)
+            b, n, _, _ = aggregated_tokens_list[0].shape
+            image_cond = self.encode_image(pipeline, images).reshape(b, n, -1, 1024)
+            ss_cond = self.get_ss_cond(pipeline, image_cond[:, :, 5:], aggregated_tokens_list, 1)
+
+        ss_flow_model = pipeline.models['sparse_structure_flow_vggt_model']
+        sampler_params = {**pipeline.sparse_structure_sampler_params, **ss_sampler_params}
+        reso = ss_flow_model.resolution
+        ss_noise = torch.randn(1, ss_flow_model.in_channels, reso, reso, reso).to(cuda_device)
+
+        with torch.autocast('cuda', dtype=torch.float16):
+            ss_latent = pipeline.sparse_structure_sampler.sample(
+                ss_flow_model,
+                ss_noise,
+                **ss_cond,
+                **sampler_params,
+                verbose=True,
+            ).samples
+
+        decoder = pipeline.models['sparse_structure_decoder']
+        decoded = decoder(ss_latent) > 0
+        if target_ss_res != decoded.shape[2]:
+            ratio = decoded.shape[2] // target_ss_res
+            decoded = torch.nn.functional.max_pool3d(decoded.float(), ratio, ratio, 0) > 0.5
+        coords = torch.argwhere(decoded)[:, [0, 2, 3, 4]].int()
+
+        if pipeline.low_vram:
+            pipeline.VGGT_model.to('cpu')
+            decoder.to('cpu')
+            ss_cond = pipeline._cond_cpu(ss_cond)
+            torch.cuda.empty_cache()
+
+        return coords 
+        
+    @torch.no_grad()
+    def _run_ss_stage(
+        self,
+        pipeline,
+        images,
+        target_ss_res: int,
+        ss_sampler_params: dict,
+        slat_sampler_params: dict,
+    ) -> torch.Tensor:
+        """
+        Generate a rough mesh via vggt_pipeline, then voxelise it into
+        surface-only coords at target_ss_res^3 for the downstream shape/tex stages.
+
+        Returns:
+            coords : (N, 4) int tensor  [batch_idx, x, y, z]  in [0, target_ss_res)
+        """
+        vp = self.vggt_pipeline
+        # vp.device is dynamic (inferred from model params), so when models are on
+        # CPU it returns 'cpu'. Hardcode the target cuda device instead.
+        cuda_device = torch.device('cuda')
+
+        if self.low_vram:
+            self._vggt_models_to(cuda_device)
+
+        outputs, _, _ = vp.run(
+            image=images,
+            formats=["mesh"],
+            preprocess_image=False,
+            sparse_structure_sampler_params=ss_sampler_params,
+            slat_sampler_params=slat_sampler_params,
+        )
+        mesh_result = outputs["mesh"][0]
+        coords = self._mesh_to_surface_coords(mesh_result, target_ss_res, cuda_device)
+
+        if self.low_vram:
+            self._vggt_models_to('cpu')
+            torch.cuda.empty_cache()
+
+        return coords        
+
+    @torch.no_grad()
+    def vggt_feat(self, pipeline, image):
+        """
+        Encode the image.
+
+        Args:
+            image (Union[torch.Tensor, list[Image.Image]]): The image to encode
+
+        Returns:
+            torch.Tensor: The encoded features.
+        """
+        if isinstance(image, torch.Tensor):
+            assert image.ndim == 4, "Image tensor should be batched (B, H, W, C) or (B, C, H, W)"
+            # ComfyUI IMAGE tensors are (B, H, W, C); convert to (B, C, H, W)
+            if image.shape[-1] in (3, 4):
+                image = image.permute(0, 3, 1, 2)
+            image = F.interpolate(image, 518, mode='bilinear', align_corners=False)
+            image = image.to(pipeline.device)
+        elif isinstance(image, list):
+            assert all(isinstance(i, Image.Image) for i in image), "Image list should be list of PIL images"
+            image = [i.resize((518, 518), Image.LANCZOS) for i in image]
+            image = [np.array(i.convert('RGB')).astype(np.float32) / 255 for i in image]
+            image = [torch.from_numpy(i).permute(2, 0, 1).float() for i in image]
+            image = torch.stack(image).to(pipeline.device)
+        else:
+            raise ValueError(f"Unsupported type of image: {type(image)}")
+
+        with torch.no_grad():
+            with torch.cuda.amp.autocast(dtype=pipeline.VGGT_dtype):
+                # Predict attributes including cameras, depth maps, and point maps.
+                aggregated_tokens_list, _ = pipeline.VGGT_model.aggregator(image[None])
+
+        return aggregated_tokens_list, image
+
+    def get_ss_cond(self, pipeline, image_cond: torch.Tensor, aggregated_tokens_list: list, num_samples: int) -> dict:
+        """
+        Get the conditioning information for the model.
+
+        Args:
+            image (Union[torch.Tensor, list[Image.Image]]): The image prompts.
+
+        Returns:
+            dict: The conditioning information
+        """
+        cond = pipeline.models['sparse_structure_vggt_cond'](aggregated_tokens_list, image_cond)
+        neg_cond = torch.zeros_like(cond)
+        return {
+            'cond': cond,
+            'neg_cond': neg_cond,
+        }
+
+    def get_slat_cond(self, pipeline, image_cond: torch.Tensor, aggregated_tokens_list: list, num_samples: int) -> dict:
+        """
+        Get the conditioning information for the model.
+
+        Args:
+            image (Union[torch.Tensor, list[Image.Image]]): The image prompts.
+
+        Returns:
+            dict: The conditioning information
+        """
+        b, n, _, _ = aggregated_tokens_list[0].shape
+        cond = pipeline.models['slat_vggt_cond'](aggregated_tokens_list, image_cond).reshape(b, n, -1, 1024)
+        cond = [c.squeeze(1) for c in cond.split(1, dim=1)]
+        neg_cond = [torch.zeros_like(c) for c in cond]
+        return {
+            'cond': cond,
+            'neg_cond': neg_cond,
+        }     
+
+    @torch.no_grad()
+    def encode_image(self, pipeline, image, w_layernorm=True) -> torch.Tensor:
+        """
+        Encode the image.
+
+        Args:
+            image (Union[torch.Tensor, list[Image.Image]]): The image to encode
+
+        Returns:
+            torch.Tensor: The encoded features.
+        """
+        if isinstance(image, torch.Tensor):
+            assert image.ndim == 4, "Image tensor should be batched (B, H, W, C) or (B, C, H, W)"
+            # ComfyUI IMAGE tensors are (B, H, W, C); convert to (B, C, H, W)
+            if image.shape[-1] in (3, 4):
+                image = image.permute(0, 3, 1, 2)
+            image = F.interpolate(image, 518, mode='bilinear', align_corners=False)
+            image = image.to(pipeline.device)
+        elif isinstance(image, list):
+            assert all(isinstance(i, Image.Image) for i in image), "Image list should be list of PIL images"
+            image = [i.resize((518, 518), Image.LANCZOS) for i in image]
+            image = [np.array(i.convert('RGB')).astype(np.float32) / 255 for i in image]
+            image = [torch.from_numpy(i).permute(2, 0, 1).float() for i in image]
+            image = torch.stack(image).to(pipeline.device)
+        else:
+            raise ValueError(f"Unsupported type of image: {type(image)}")
+
+        image = pipeline.image_cond_model_transform(image).to(pipeline.device)
+        pipeline.models['image_cond_model_vggt'].to(pipeline.device)
+        features = pipeline.models['image_cond_model_vggt'](image, is_training=True)['x_prenorm']
+        if w_layernorm:
+            features = F.layer_norm(features, features.shape[-1:])
+        return features
+
+    def _init_image_cond_model(self, pipeline, name: str = "dinov2_vitl14_reg"):
+        """
+        Initialize the image conditioning model.
+        """
+        try:
+            dinov2_model = torch.hub.load(os.path.join(torch.hub.get_dir(), 'facebookresearch_dinov2_main'), name, source='local',pretrained=True)
+        except:
+            dinov2_model = torch.hub.load('facebookresearch/dinov2', name, pretrained=True)
+        dinov2_model.eval()
+        pipeline.models['image_cond_model_vggt'] = dinov2_model
+        transform = transforms.Compose([
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ])
+        pipeline.image_cond_model_transform = transform        
+        
 NODE_CLASS_MAPPINGS = {
     "Trellis2LoadModel": Trellis2LoadModel,
     "Trellis2MeshWithVoxelGenerator": Trellis2MeshWithVoxelGenerator,
@@ -4668,6 +5116,8 @@ NODE_CLASS_MAPPINGS = {
     "Trellis2RenderMultiView": Trellis2RenderMultiView,
     "Trellis2SaveImage": Trellis2SaveImage,
     "Trellis2VoxelToMesh": Trellis2VoxelToMesh,
+    "Trellis2UnloadAllModels": Trellis2UnloadAllModels,
+    "Trellis2SparseGeneratorWithReconViaGen": Trellis2SparseGeneratorWithReconViaGen,
     }
     
 
@@ -4726,4 +5176,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Trellis2RenderMultiView": "Trellis2 - Render MultiView",
     "Trellis2SaveImage": "Trellis2 - Save Image",
     "Trellis2VoxelToMesh": "Trellis2 - Voxel to Mesh",
+    "Trellis2UnloadAllModels": "Trellis2 - Unload All ComfyUI Models",
+    "Trellis2SparseGeneratorWithReconViaGen": "Trellis2 - Sparse Generator with ReconViaGen",
     }

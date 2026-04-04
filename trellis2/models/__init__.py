@@ -14,7 +14,10 @@ __attributes = {
     'SparseUnetVaeEncoder': 'sc_vaes.sparse_unet_vae',
     'SparseUnetVaeDecoder': 'sc_vaes.sparse_unet_vae',
     'FlexiDualGridVaeEncoder': 'sc_vaes.fdg_vae',
-    'FlexiDualGridVaeDecoder': 'sc_vaes.fdg_vae'
+    'FlexiDualGridVaeDecoder': 'sc_vaes.fdg_vae',
+    
+    # vggt
+    'ModulatedMultiViewCond': 'sparse_structure_flow',
 }
 
 __submodules = []
