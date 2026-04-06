@@ -8,6 +8,236 @@ from .classifier_free_guidance_mixin import ClassifierFreeGuidanceSamplerMixin
 from .guidance_interval_mixin import GuidanceIntervalSamplerMixin
 
 
+class DinoLockMixin:
+    """
+    Shared DINO-lock functionality for any GuidanceInterval sampler.
+
+    When ``dino_lock > 0`` each step computes both the CFG-guided velocity
+    and the pure positive-conditioned (DINO-only) velocity, then blends
+    toward the DINO direction.  The schedule builds the initial shape from
+    DINOv3 features first, then hands off to CFG for detail:
+
+        +-----------+---------------------------+
+        | Steps     | Lock strength             |
+        +-----------+---------------------------+
+        | 0 – 40 %  | 0.92 (full DINO: shape)   |
+        | 40 – 70 % | ramp 0.92 → dino_lock     |
+        | 70 – 100 %| dino_lock (CFG guardrail)  |
+        +-----------+---------------------------+
+
+    The mixin intercepts ``sample()`` to add the ``dino_lock`` and
+    ``dino_substeps`` keyword arguments.  When ``dino_lock <= 0`` it
+    falls straight through to the underlying sampler's ``sample()``.
+    """
+
+    # ------------------------------------------------------------------ #
+    #  Internal helpers                                                   #
+    # ------------------------------------------------------------------ #
+
+    def _get_pos_only_v(self, model, x_t, t, cond, **kwargs):
+        """Run model with guidance_strength=1 (positive cond only)."""
+        pos_kw = dict(kwargs)
+        pos_kw["guidance_strength"] = 1.0
+        return self._inference_model(model, x_t, t, cond, **pos_kw)
+
+    def _dino_project(self, guided_v, pos_v, lock_strength):
+        """
+        Linear velocity blend toward the DINO-only signal.
+
+        lock_strength=0 → guided_v unchanged
+        lock_strength=1 → pure pos_v (full DINO trajectory)
+        """
+        return (1.0 - lock_strength) * guided_v + lock_strength * pos_v
+
+    @staticmethod
+    def _alignment_stats(guided_v, pos_v):
+        """Alignment statistics between guided and positive-only velocity."""
+        g_raw = guided_v.feats if hasattr(guided_v, 'feats') else guided_v
+        p_raw = pos_v.feats if hasattr(pos_v, 'feats') else pos_v
+
+        g_flat = g_raw.reshape(-1).float().unsqueeze(0)
+        p_flat = p_raw.reshape(-1).float().unsqueeze(0)
+
+        g_norm = g_flat.norm(dim=1, keepdim=True).clamp(min=1e-8)
+        p_norm = p_flat.norm(dim=1, keepdim=True).clamp(min=1e-8)
+
+        cos = (g_flat * p_flat).sum(dim=1) / (g_norm.squeeze() * p_norm.squeeze())
+        cos_mean = cos.mean().item()
+        angle = np.degrees(np.arccos(np.clip(cos_mean, -1.0, 1.0)))
+        mag_ratio = (p_norm.squeeze() / g_norm.squeeze()).mean().item()
+        drift = (g_flat - p_flat).norm(dim=1).mean().item() / g_norm.squeeze().mean().item()
+
+        proj_c = (g_flat * p_flat).sum(dim=1, keepdim=True) / (p_flat * p_flat).sum(dim=1, keepdim=True).clamp(min=1e-8)
+        perp = g_flat - proj_c * p_flat
+        perp_ratio = perp.norm(dim=1).mean().item() / g_norm.squeeze().mean().item()
+
+        return {"cos_sim": cos_mean, "mag_ratio": mag_ratio,
+                "angle_deg": angle, "drift": drift, "perp_ratio": perp_ratio}
+
+    def _dino_lock_step(self, model, x_t, t, t_prev, cond,
+                         lock_strength, step_idx, total_steps,
+                         substeps=1, v_ema=None, ema_alpha=0.8, verbose=True, **kwargs):
+        """
+        One step with DINO lock + velocity EMA smoothing.
+
+        v_ema smoothing reduces velocity discontinuities at phase
+        transitions: v_final = α·v_current + (1-α)·v_ema_prev.
+        """
+        guided_v = self._inference_model(model, x_t, t, cond, **kwargs)
+        pos_v = self._get_pos_only_v(model, x_t, t, cond, **kwargs)
+
+        stats = self._alignment_stats(guided_v, pos_v)
+        
+        if verbose:
+            phase = "FOUND" if lock_strength >= 0.9 else ("RAMP" if step_idx >= int(total_steps * 0.4) and step_idx < int(total_steps * 0.7) else "GUARD")
+            sub_tag = f" x{substeps}" if substeps > 1 else ""
+            ema_tag = " +ema" if v_ema is not None else ""
+            print(f"  [DinoLock {step_idx+1:>3}/{total_steps}] "
+                  f"cos={stats['cos_sim']:+.4f}  "
+                  f"angle={stats['angle_deg']:5.1f}°  "
+                  f"perp={stats['perp_ratio']:.3f}  "
+                  f"drift={stats['drift']:.4f}  "
+                  f"lock={lock_strength:.3f} ({phase}{sub_tag}{ema_tag})")
+
+        if lock_strength <= 0.0:
+            pred_v = guided_v
+        else:
+            pred_v = self._dino_project(guided_v, pos_v, lock_strength)
+
+        if v_ema is not None:
+            pred_v = ema_alpha * pred_v + (1.0 - ema_alpha) * v_ema
+        new_v_ema = pred_v
+
+        if substeps > 1 and lock_strength >= 0.9:
+            dt_total = t - t_prev
+            dt_sub = dt_total / substeps
+            current = x_t
+            t_cur = t
+            for _s in range(substeps):
+                v_sub = self._inference_model(model, current, t_cur, cond, **kwargs)
+                current = current - dt_sub * v_sub
+                t_cur = t_cur - dt_sub
+            pred_x_prev = current
+        else:
+            pred_x_prev = x_t - (t - t_prev) * pred_v
+
+        pred_x_0, _ = self._v_to_xstart_eps(x_t=x_t, t=t, v=pred_v)
+        return edict({"pred_x_prev": pred_x_prev, "pred_x_0": pred_x_0,
+                       "stats": stats, "lock_strength": lock_strength,
+                       "v_ema": new_v_ema})
+
+    @staticmethod
+    def _compute_lock_strength(step_idx, total_steps, base_strength):
+        """
+        DINO Foundation schedule:
+        - Steps  0 – 40 %:  0.92  (near-full DINO, 8 % CFG on-distribution).
+        - Steps 40 – 70 %:  cosine ramp 0.92 → base_strength.
+        - Steps 70 – 100 %: base_strength (residual guardrail).
+        """
+        FOUNDATION_CAP = 0.92
+        foundation_end = int(total_steps * 0.4)
+        ramp_end = int(total_steps * 0.7)
+        if step_idx < foundation_end:
+            return FOUNDATION_CAP
+        if step_idx >= ramp_end:
+            return base_strength
+        progress = (step_idx - foundation_end) / max(1, ramp_end - foundation_end)
+        blend = 0.5 * (1.0 - np.cos(np.pi * progress))
+        return float(FOUNDATION_CAP + (base_strength - FOUNDATION_CAP) * blend)
+
+    # ------------------------------------------------------------------ #
+    #  sample() override                                                  #
+    # ------------------------------------------------------------------ #
+
+    @torch.no_grad()
+    def sample(
+        self,
+        model,
+        noise,
+        cond,
+        neg_cond,
+        steps: int = 50,
+        rescale_t: float = 1.0,
+        guidance_strength: float = 3.0,
+        guidance_interval: Tuple[float, float] = (0.0, 1.0),
+        verbose: bool = True,
+        tqdm_desc: str = "Sampling",
+        dino_lock: float = 0.0,
+        dino_substeps: int = 4,
+        **kwargs
+    ):
+        # Strip keys that must not reach the model
+        kwargs.pop("rk4_cond_lock_strength", None)
+        kwargs.pop("rk4_cond_lock_end_strength", None)
+        kwargs.pop("debug_dino_alignment", None)
+        kwargs.pop("debug_dino_interval", None)
+
+        if dino_lock <= 0.0:
+            return super().sample(model, noise, cond, steps, rescale_t, verbose,
+                                  tqdm_desc=tqdm_desc,
+                                  neg_cond=neg_cond,
+                                  guidance_strength=guidance_strength,
+                                  guidance_interval=guidance_interval,
+                                  **kwargs)
+
+        # ----- DINO-locked sampling loop -----
+        if verbose:
+            print(f"\n{'='*72}")
+            print(f"  DINO Foundation  |  guardrail={dino_lock:.2f}  |  steps={steps}")
+            print(f"  Schedule: 0-40% DINO@0.92 (shape), 40-70% ramp→{dino_lock:.2f}, 70-100% guardrail")
+            print(f"  Mode: foundation-first + velocity EMA smoothing")
+            if dino_substeps > 1:
+                print(f"  Substeps: {dino_substeps}x during foundation phase")
+            print(f"{'='*72}")
+
+        sample = noise
+        t_seq = np.linspace(1, 0, steps + 1)
+        t_seq = rescale_t * t_seq / (1 + (rescale_t - 1) * t_seq)
+        t_seq = t_seq.tolist()
+        t_pairs = [(t_seq[i], t_seq[i + 1]) for i in range(steps)]
+
+        merged_kwargs = dict(kwargs)
+        merged_kwargs["neg_cond"] = neg_cond
+        merged_kwargs["guidance_strength"] = guidance_strength
+        merged_kwargs["guidance_interval"] = guidance_interval
+
+        all_stats = []
+        v_ema = None
+        ret = edict({"samples": None, "pred_x_t": [], "pred_x_0": []})
+        for i, (t, t_prev) in enumerate(tqdm(t_pairs, desc=tqdm_desc)):
+            s = self._compute_lock_strength(i, steps, dino_lock)
+            n_sub = dino_substeps if (s >= 0.9 and dino_substeps > 1) else 1
+            out = self._dino_lock_step(model, sample, t, t_prev, cond,
+                                        lock_strength=s,
+                                        step_idx=i, total_steps=steps,
+                                        substeps=n_sub,
+                                        v_ema=v_ema,
+                                        verbose=verbose,
+                                        **merged_kwargs)
+            sample = out.pred_x_prev
+            v_ema = out.v_ema
+            ret.pred_x_t.append(out.pred_x_prev)
+            ret.pred_x_0.append(out.pred_x_0)
+            all_stats.append(out.stats)
+
+        avg_cos = np.mean([s["cos_sim"] for s in all_stats])
+        avg_drift = np.mean([s["drift"] for s in all_stats])
+        avg_perp = np.mean([s["perp_ratio"] for s in all_stats])
+        final_cos = all_stats[-1]["cos_sim"]
+        final_angle = all_stats[-1]["angle_deg"]
+        final_perp = all_stats[-1]["perp_ratio"]
+        
+        if verbose:
+            print(f"\n{'─'*72}")
+            print(f"  DINO Foundation Summary")
+            print(f"  avg cos_sim={avg_cos:+.4f}  avg drift={avg_drift:.4f}  avg perp={avg_perp:.4f}")
+            print(f"  final cos_sim={final_cos:+.4f}  final angle={final_angle:.1f}°  final perp={final_perp:.4f}")
+            print(f"{'─'*72}\n")
+
+        ret.samples = sample
+        return ret
+
+
 class FlowEulerSampler(Sampler):
     """
     Generate samples from a flow-matching model using Euler sampling.
@@ -117,7 +347,7 @@ class FlowEulerSampler(Sampler):
         t_seq = t_seq.tolist()
         t_pairs = list((t_seq[i], t_seq[i + 1]) for i in range(steps))
         ret = edict({"samples": None, "pred_x_t": [], "pred_x_0": []})
-        for t, t_prev in tqdm(t_pairs, desc=tqdm_desc, disable=not verbose):
+        for t, t_prev in tqdm(t_pairs, desc=tqdm_desc):
             out = self.sample_once(model, sample, t, t_prev, cond, **kwargs)
             sample = out.pred_x_prev
             ret.pred_x_t.append(out.pred_x_prev)
@@ -166,46 +396,9 @@ class FlowEulerCfgSampler(ClassifierFreeGuidanceSamplerMixin, FlowEulerSampler):
         return super().sample(model, noise, cond, steps, rescale_t, verbose, neg_cond=neg_cond, guidance_strength=guidance_strength, **kwargs)
 
 
-class FlowEulerGuidanceIntervalSampler(GuidanceIntervalSamplerMixin, ClassifierFreeGuidanceSamplerMixin, FlowEulerSampler):
-    """
-    Generate samples from a flow-matching model using Euler sampling with classifier-free guidance and interval.
-    """
-    @torch.no_grad()
-    def sample(
-        self,
-        model,
-        noise,
-        cond,
-        neg_cond,
-        steps: int = 50,
-        rescale_t: float = 1.0,
-        guidance_strength: float = 3.0,
-        guidance_interval: Tuple[float, float] = (0.0, 1.0),
-        verbose: bool = True,
-        **kwargs
-    ):
-        """
-        Generate samples from the model using Euler method.
-        
-        Args:
-            model: The model to sample from.
-            noise: The initial noise tensor.
-            cond: conditional information.
-            neg_cond: negative conditional information.
-            steps: The number of steps to sample.
-            rescale_t: The rescale factor for t.
-            guidance_strength: The strength of classifier-free guidance.
-            guidance_interval: The interval for classifier-free guidance.
-            verbose: If True, show a progress bar.
-            **kwargs: Additional arguments for model_inference.
-
-        Returns:
-            a dict containing the following
-            - 'samples': the model samples.
-            - 'pred_x_t': a list of prediction of x_t.
-            - 'pred_x_0': a list of prediction of x_0.
-        """
-        return super().sample(model, noise, cond, steps, rescale_t, verbose, neg_cond=neg_cond, guidance_strength=guidance_strength, guidance_interval=guidance_interval, **kwargs)
+class FlowEulerGuidanceIntervalSampler(DinoLockMixin, GuidanceIntervalSamplerMixin, ClassifierFreeGuidanceSamplerMixin, FlowEulerSampler):
+    """Euler sampling with CFG, guidance interval, and optional DINO lock."""
+    pass
 
 
 class FlowEulerMultiViewSampler(FlowEulerSampler):
@@ -396,7 +589,7 @@ class FlowEulerMultiViewSampler(FlowEulerSampler):
         t_pairs = list((t_seq[i], t_seq[i + 1]) for i in range(steps))
         ret = edict({"samples": None, "pred_x_t": [], "pred_x_0": []})
         
-        for t, t_prev in tqdm(t_pairs, desc=tqdm_desc, disable=not verbose):
+        for t, t_prev in tqdm(t_pairs, desc=tqdm_desc):
             out = self.sample_once(
                 model, sample, t, t_prev, 
                 conds=conds, 
@@ -510,12 +703,12 @@ class FlowRK5CfgSampler(ClassifierFreeGuidanceSamplerMixin, FlowRK5Sampler):
     def sample(self, model, noise, cond, neg_cond, steps: int = 50, rescale_t: float = 1.0, guidance_strength: float = 3.0, verbose: bool = True, **kwargs):
         return super().sample(model, noise, cond, steps, rescale_t, verbose, neg_cond=neg_cond, guidance_strength=guidance_strength, **kwargs)
         
-class FlowRK4GuidanceIntervalSampler(GuidanceIntervalSamplerMixin, ClassifierFreeGuidanceSamplerMixin, FlowRK4Sampler):
-    """RK4 with CFG and Guidance Intervals."""
+class FlowRK4GuidanceIntervalSampler(DinoLockMixin, GuidanceIntervalSamplerMixin, ClassifierFreeGuidanceSamplerMixin, FlowRK4Sampler):
+    """RK4 with CFG, Guidance Intervals, and optional DINO lock."""
     pass
 
-class FlowRK5GuidanceIntervalSampler(GuidanceIntervalSamplerMixin, ClassifierFreeGuidanceSamplerMixin, FlowRK5Sampler):
-    """RK5 with CFG and Guidance Intervals."""
+class FlowRK5GuidanceIntervalSampler(DinoLockMixin, GuidanceIntervalSamplerMixin, ClassifierFreeGuidanceSamplerMixin, FlowRK5Sampler):
+    """RK5 with CFG, Guidance Intervals, and optional DINO lock."""
     pass        
     
 # RK4 and RK5 for MultiView
@@ -672,8 +865,8 @@ class FlowHeunSampler(FlowEulerSampler):
         return edict({"pred_x_prev": pred_x_prev, "pred_x_0": pred_x_0})
 
 # --- CFG Wrapper for Heun ---
-class FlowHeunGuidanceIntervalSampler(GuidanceIntervalSamplerMixin, ClassifierFreeGuidanceSamplerMixin, FlowHeunSampler):
-    """Heun sampling with CFG and Guidance Intervals."""
+class FlowHeunGuidanceIntervalSampler(DinoLockMixin, GuidanceIntervalSamplerMixin, ClassifierFreeGuidanceSamplerMixin, FlowHeunSampler):
+    """Heun sampling with CFG, Guidance Intervals, and optional DINO lock."""
     pass
     
 class FlowHeunMultiViewSampler(FlowEulerMultiViewSampler):

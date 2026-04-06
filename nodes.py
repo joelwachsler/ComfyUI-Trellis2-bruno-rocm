@@ -508,6 +508,8 @@ class Trellis2MeshWithVoxelGenerator:
                 "generate_texture_slat": ("BOOLEAN", {"default":True}),
                 "use_tiled_decoder": ("BOOLEAN", {"default":True}),
                 "sampler": (["euler", "heun", "rk4", "rk5"], {"default": "euler"}),
+                "fill_holes":("BOOLEAN",{"default":True}),
+                "hole_iterations": ("INT",{"default":1,"min":1,"max":9,"step":1}),
             },
         }
 
@@ -517,7 +519,7 @@ class Trellis2MeshWithVoxelGenerator:
     CATEGORY = "Trellis2Wrapper"
     OUTPUT_NODE = True
 
-    def process(self, pipeline, image, seed, pipeline_type, sparse_structure_steps, shape_steps, texture_steps, max_num_tokens, max_views, sparse_structure_resolution, generate_texture_slat, use_tiled_decoder, sampler):
+    def process(self, pipeline, image, seed, pipeline_type, sparse_structure_steps, shape_steps, texture_steps, max_num_tokens, max_views, sparse_structure_resolution, generate_texture_slat, use_tiled_decoder, sampler, fill_holes, hole_iterations):
         reset_cuda()
         
         images = tensor_batch_to_pil_list(image, max_views=max_views)
@@ -534,7 +536,21 @@ class Trellis2MeshWithVoxelGenerator:
 
         pbar = ProgressBar(num_steps)        
         
-        mesh = pipeline.run(image=image_in, seed=seed, pipeline_type=pipeline_type, sparse_structure_sampler_params = sparse_structure_sampler_params, shape_slat_sampler_params = shape_slat_sampler_params, tex_slat_sampler_params = tex_slat_sampler_params, max_num_tokens = max_num_tokens, sparse_structure_resolution = sparse_structure_resolution, max_views = max_views, generate_texture_slat = generate_texture_slat, use_tiled=use_tiled_decoder, pbar=pbar, sampler=sampler)[0]
+        mesh = pipeline.run(image=image_in, 
+                            seed=seed, 
+                            pipeline_type=pipeline_type, 
+                            sparse_structure_sampler_params = sparse_structure_sampler_params, 
+                            shape_slat_sampler_params = shape_slat_sampler_params, 
+                            tex_slat_sampler_params = tex_slat_sampler_params, 
+                            max_num_tokens = max_num_tokens, 
+                            sparse_structure_resolution = sparse_structure_resolution, 
+                            max_views = max_views, 
+                            generate_texture_slat = generate_texture_slat, 
+                            use_tiled=use_tiled_decoder, 
+                            pbar=pbar, 
+                            sampler=sampler,
+                            fill_holes=fill_holes,
+                            hole_iterations=hole_iterations)[0]
         
         vertices = mesh.vertices.cuda()
         faces = mesh.faces.cuda()        
@@ -1331,6 +1347,11 @@ class Trellis2MeshWithVoxelAdvancedGenerator:
                 "texture_guidance_interval_end": ("FLOAT",{"default":0.90,"min":0.00,"max":1.00,"step":0.01}),
                 "use_tiled_decoder": ("BOOLEAN", {"default":True}),
                 "sampler": (["euler", "heun", "rk4", "rk5"], {"default": "euler"}),
+                "fill_holes":("BOOLEAN",{"default":True}),
+                "hole_iterations": ("INT",{"default":1,"min":1,"max":9,"step":1}),                
+                "verbose": ("BOOLEAN",{"default":False}),
+                "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),  
             },
         }
 
@@ -1363,7 +1384,12 @@ class Trellis2MeshWithVoxelAdvancedGenerator:
         texture_guidance_interval_start,
         texture_guidance_interval_end,
         use_tiled_decoder,
-        sampler
+        sampler,
+        fill_holes,
+        hole_iterations,
+        verbose,
+        dino_lock,
+        dino_substeps,
         ):
         reset_cuda()
         
@@ -1385,7 +1411,24 @@ class Trellis2MeshWithVoxelAdvancedGenerator:
 
         pbar = ProgressBar(num_steps)
         
-        mesh = pipeline.run(image=image_in, seed=seed, pipeline_type=pipeline_type, sparse_structure_sampler_params = sparse_structure_sampler_params, shape_slat_sampler_params = shape_slat_sampler_params, tex_slat_sampler_params = tex_slat_sampler_params, max_num_tokens = max_num_tokens, sparse_structure_resolution = sparse_structure_resolution, max_views = max_views, generate_texture_slat=generate_texture_slat, use_tiled=use_tiled_decoder, pbar=pbar, sampler=sampler)[0]         
+        mesh = pipeline.run(image=image_in, 
+                            seed=seed, 
+                            pipeline_type=pipeline_type, 
+                            sparse_structure_sampler_params = sparse_structure_sampler_params, 
+                            shape_slat_sampler_params = shape_slat_sampler_params, 
+                            tex_slat_sampler_params = tex_slat_sampler_params, 
+                            max_num_tokens = max_num_tokens, 
+                            sparse_structure_resolution = sparse_structure_resolution, 
+                            max_views = max_views, 
+                            generate_texture_slat=generate_texture_slat, 
+                            use_tiled=use_tiled_decoder, 
+                            pbar=pbar, 
+                            sampler=sampler,
+                            fill_holes = fill_holes,
+                            hole_iterations = hole_iterations,
+                            verbose = verbose,
+                            dino_lock = dino_lock,
+                            dino_substeps = dino_substeps)[0]         
         
         vertices = mesh.vertices.cuda()
         faces = mesh.faces.cuda()                
@@ -1436,6 +1479,11 @@ class Trellis2MeshWithVoxelMultiViewGenerator:
                 "front_axis": (["z", "x"], {"default": "z"}),
                 "blend_temperature": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 10.0, "step": 0.1}),
                 "sampler": (["euler", "heun", "rk4", "rk5"], {"default": "euler"}),
+                "fill_holes":("BOOLEAN",{"default":True}),
+                "hole_iterations": ("INT",{"default":1,"min":1,"max":9,"step":1}),                
+                "verbose": ("BOOLEAN",{"default":False}),
+                "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),                  
             },
             "optional": {
                 "back_image": ("IMAGE",),
@@ -1475,6 +1523,11 @@ class Trellis2MeshWithVoxelMultiViewGenerator:
         front_axis,
         blend_temperature,
         sampler,
+        fill_holes,
+        hole_iterations,
+        verbose,
+        dino_lock,
+        dino_substeps,
         back_image=None,
         left_image=None,
         right_image=None):
@@ -1521,7 +1574,12 @@ class Trellis2MeshWithVoxelMultiViewGenerator:
             pbar=pbar,
             front_axis=front_axis,
             blend_temperature=blend_temperature,
-            sampler=sampler
+            sampler=sampler,
+            fill_holes=fill_holes,
+            hole_iterations=hole_iterations,
+            verbose=verbose,
+            dino_lock=dino_lock,
+            dino_substeps=dino_substeps
         )[0]         
         
         vertices = mesh.vertices.cuda()
@@ -2196,6 +2254,9 @@ class Trellis2MeshTexturing:
                 "mesh_cluster_threshold_cone_half_angle_rad": ("FLOAT",{"default":60.0,"min":0.0,"max":359.9}),
                 "sampler": (["euler", "heun", "rk4", "rk5"], {"default": "euler"}),
                 "inpainting": (["telea","ns"],{"default":"telea"}),
+                "verbose": ("BOOLEAN",{"default":False}),
+                "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),                
             },
         }
 
@@ -2205,7 +2266,9 @@ class Trellis2MeshTexturing:
     CATEGORY = "Trellis2Wrapper"
     OUTPUT_NODE = True
 
-    def process(self, pipeline, image, trimesh, seed, texture_steps, texture_guidance_strength, texture_guidance_rescale, texture_rescale_t, resolution, texture_size, texture_alpha_mode, double_side_material, texture_guidance_interval_start, texture_guidance_interval_end, max_views,bake_on_vertices,use_custom_normals,mesh_cluster_threshold_cone_half_angle_rad, sampler, inpainting):
+    def process(self, pipeline, image, trimesh, seed, texture_steps, texture_guidance_strength, texture_guidance_rescale, texture_rescale_t, resolution, texture_size, texture_alpha_mode, double_side_material, texture_guidance_interval_start, texture_guidance_interval_end, max_views,bake_on_vertices,use_custom_normals,mesh_cluster_threshold_cone_half_angle_rad, sampler, inpainting,
+        verbose, dino_lock, dino_substeps):
+            
         images = tensor_batch_to_pil_list(image, max_views=max_views)
         image_in = images[0] if len(images) == 1 else images
 
@@ -2228,7 +2291,10 @@ class Trellis2MeshTexturing:
             use_custom_normals = use_custom_normals,
             mesh_cluster_threshold_cone_half_angle_rad = mesh_cluster_threshold_cone_half_angle_rad,
             sampler = sampler,
-            inpainting = inpainting
+            inpainting = inpainting,
+            verbose = verbose,
+            dino_lock = dino_lock,
+            dino_substeps = dino_substeps
         )            
 
         baseColorTexture = pil2tensor(baseColorTexture_np)
@@ -2262,6 +2328,9 @@ class Trellis2MeshTexturingMultiView:
                 "blend_temperature": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 10.0, "step": 0.1}),
                 "sampler": (["euler", "heun", "rk4", "rk5"], {"default": "euler"}),
                 "inpainting": (["telea","ns"],{"default":"telea"}),
+                "verbose": ("BOOLEAN",{"default":False}),
+                "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),                
             },
             "optional": {
                 "back_image": ("IMAGE",),
@@ -2298,6 +2367,9 @@ class Trellis2MeshTexturingMultiView:
         blend_temperature,
         sampler,
         inpainting,
+        verbose,
+        dino_lock,
+        dino_substeps,
         back_image = None,
         left_image = None,
         right_image = None):
@@ -2333,7 +2405,10 @@ class Trellis2MeshTexturingMultiView:
             front_axis = front_axis,
             blend_temperature = blend_temperature,
             sampler = sampler,
-            inpainting = inpainting
+            inpainting = inpainting,
+            verbose = verbose,
+            dino_lock = dino_lock,
+            dino_substeps = dino_substeps
         )            
 
         baseColorTexture = pil2tensor(baseColorTexture_np)
@@ -2519,6 +2594,9 @@ class Trellis2MeshRefiner:
                 "use_tiled_decoder": ("BOOLEAN", {"default":True}),
                 "max_views": ("INT", {"default": 4, "min": 1, "max": 16}),
                 "sampler": (["euler", "heun", "rk4", "rk5"], {"default": "euler"}),
+                "verbose": ("BOOLEAN",{"default":False}),
+                "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),                
             },
         }
 
@@ -2546,7 +2624,10 @@ class Trellis2MeshRefiner:
         texture_guidance_interval_end,
         use_tiled_decoder,
         max_views,
-        sampler):
+        sampler,
+        verbose,
+        dino_lock,
+        dino_substeps):
 
         reset_cuda()
 
@@ -2559,7 +2640,21 @@ class Trellis2MeshRefiner:
         shape_slat_sampler_params = {"steps":shape_steps,"guidance_strength":shape_guidance_strength,"guidance_rescale":shape_guidance_rescale,"guidance_interval":shape_guidance_interval,"rescale_t":shape_rescale_t}       
         tex_slat_sampler_params = {"steps":texture_steps,"guidance_strength":texture_guidance_strength,"guidance_rescale":texture_guidance_rescale,"guidance_interval":texture_guidance_interval,"rescale_t":texture_rescale_t}
         
-        mesh = pipeline.refine_mesh(mesh = trimesh, image=image_in, seed=seed, shape_slat_sampler_params = shape_slat_sampler_params, tex_slat_sampler_params = tex_slat_sampler_params, resolution = resolution, max_num_tokens = max_num_tokens, generate_texture_slat=generate_texture_slat, downsampling=downsampling, use_tiled=use_tiled_decoder, max_views = max_views, sampler = sampler)[0]         
+        mesh = pipeline.refine_mesh(mesh = trimesh, 
+                                    image=image_in, 
+                                    seed=seed, 
+                                    shape_slat_sampler_params = shape_slat_sampler_params, 
+                                    tex_slat_sampler_params = tex_slat_sampler_params, 
+                                    resolution = resolution, 
+                                    max_num_tokens = max_num_tokens, 
+                                    generate_texture_slat=generate_texture_slat, 
+                                    downsampling=downsampling, 
+                                    use_tiled=use_tiled_decoder, 
+                                    max_views = max_views, 
+                                    sampler = sampler,
+                                    verbose = verbose,
+                                    dino_lock = dino_lock,
+                                    dino_substeps = dino_substeps)[0]         
         
         vertices = mesh.vertices.cuda()
         faces = mesh.faces.cuda()        
@@ -3452,6 +3547,11 @@ class Trellis2MeshWithVoxelCascadeGenerator:
                 "max_num_tokens": ("INT",{"default":999999,"min":0,"max":999999}),
                 "use_tiled_decoder": ("BOOLEAN", {"default":True}),
                 "max_views": ("INT", {"default": 4, "min": 1, "max": 16}),
+                "fill_holes":("BOOLEAN",{"default":True}),
+                "hole_iterations": ("INT",{"default":1,"min":1,"max":9,"step":1}),
+                "verbose": ("BOOLEAN",{"default":False}),
+                "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),                
             },
         }
 
@@ -3499,7 +3599,12 @@ class Trellis2MeshWithVoxelCascadeGenerator:
         # others
         max_num_tokens,
         use_tiled_decoder,
-        max_views
+        max_views,
+        fill_holes,
+        hole_iterations,
+        verbose,
+        dino_lock,
+        dino_substeps
         ):
             
         reset_cuda()
@@ -3540,7 +3645,12 @@ class Trellis2MeshWithVoxelCascadeGenerator:
                                     sparse_structure_sampler = sparse_structure_sampler,
                                     low_res_shape_sampler = low_res_shape_sampler,
                                     high_res_shape_sampler = high_res_shape_sampler,
-                                    tex_sampler = texture_sampler
+                                    tex_sampler = texture_sampler,
+                                    fill_holes = fill_holes,
+                                    hole_iterations = hole_iterations,
+                                    verbose = verbose,
+                                    dino_lock = dino_lock,
+                                    dino_substeps = dino_substeps
                                     )[0]         
         
         vertices = mesh.vertices.cuda()
@@ -3610,6 +3720,11 @@ class Trellis2SparseGenerator:
                 "sparse_structure_resolution": ("INT", {"default":32,"min":32,"max":128,"step":4}),
                 "sparse_structure_guidance_interval_start": ("FLOAT",{"default":0.10,"min":0.00,"max":1.00,"step":0.01}),
                 "sparse_structure_guidance_interval_end": ("FLOAT",{"default":1.00,"min":0.00,"max":1.00,"step":0.01}),
+                "fill_holes":("BOOLEAN",{"default":True}),
+                "hole_iterations": ("INT",{"default":1,"min":1,"max":9,"step":1}),
+                "verbose": ("BOOLEAN",{"default":False}),
+                "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),
             },
         }
 
@@ -3629,6 +3744,11 @@ class Trellis2SparseGenerator:
         sparse_structure_resolution,
         sparse_structure_guidance_interval_start,
         sparse_structure_guidance_interval_end,
+        fill_holes,
+        hole_iterations,
+        verbose,
+        dino_lock,
+        dino_substeps
         ):
         
         self.seed_all(seed)
@@ -3642,7 +3762,12 @@ class Trellis2SparseGenerator:
         pipeline.load_sparse_structure_model()        
         coords = pipeline.sample_sparse_structure(
             image_cond, sparse_structure_resolution,
-            1, sparse_structure_sampler_params
+            1, sparse_structure_sampler_params,
+            fill_holes=fill_holes,
+            hole_iterations=hole_iterations,
+            verbose=verbose,
+            dino_lock=dino_lock,
+            dino_substeps=dino_substeps
         )
         
         if not pipeline.keep_models_loaded:
@@ -3676,6 +3801,9 @@ class Trellis2ShapeGenerator:
                 "shape_sampler": (["euler", "heun", "rk4", "rk5"], {"default": "euler"}),
                 "shape_guidance_interval_start": ("FLOAT",{"default":0.10,"min":0.00,"max":1.00,"step":0.01}),
                 "shape_guidance_interval_end": ("FLOAT",{"default":1.00,"min":0.00,"max":1.00,"step":0.01}),
+                "verbose": ("BOOLEAN",{"default":False}),
+                "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),                
             },
         }
 
@@ -3694,6 +3822,9 @@ class Trellis2ShapeGenerator:
         shape_sampler,
         shape_guidance_interval_start,
         shape_guidance_interval_end,
+        verbose,
+        dino_lock,
+        dino_substeps
         ):
             
         shape_guidance_interval = [shape_guidance_interval_start, shape_guidance_interval_end]        
@@ -3708,7 +3839,10 @@ class Trellis2ShapeGenerator:
             pipeline.load_shape_slat_flow_model_512()            
             shape_slat = pipeline.sample_shape_slat(
                 image_cond, pipeline.models['shape_slat_flow_model_512'],
-                coords, shape_slat_sampler_params
+                coords, shape_slat_sampler_params,
+                verbose = verbose,
+                dino_lock = dino_lock,
+                dino_substeps = dino_substeps
             )
             
             if not pipeline.keep_models_loaded:
@@ -3718,7 +3852,10 @@ class Trellis2ShapeGenerator:
             pipeline.load_shape_slat_flow_model_1024()
             shape_slat = pipeline.sample_shape_slat(
                 image_cond, pipeline.models['shape_slat_flow_model_1024'],
-                coords, shape_slat_sampler_params
+                coords, shape_slat_sampler_params,
+                verbose = verbose,
+                dino_lock = dino_lock,
+                dino_substeps = dino_substeps                
             )
             
             if not pipeline.keep_models_loaded:
@@ -3745,6 +3882,9 @@ class Trellis2ShapeCascadeGenerator:
                 "shape_sampler": (["euler", "heun", "rk4", "rk5"], {"default": "euler"}),
                 "shape_guidance_interval_start": ("FLOAT",{"default":0.10,"min":0.00,"max":1.00,"step":0.01}),
                 "shape_guidance_interval_end": ("FLOAT",{"default":1.00,"min":0.00,"max":1.00,"step":0.01}),
+                "verbose": ("BOOLEAN",{"default":False}),
+                "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),                   
             },
         }
 
@@ -3763,6 +3903,9 @@ class Trellis2ShapeCascadeGenerator:
         shape_sampler,
         shape_guidance_interval_start,
         shape_guidance_interval_end,
+        verbose,
+        dino_lock,
+        dino_substeps,
         ):
             
         shape_guidance_interval = [shape_guidance_interval_start, shape_guidance_interval_end]        
@@ -3772,14 +3915,14 @@ class Trellis2ShapeCascadeGenerator:
         shape_sampler_prefix = pipeline.GetSamplerName(shape_sampler)
         pipeline.shape_slat_sampler = getattr(samplers, f"Flow{shape_sampler_prefix}GuidanceIntervalSampler")(**args['shape_slat_sampler']['args'])
         pipeline.load_shape_slat_flow_model_1024()           
-        slat, hr_resolution = self.sample(pipeline, shape_slat, from_resolution, to_resolution, sparse_structure_resolution, max_num_tokens, image_cond, shape_slat_sampler_params, pipeline.models['shape_slat_flow_model_1024'])
+        slat, hr_resolution = self.sample(pipeline, shape_slat, from_resolution, to_resolution, sparse_structure_resolution, max_num_tokens, image_cond, shape_slat_sampler_params, pipeline.models['shape_slat_flow_model_1024'], verbose, dino_lock, dino_substeps)
         
         if not pipeline.keep_models_loaded:
             pipeline.unload_shape_slat_flow_model_1024()              
         
         return (slat, hr_resolution, pipeline,)         
         
-    def sample(self, pipeline, slat, lr_resolution, resolution, sparse_structure_resolution, max_num_tokens, cond, sampler_params, flow_model):
+    def sample(self, pipeline, slat, lr_resolution, resolution, sparse_structure_resolution, max_num_tokens, cond, sampler_params, flow_model, verbose, dino_lock, dino_substeps):
         # Upsample       
         pipeline.load_shape_slat_decoder()
         if pipeline.low_vram:
@@ -3835,7 +3978,9 @@ class Trellis2ShapeCascadeGenerator:
             noise,
             **cond,
             **sampler_params,
-            verbose=True,
+            verbose=verbose,
+            dino_lock=dino_lock,
+            dino_substeps=dino_substeps,
             tqdm_desc="Sampling shape SLat (HR)",
         ).samples
         if pipeline.low_vram:
@@ -3869,6 +4014,9 @@ class Trellis2TexSlatGenerator:
                 "texture_sampler": (["euler", "heun", "rk4", "rk5"], {"default": "euler"}),                                                               
                 "texture_guidance_interval_start": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
                 "texture_guidance_interval_end": ("FLOAT",{"default":0.90,"min":0.00,"max":1.00,"step":0.01}),
+                "verbose": ("BOOLEAN",{"default":False}),
+                "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),                
             },
         }
 
@@ -3887,6 +4035,9 @@ class Trellis2TexSlatGenerator:
         texture_sampler,
         texture_guidance_interval_start,
         texture_guidance_interval_end,
+        verbose,
+        dino_lock,
+        dino_substeps,
         ):
 
         texture_guidance_interval = [texture_guidance_interval_start,texture_guidance_interval_end]
@@ -3897,7 +4048,10 @@ class Trellis2TexSlatGenerator:
             pipeline.load_tex_slat_flow_model_512()
             tex_slat = pipeline.sample_tex_slat_advanced(
                 image_cond, pipeline.models['tex_slat_flow_model_512'],
-                shape_slat, tex_slat_sampler_params, texture_sampler
+                shape_slat, tex_slat_sampler_params, texture_sampler,
+                verbose = verbose,
+                dino_lock = dino_lock,
+                dino_substeps = dino_substeps
             )
             if not pipeline.keep_models_loaded:
                 pipeline.unload_tex_slat_flow_model_512()
@@ -3907,7 +4061,10 @@ class Trellis2TexSlatGenerator:
             pipeline.load_tex_slat_flow_model_1024()
             tex_slat = pipeline.sample_tex_slat_advanced(
                 image_cond, pipeline.models['tex_slat_flow_model_1024'],
-                shape_slat, tex_slat_sampler_params, texture_sampler
+                shape_slat, tex_slat_sampler_params, texture_sampler,
+                verbose = verbose,
+                dino_lock = dino_lock,
+                dino_substeps = dino_substeps                
             )
             
             if not pipeline.keep_models_loaded:
@@ -4079,6 +4236,7 @@ class Trellis2MultiViewTexturing:
                 "max_hole_size": ("INT",{"default":20,"min":0,"max":99999,"step":1}),
                 "use_metallic": ("BOOLEAN",{"default":True}),
                 "depth_eps": ("FLOAT",{"default":0.0100,"min":0.0001,"max":1.0000,"step":0.0001}),
+                "mesh_cluster_threshold_cone_half_angle_rad": ("FLOAT",{"default":60,"min":1,"max":179,"step":1}),
             },
             "optional": {
                 # Standard views
@@ -4121,6 +4279,7 @@ class Trellis2MultiViewTexturing:
         max_hole_size,
         use_metallic,
         depth_eps,
+        mesh_cluster_threshold_cone_half_angle_rad,
         baseColorTexture = None,
         front_image=None,
         back_image=None,
@@ -4210,6 +4369,7 @@ class Trellis2MultiViewTexturing:
             elevations,
             weights,
             texture_size=texture_size,
+            mesh_cluster_threshold_cone_half_angle_rad=mesh_cluster_threshold_cone_half_angle_rad,
             blend_exponent=blend_exponent,
             ortho_scale=ortho_scale,
             blend_texture=blend_texture,
@@ -4801,6 +4961,11 @@ class Trellis2SparseGeneratorWithReconViaGen:
                 "sparse_structure_resolution": ("INT", {"default":32,"min":32,"max":128,"step":4}),
                 "sparse_structure_guidance_interval_start": ("FLOAT",{"default":0.10,"min":0.00,"max":1.00,"step":0.01}),
                 "sparse_structure_guidance_interval_end": ("FLOAT",{"default":1.00,"min":0.00,"max":1.00,"step":0.01}),
+                "fill_holes":("BOOLEAN",{"default":True}),
+                "hole_iterations": ("INT",{"default":1,"min":1,"max":9,"step":1}),
+                "verbose": ("BOOLEAN",{"default":False}),
+                "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),
             },
         }
 
@@ -4820,6 +4985,11 @@ class Trellis2SparseGeneratorWithReconViaGen:
         sparse_structure_resolution,
         sparse_structure_guidance_interval_start,
         sparse_structure_guidance_interval_end,
+        fill_holes,
+        hole_iterations,
+        verbose,
+        dino_lock,
+        dino_substeps
         ):
         
         self.seed_all(seed)
@@ -4838,7 +5008,7 @@ class Trellis2SparseGeneratorWithReconViaGen:
         if images.ndim == 3:
             images = images.unsqueeze(0)
         
-        coords = self._run_ss_stage_direct(pipeline, images, sparse_structure_resolution, sparse_structure_sampler_params)
+        coords = self._run_ss_stage_direct(pipeline, images, sparse_structure_resolution, sparse_structure_sampler_params, fill_holes, hole_iterations, verbose, dino_lock, dino_substeps)
         
         if not pipeline.keep_models_loaded:
             pipeline.unload_sparse_structure_vggt_model()            
@@ -4893,6 +5063,11 @@ class Trellis2SparseGeneratorWithReconViaGen:
         images,
         target_ss_res: int,
         ss_sampler_params: dict,
+        fill_holes: bool,
+        hole_iterations: int,
+        verbose: bool,
+        dino_lock: float,
+        dino_substeps: int
     ) -> torch.Tensor:
         """
         Run only ReconViaGen's sparse structure diffusion stage to obtain coords
@@ -4925,7 +5100,11 @@ class Trellis2SparseGeneratorWithReconViaGen:
                 ss_noise,
                 **ss_cond,
                 **sampler_params,
-                verbose=True,
+                verbose=verbose,
+                fill_holes=fill_holes,
+                hole_iterations=hole_iterations,
+                dino_lock=dino_lock,
+                dino_substeps=dino_substeps
             ).samples
 
         decoder = pipeline.models['sparse_structure_decoder']
