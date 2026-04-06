@@ -521,7 +521,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         fill_holes: bool = True,
         hole_structure: int = 1,
         hole_iterations: int = 1,
-        hole_fill_algorithm: str = "flood_fill",
+        hole_fill_algorithm: str = "remove_small_holes",
         keep_only_shell: bool = True,
         verbose: bool = True,
         dino_lock: float = 0.0,
@@ -1087,6 +1087,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         hole_iterations: int = 1,
         dino_lock: float = 0.00,
         dino_substeps: int = 4,
+        hole_fill_algorithm = "remove_small_holes"
     ) -> List[MeshWithVoxel]:
         """
         Run the pipeline.
@@ -1158,7 +1159,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             fill_holes = fill_holes,
             hole_iterations = hole_iterations,
             dino_lock = dino_lock,
-            dino_substeps = dino_substeps
+            dino_substeps = dino_substeps,
+            hole_fill_algorithm=hole_fill_algorithm
         )
         
         if pbar is not None:
@@ -1649,7 +1651,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         fill_holes: bool = True,
         hole_iterations: int = 1,
         dino_lock: float = 0.00,
-        dino_substeps: int = 4,        
+        dino_substeps: int = 4,
+        hole_fill_algorithm = 'remove_small_holes'
     ) -> List[MeshWithVoxel]:
         
         if isinstance(image, (list, tuple)):
@@ -1688,7 +1691,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             fill_holes = fill_holes,
             hole_iterations = hole_iterations,
             dino_lock = dino_lock,
-            dino_substeps = dino_substeps            
+            dino_substeps = dino_substeps,
+            hole_fill_algorithm = hole_fill_algorithm
         )
         
         if pbar is not None:
@@ -1814,6 +1818,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         dino_substeps: int = 4,
         fill_holes: bool = True,
         hole_iterations: int = 1,
+        hole_fill_algorithm = 'remove_small_holes'
     ) -> List[MeshWithVoxel]:
         """
         Run the pipeline with named multi-view images and spatial blending.
@@ -1885,7 +1890,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             dino_lock=dino_lock,
             dino_substeps=dino_substeps,
             fill_holes=fill_holes,
-            hole_iterations=hole_iterations
+            hole_iterations=hole_iterations,
+            hole_fill_algorithm=hole_fill_algorithm
         )
         
         if not self.keep_models_loaded:

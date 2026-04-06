@@ -510,6 +510,7 @@ class Trellis2MeshWithVoxelGenerator:
                 "sampler": (["euler", "heun", "rk4", "rk5"], {"default": "euler"}),
                 "fill_holes":("BOOLEAN",{"default":True}),
                 "hole_iterations": ("INT",{"default":1,"min":1,"max":9,"step":1}),
+                "hole_fill_algorithm": (["morphological_closing","flood_fill","remove_small_holes"],{"default":"remove_small_holes"}),
             },
         }
 
@@ -519,7 +520,7 @@ class Trellis2MeshWithVoxelGenerator:
     CATEGORY = "Trellis2Wrapper"
     OUTPUT_NODE = True
 
-    def process(self, pipeline, image, seed, pipeline_type, sparse_structure_steps, shape_steps, texture_steps, max_num_tokens, max_views, sparse_structure_resolution, generate_texture_slat, use_tiled_decoder, sampler, fill_holes, hole_iterations):
+    def process(self, pipeline, image, seed, pipeline_type, sparse_structure_steps, shape_steps, texture_steps, max_num_tokens, max_views, sparse_structure_resolution, generate_texture_slat, use_tiled_decoder, sampler, fill_holes, hole_iterations, hole_fill_algorithm):
         reset_cuda()
         
         images = tensor_batch_to_pil_list(image, max_views=max_views)
@@ -550,7 +551,8 @@ class Trellis2MeshWithVoxelGenerator:
                             pbar=pbar, 
                             sampler=sampler,
                             fill_holes=fill_holes,
-                            hole_iterations=hole_iterations)[0]
+                            hole_iterations=hole_iterations,
+                            hole_fill_algorithm=hole_fill_algorithm)[0]
         
         vertices = mesh.vertices.cuda()
         faces = mesh.faces.cuda()        
@@ -1351,7 +1353,8 @@ class Trellis2MeshWithVoxelAdvancedGenerator:
                 "hole_iterations": ("INT",{"default":1,"min":1,"max":9,"step":1}),                
                 "verbose": ("BOOLEAN",{"default":False}),
                 "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
-                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),  
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),
+                "hole_fill_algorithm": (["morphological_closing","flood_fill","remove_small_holes"],{"default":"remove_small_holes"}),
             },
         }
 
@@ -1390,6 +1393,7 @@ class Trellis2MeshWithVoxelAdvancedGenerator:
         verbose,
         dino_lock,
         dino_substeps,
+        hole_fill_algorithm
         ):
         reset_cuda()
         
@@ -1428,7 +1432,8 @@ class Trellis2MeshWithVoxelAdvancedGenerator:
                             hole_iterations = hole_iterations,
                             verbose = verbose,
                             dino_lock = dino_lock,
-                            dino_substeps = dino_substeps)[0]         
+                            dino_substeps = dino_substeps,
+                            hole_fill_algorithm=hole_fill_algorithm)[0]         
         
         vertices = mesh.vertices.cuda()
         faces = mesh.faces.cuda()                
@@ -1483,7 +1488,8 @@ class Trellis2MeshWithVoxelMultiViewGenerator:
                 "hole_iterations": ("INT",{"default":1,"min":1,"max":9,"step":1}),                
                 "verbose": ("BOOLEAN",{"default":False}),
                 "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
-                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),                  
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),
+                "hole_fill_algorithm": (["morphological_closing","flood_fill","remove_small_holes"],{"default":"remove_small_holes"}),
             },
             "optional": {
                 "back_image": ("IMAGE",),
@@ -1528,6 +1534,7 @@ class Trellis2MeshWithVoxelMultiViewGenerator:
         verbose,
         dino_lock,
         dino_substeps,
+        hole_fill_algorithm,
         back_image=None,
         left_image=None,
         right_image=None):
@@ -1579,7 +1586,8 @@ class Trellis2MeshWithVoxelMultiViewGenerator:
             hole_iterations=hole_iterations,
             verbose=verbose,
             dino_lock=dino_lock,
-            dino_substeps=dino_substeps
+            dino_substeps=dino_substeps,
+            hole_fill_algorithm=hole_fill_algorithm
         )[0]         
         
         vertices = mesh.vertices.cuda()
@@ -3551,7 +3559,8 @@ class Trellis2MeshWithVoxelCascadeGenerator:
                 "hole_iterations": ("INT",{"default":1,"min":1,"max":9,"step":1}),
                 "verbose": ("BOOLEAN",{"default":False}),
                 "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
-                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),                
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),      
+                "hole_fill_algorithm": (["morphological_closing","flood_fill","remove_small_holes"],{"default":"remove_small_holes"}),                
             },
         }
 
@@ -3604,7 +3613,8 @@ class Trellis2MeshWithVoxelCascadeGenerator:
         hole_iterations,
         verbose,
         dino_lock,
-        dino_substeps
+        dino_substeps,
+        hole_fill_algorithm
         ):
             
         reset_cuda()
@@ -3650,7 +3660,8 @@ class Trellis2MeshWithVoxelCascadeGenerator:
                                     hole_iterations = hole_iterations,
                                     verbose = verbose,
                                     dino_lock = dino_lock,
-                                    dino_substeps = dino_substeps
+                                    dino_substeps = dino_substeps,
+                                    hole_fill_algorithm = hole_fill_algorithm
                                     )[0]         
         
         vertices = mesh.vertices.cuda()
@@ -3725,6 +3736,7 @@ class Trellis2SparseGenerator:
                 "verbose": ("BOOLEAN",{"default":False}),
                 "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
                 "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),
+                "hole_fill_algorithm": (["morphological_closing","flood_fill","remove_small_holes"],{"default":"remove_small_holes"}),
             },
         }
 
@@ -3748,7 +3760,8 @@ class Trellis2SparseGenerator:
         hole_iterations,
         verbose,
         dino_lock,
-        dino_substeps
+        dino_substeps,
+        hole_fill_algorithm
         ):
         
         self.seed_all(seed)
@@ -3767,7 +3780,8 @@ class Trellis2SparseGenerator:
             hole_iterations=hole_iterations,
             verbose=verbose,
             dino_lock=dino_lock,
-            dino_substeps=dino_substeps
+            dino_substeps=dino_substeps,
+            hole_fill_algorithm=hole_fill_algorithm
         )
         
         if not pipeline.keep_models_loaded:
@@ -4961,11 +4975,9 @@ class Trellis2SparseGeneratorWithReconViaGen:
                 "sparse_structure_resolution": ("INT", {"default":32,"min":32,"max":128,"step":4}),
                 "sparse_structure_guidance_interval_start": ("FLOAT",{"default":0.10,"min":0.00,"max":1.00,"step":0.01}),
                 "sparse_structure_guidance_interval_end": ("FLOAT",{"default":1.00,"min":0.00,"max":1.00,"step":0.01}),
-                "fill_holes":("BOOLEAN",{"default":True}),
-                "hole_iterations": ("INT",{"default":1,"min":1,"max":9,"step":1}),
                 "verbose": ("BOOLEAN",{"default":False}),
                 "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
-                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1})
             },
         }
 
@@ -4985,8 +4997,6 @@ class Trellis2SparseGeneratorWithReconViaGen:
         sparse_structure_resolution,
         sparse_structure_guidance_interval_start,
         sparse_structure_guidance_interval_end,
-        fill_holes,
-        hole_iterations,
         verbose,
         dino_lock,
         dino_substeps
@@ -5008,7 +5018,7 @@ class Trellis2SparseGeneratorWithReconViaGen:
         if images.ndim == 3:
             images = images.unsqueeze(0)
         
-        coords = self._run_ss_stage_direct(pipeline, images, sparse_structure_resolution, sparse_structure_sampler_params, fill_holes, hole_iterations, verbose, dino_lock, dino_substeps)
+        coords = self._run_ss_stage_direct(pipeline, images, sparse_structure_resolution, sparse_structure_sampler_params, verbose, dino_lock, dino_substeps)
         
         if not pipeline.keep_models_loaded:
             pipeline.unload_sparse_structure_vggt_model()            
@@ -5101,8 +5111,6 @@ class Trellis2SparseGeneratorWithReconViaGen:
                 **ss_cond,
                 **sampler_params,
                 verbose=verbose,
-                fill_holes=fill_holes,
-                hole_iterations=hole_iterations,
                 dino_lock=dino_lock,
                 dino_substeps=dino_substeps
             ).samples
