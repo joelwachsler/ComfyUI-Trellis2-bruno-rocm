@@ -526,6 +526,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         verbose: bool = True,
         dino_lock: float = 0.0,
         dino_substeps: int = 4,
+        dino_foundation_cap: float = 0.92
     ) -> torch.Tensor:
         """
         Sample sparse structures with the given conditioning.
@@ -554,7 +555,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             verbose=verbose,
             tqdm_desc="Sampling sparse structure",
             dino_lock=dino_lock,
-            dino_substeps=dino_substeps
+            dino_substeps=dino_substeps,
+            dino_foundation_cap=dino_foundation_cap
         ).samples
         if self.low_vram:
             flow_model.cpu()
@@ -618,7 +620,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                             largest = sizes.argmax()
                             closed[b] = (labeled == largest)
                         else:
-                            closed[b] = filled
+                            closed[b] = filled                     
                     elif hole_fill_algorithm == "remove_small_holes":
                         # Remove small holes by area (2D slices)
                         from skimage.morphology import remove_small_holes
@@ -639,25 +641,27 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                     n_holes2 = np.unique(labeled2[holes2]).size
                     print(f"[Sparse HoleFill] Batch {b}: {n_holes-n_holes2} holes filled, {n_holes2} remain after filling.")
 
-                    # Optionally remove the solid interior, keeping only the shell
+                    # Optionally remove deeply interior voxels, keeping surface and near-surface structure
                     if keep_only_shell:
-                        # Find exterior-connected region (background)
-                        from scipy.ndimage import label, binary_dilation
                         from scipy.ndimage import binary_erosion
 
                         filled = closed[b].astype(np.bool_)
-                        structure = np.ones((3, 3, 3), dtype=bool)  # 3x3x3 cube
-                        shell_thickness = 1  # Set to 1 for thinnest shell, 2 for thicker, etc.
-
-                        eroded = filled.copy()
-                        for _ in range(shell_thickness):
-                            eroded = binary_erosion(eroded, structure=structure, border_value=0)
+                        before_count = int(filled.sum())
+                        struct = np.ones((3, 3, 3), dtype=bool)
+                        # Erode twice: only voxels surviving 2 erosion passes are >=2 layers deep
+                        # This preserves thin structures (e.g. necks with 3x3 cross-section)
+                        eroded = binary_erosion(filled, structure=struct, border_value=0)
+                        eroded = binary_erosion(eroded, structure=struct, border_value=0)
+                        # Remove only deeply interior voxels (>=2 layers from any surface)
                         shell = filled & ~eroded
                         closed[b] = shell
+                        after_count = int(shell.sum())
+                        if verbose:
+                            print(f"[Sparse Shell] Batch {b}: {before_count} -> {after_count} voxels (removed {before_count - after_count} deeply interior)")
 
                 decoded = torch.from_numpy(closed).to(decoded.device)
 
-                
+
                 # Debug: print tensor info before extracting coordinates
                 if verbose:
                     print(f"[Sparse HoleFill] decoded shape: {decoded.shape}, dtype: {decoded.dtype}, device: {decoded.device}")
@@ -675,10 +679,10 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             except Exception as e:
                 print(f"[Sparse HoleFill] Error in torch.argwhere: {e}")
                 raise
-                
+
             if verbose:
                 print(f"[Sparse HoleFill] coords shape: {coords.shape}, min: {coords.min(dim=0).values.tolist() if coords.numel()>0 else 'empty'}, max: {coords.max(dim=0).values.tolist() if coords.numel()>0 else 'empty'}")
-                
+
             if coords.numel() == 0:
                 raise RuntimeError("No voxels remain after hole filling/shell extraction. The mask is empty. Adjust your input, mask, or hole filling parameters.")
         else:
@@ -702,6 +706,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         verbose: bool = True,
         dino_lock: float = 0.0,
         dino_substeps: int = 4,
+        dino_foundation_cap: float = 0.92
     ) -> SparseTensor:
         """
         Sample structured latent with the given conditioning.
@@ -731,6 +736,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             verbose=verbose,
             dino_lock=dino_lock,
             dino_substeps=dino_substeps,
+            dino_foundation_cap=dino_foundation_cap,
             tqdm_desc="Sampling shape SLat",
         ).samples
         if self.low_vram:
@@ -763,6 +769,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         verbose: bool = False,
         dino_lock: float = 0.0,
         dino_substeps: int = 4,
+        dino_foundation_cap: float = 0.92
     ) -> SparseTensor:
         """
         Sample structured latent with the given conditioning.
@@ -795,6 +802,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             verbose=verbose,
             dino_lock=dino_lock,
             dino_substeps=dino_substeps,
+            dino_foundation_cap=dino_foundation_cap,
             tqdm_desc="Sampling shape SLat (LR)",
         ).samples
         if self.low_vram:
@@ -864,6 +872,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             verbose=verbose,
             dino_lock=dino_lock,
             dino_substeps=dino_substeps,
+            dino_foundation_cap=dino_foundation_cap,
             tqdm_desc="Sampling shape SLat (HR)",
         ).samples
         if self.low_vram:
@@ -924,6 +933,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         verbose: bool = False,
         dino_lock: float = 0.0,
         dino_substeps: int = 4,
+        dino_foundation_cap: float = 0.92
     ) -> SparseTensor:
         """
         Sample structured latent with the given conditioning.
@@ -954,6 +964,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             verbose=verbose,
             dino_lock=dino_lock,
             dino_substeps=dino_substeps,
+            dino_foundation_cap=dino_foundation_cap,
             tqdm_desc="Sampling texture SLat",
         ).samples
         if self.low_vram:
@@ -1087,7 +1098,9 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         hole_iterations: int = 1,
         dino_lock: float = 0.00,
         dino_substeps: int = 4,
-        hole_fill_algorithm = "remove_small_holes"
+        hole_fill_algorithm = "remove_small_holes",
+        dino_foundation_cap: float = 0.92,
+        keep_only_shell: bool = True,
     ) -> List[MeshWithVoxel]:
         """
         Run the pipeline.
@@ -1160,7 +1173,9 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             hole_iterations = hole_iterations,
             dino_lock = dino_lock,
             dino_substeps = dino_substeps,
-            hole_fill_algorithm=hole_fill_algorithm
+            hole_fill_algorithm=hole_fill_algorithm,
+            dino_foundation_cap=dino_foundation_cap,
+            keep_only_shell=keep_only_shell
         )
         
         if pbar is not None:
@@ -1178,7 +1193,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                 coords, shape_slat_sampler_params,
                 verbose = verbose,
                 dino_lock = dino_lock,
-                dino_substeps = dino_substeps                
+                dino_substeps = dino_substeps,
+                dino_foundation_cap = dino_foundation_cap
             )
             
             if pbar is not None:
@@ -1195,7 +1211,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                     shape_slat, tex_slat_sampler_params,
                     verbose = verbose,
                     dino_lock = dino_lock,
-                    dino_substeps = dino_substeps
+                    dino_substeps = dino_substeps,
+                    dino_foundation_cap = dino_foundation_cap
                 )
                 
                 if pbar is not None:
@@ -1213,7 +1230,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                 coords, shape_slat_sampler_params,
                 verbose = verbose,
                 dino_lock = dino_lock,
-                dino_substeps = dino_substeps                
+                dino_substeps = dino_substeps,
+                dino_foundation_cap = dino_foundation_cap
             )
             
             if pbar is not None:
@@ -1230,7 +1248,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                     shape_slat, tex_slat_sampler_params,
                     verbose = verbose,
                     dino_lock = dino_lock,
-                    dino_substeps = dino_substeps                    
+                    dino_substeps = dino_substeps,
+                    dino_foundation_cap = dino_foundation_cap
                 )
                 
                 if pbar is not None:
@@ -1252,7 +1271,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                 sparse_structure_resolution,
                 verbose = verbose,
                 dino_lock = dino_lock,
-                dino_substeps = dino_substeps                
+                dino_substeps = dino_substeps,
+                dino_foundation_cap = dino_foundation_cap
             )
             
             if pbar is not None:
@@ -1270,7 +1290,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                     shape_slat, tex_slat_sampler_params,
                     verbose = verbose,
                     dino_lock = dino_lock,
-                    dino_substeps = dino_substeps                    
+                    dino_substeps = dino_substeps,
+                    dino_foundation_cap = dino_foundation_cap
                 )
                 
             if pbar is not None:
@@ -1290,7 +1311,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                 sparse_structure_resolution,
                 verbose = verbose,
                 dino_lock = dino_lock,
-                dino_substeps = dino_substeps                
+                dino_substeps = dino_substeps,
+                dino_foundation_cap = dino_foundation_cap
             )
             
             if pbar is not None:
@@ -1308,7 +1330,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                     shape_slat, tex_slat_sampler_params,
                     verbose = verbose,
                     dino_lock = dino_lock,
-                    dino_substeps = dino_substeps                    
+                    dino_substeps = dino_substeps,
+                    dino_foundation_cap = dino_foundation_cap
                 )
                 
                 if pbar is not None:
@@ -1328,7 +1351,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                 sparse_structure_resolution,
                 verbose = verbose,
                 dino_lock = dino_lock,
-                dino_substeps = dino_substeps                
+                dino_substeps = dino_substeps,
+                dino_foundation_cap = dino_foundation_cap
             )
             
             if pbar is not None:
@@ -1346,7 +1370,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                     shape_slat, tex_slat_sampler_params,
                     verbose = verbose,
                     dino_lock = dino_lock,
-                    dino_substeps = dino_substeps                    
+                    dino_substeps = dino_substeps,
+                    dino_foundation_cap = dino_foundation_cap
                 )
                         
                 if pbar is not None:
@@ -1366,7 +1391,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                 sparse_structure_resolution,
                 verbose = verbose,
                 dino_lock = dino_lock,
-                dino_substeps = dino_substeps                
+                dino_substeps = dino_substeps,
+                dino_foundation_cap = dino_foundation_cap
             )
             
             if pbar is not None:
@@ -1384,7 +1410,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                     shape_slat, tex_slat_sampler_params,
                     verbose = verbose,
                     dino_lock = dino_lock,
-                    dino_substeps = dino_substeps                    
+                    dino_substeps = dino_substeps,
+                    dino_foundation_cap = dino_foundation_cap
                 )
                 
                 if pbar is not None:
@@ -1438,6 +1465,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         verbose: bool = False,
         dino_lock: float = 0.0,
         dino_substeps: int = 4,
+        dino_foundation_cap: float = 0.92
     ) -> SparseTensor:
         """
         Sample structured latent with the given conditioning.
@@ -1475,6 +1503,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             verbose=verbose,
             dino_lock=dino_lock,
             dino_substeps=dino_substeps,
+            dino_foundation_cap=dino_foundation_cap,
             tqdm_desc="Sampling shape SLat (LR)",
         ).samples
         if self.low_vram:
@@ -1549,6 +1578,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             verbose=verbose,
             dino_lock=dino_lock,
             dino_substeps=dino_substeps,
+            dino_foundation_cap=dino_foundation_cap,
             tqdm_desc="Sampling shape SLat (HR)",
         ).samples
         if self.low_vram:
@@ -1576,6 +1606,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         verbose: bool = False,
         dino_lock: float = 0.0,
         dino_substeps: int = 4,
+        dino_foundation_cap: float = 0.92
     ) -> SparseTensor:
         """
         Sample structured latent with the given conditioning.
@@ -1611,6 +1642,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             verbose=verbose,
             dino_lock=dino_lock,
             dino_substeps=dino_substeps,
+            dino_foundation_cap=dino_foundation_cap,
             tqdm_desc="Sampling texture SLat",
         ).samples
         if self.low_vram:
@@ -1652,7 +1684,9 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         hole_iterations: int = 1,
         dino_lock: float = 0.00,
         dino_substeps: int = 4,
-        hole_fill_algorithm = 'remove_small_holes'
+        hole_fill_algorithm = 'remove_small_holes',
+        dino_foundation_cap: float = 0.92,
+        keep_only_shell: bool = True,
     ) -> List[MeshWithVoxel]:
         
         if isinstance(image, (list, tuple)):
@@ -1692,7 +1726,9 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             hole_iterations = hole_iterations,
             dino_lock = dino_lock,
             dino_substeps = dino_substeps,
-            hole_fill_algorithm = hole_fill_algorithm
+            hole_fill_algorithm = hole_fill_algorithm,
+            dino_foundation_cap=dino_foundation_cap,
+            keep_only_shell=keep_only_shell
         )
         
         if pbar is not None:
@@ -1715,7 +1751,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                 low_res_shape_sampler, high_res_shape_sampler,
                 verbose = verbose,
                 dino_lock = dino_lock,
-                dino_substeps = dino_substeps                 
+                dino_substeps = dino_substeps,
+                dino_foundation_cap=dino_foundation_cap
             )
             
             if pbar is not None:
@@ -1733,7 +1770,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                     shape_slat, tex_slat_sampler_params, tex_sampler,
                     verbose = verbose,
                     dino_lock = dino_lock,
-                    dino_substeps = dino_substeps                     
+                    dino_substeps = dino_substeps,
+                    dino_foundation_cap=dino_foundation_cap
                 )
                 
             if pbar is not None:
@@ -1754,7 +1792,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                 low_res_shape_sampler, high_res_shape_sampler,
                 verbose = verbose,
                 dino_lock = dino_lock,
-                dino_substeps = dino_substeps                  
+                dino_substeps = dino_substeps,
+                dino_foundation_cap=dino_foundation_cap
             )
             
             if pbar is not None:
@@ -1772,7 +1811,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                     shape_slat, tex_slat_sampler_params, tex_sampler,
                     verbose = verbose,
                     dino_lock = dino_lock,
-                    dino_substeps = dino_substeps                      
+                    dino_substeps = dino_substeps,
+                    dino_foundation_cap=dino_foundation_cap
                 )
                 
             if pbar is not None:
@@ -1818,7 +1858,9 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         dino_substeps: int = 4,
         fill_holes: bool = True,
         hole_iterations: int = 1,
-        hole_fill_algorithm = 'remove_small_holes'
+        hole_fill_algorithm = 'remove_small_holes',
+        dino_foundation_cap: float = 0.92,
+        keep_only_shell: bool = True,
     ) -> List[MeshWithVoxel]:
         """
         Run the pipeline with named multi-view images and spatial blending.
@@ -1891,7 +1933,9 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             dino_substeps=dino_substeps,
             fill_holes=fill_holes,
             hole_iterations=hole_iterations,
-            hole_fill_algorithm=hole_fill_algorithm
+            hole_fill_algorithm=hole_fill_algorithm,
+            dino_foundation_cap=dino_foundation_cap,
+            keep_only_shell=keep_only_shell
         )
         
         if not self.keep_models_loaded:
@@ -1918,7 +1962,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                 sparse_structure_resolution = sparse_structure_resolution,
                 verbose=verbose,
                 dino_lock=dino_lock,
-                dino_substeps=dino_substeps,                
+                dino_substeps=dino_substeps,
+                dino_foundation_cap=dino_foundation_cap
             )
             res = 1024
             
@@ -1940,7 +1985,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                 sparse_structure_resolution = sparse_structure_resolution,
                 verbose=verbose,
                 dino_lock=dino_lock,
-                dino_substeps=dino_substeps,                
+                dino_substeps=dino_substeps,
+                dino_foundation_cap=dino_foundation_cap
             )
             res = 1536
              
@@ -1958,7 +2004,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                 blend_temperature=blend_temperature,
                 verbose=verbose,
                 dino_lock=dino_lock,
-                dino_substeps=dino_substeps,                    
+                dino_substeps=dino_substeps,
+                dino_foundation_cap=dino_foundation_cap
              )
              res = 512
              if not self.keep_models_loaded:
@@ -1974,7 +2021,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                 blend_temperature=blend_temperature,
                 verbose=verbose,
                 dino_lock=dino_lock,
-                dino_substeps=dino_substeps,                    
+                dino_substeps=dino_substeps,
+                dino_foundation_cap=dino_foundation_cap
              )
              res = 1024
              if not self.keep_models_loaded:
@@ -2006,7 +2054,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                 blend_temperature=blend_temperature,
                 verbose=verbose,
                 dino_lock=dino_lock,
-                dino_substeps=dino_substeps,                 
+                dino_substeps=dino_substeps,
+                dino_foundation_cap=dino_foundation_cap
             )  
              
             if not self.keep_models_loaded:
@@ -2046,10 +2095,11 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         hole_structure: int = 1,
         hole_iterations: int = 1,
         hole_fill_algorithm: str = "flood_fill",
-        keep_only_shell: bool = True,
+        keep_only_shell: bool = False,
         verbose: bool = True,
         dino_lock: float = 0.0,
         dino_substeps: int = 4,
+        dino_foundation_cap: float = 0.92
     ) -> torch.Tensor:
         """
         Sample sparse structures with multi-view blending.
@@ -2090,6 +2140,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             verbose=verbose,
             dino_lock=dino_lock,
             dino_substeps=dino_substeps,
+            dino_foundation_cap=dino_foundation_cap,
             tqdm_desc="Sampling sparse structure (MultiView)",
         ).samples
         
@@ -2159,7 +2210,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                             largest = sizes.argmax()
                             closed[b] = (labeled == largest)
                         else:
-                            closed[b] = filled
+                            closed[b] = filled                      
                     elif hole_fill_algorithm == "remove_small_holes":
                         # Remove small holes by area (2D slices)
                         from skimage.morphology import remove_small_holes
@@ -2180,25 +2231,27 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                     n_holes2 = np.unique(labeled2[holes2]).size
                     print(f"[Sparse HoleFill] Batch {b}: {n_holes-n_holes2} holes filled, {n_holes2} remain after filling.")
 
-                    # Optionally remove the solid interior, keeping only the shell
+                    # Optionally remove deeply interior voxels, keeping surface and near-surface structure
                     if keep_only_shell:
-                        # Find exterior-connected region (background)
-                        from scipy.ndimage import label, binary_dilation
                         from scipy.ndimage import binary_erosion
 
                         filled = closed[b].astype(np.bool_)
-                        structure = np.ones((3, 3, 3), dtype=bool)  # 3x3x3 cube
-                        shell_thickness = 1  # Set to 1 for thinnest shell, 2 for thicker, etc.
-
-                        eroded = filled.copy()
-                        for _ in range(shell_thickness):
-                            eroded = binary_erosion(eroded, structure=structure, border_value=0)
+                        before_count = int(filled.sum())
+                        struct = np.ones((3, 3, 3), dtype=bool)
+                        # Erode twice: only voxels surviving 2 erosion passes are >=2 layers deep
+                        # This preserves thin structures (e.g. necks with 3x3 cross-section)
+                        eroded = binary_erosion(filled, structure=struct, border_value=0)
+                        eroded = binary_erosion(eroded, structure=struct, border_value=0)
+                        # Remove only deeply interior voxels (>=2 layers from any surface)
                         shell = filled & ~eroded
                         closed[b] = shell
+                        after_count = int(shell.sum())
+                        if verbose:
+                            print(f"[Sparse Shell] Batch {b}: {before_count} -> {after_count} voxels (removed {before_count - after_count} deeply interior)")
 
                 decoded = torch.from_numpy(closed).to(decoded.device)
 
-                
+
                 # Debug: print tensor info before extracting coordinates
                 if verbose:
                     print(f"[Sparse HoleFill] decoded shape: {decoded.shape}, dtype: {decoded.dtype}, device: {decoded.device}")
@@ -2216,17 +2269,17 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             except Exception as e:
                 print(f"[Sparse HoleFill] Error in torch.argwhere: {e}")
                 raise
-            
+
             if verbose:
                 print(f"[Sparse HoleFill] coords shape: {coords.shape}, min: {coords.min(dim=0).values.tolist() if coords.numel()>0 else 'empty'}, max: {coords.max(dim=0).values.tolist() if coords.numel()>0 else 'empty'}")
-                
+
             if coords.numel() == 0:
                 raise RuntimeError("No voxels remain after hole filling/shell extraction. The mask is empty. Adjust your input, mask, or hole filling parameters.")
         else:
             coords = torch.argwhere(decoded)[:, [0, 2, 3, 4]].int()
 
         coords = coords.cpu()
-        
+
         del decoded
         del z_s
         if self.low_vram:
@@ -2248,6 +2301,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         verbose: bool = False,
         dino_lock: float = 0.00,
         dino_substeps: int = 4,
+        dino_foundation_cap: float = 0.92
     ) -> SparseTensor:
         if self.low_vram:
             for v in conds:
@@ -2285,6 +2339,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             verbose=verbose,
             dino_lock = dino_lock,
             dino_substeps = dino_substeps,
+            dino_foundation_cap = dino_foundation_cap,
             tqdm_desc="Sampling shape SLat (MultiView)",
         ).samples
         
@@ -2322,6 +2377,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         verbose: bool = False,
         dino_lock: float = 0.00,
         dino_substeps: int = 4,
+        dino_foundation_cap: float = 0.92
     ) -> SparseTensor:
         # LR
         if self.low_vram:
@@ -2362,6 +2418,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             verbose=verbose,
             dino_lock=dino_lock,
             dino_substeps=dino_substeps,
+            dino_foundation_cap=dino_foundation_cap,
             tqdm_desc="Sampling shape SLat (MultiView LR)",
         ).samples
         
@@ -2437,6 +2494,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             verbose=verbose,
             dino_lock=dino_lock,
             dino_substeps=dino_substeps,
+            dino_foundation_cap=dino_foundation_cap,
             tqdm_desc="Sampling shape SLat (MultiView HR)",
         ).samples
         
@@ -2468,6 +2526,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         verbose: bool = False,
         dino_lock: float = 0.00,
         dino_substeps: int = 4,
+        dino_foundation_cap: float = 0.92
     ) -> SparseTensor:
         """
         Sample structured latent for texture with multi-view blending.
@@ -2521,6 +2580,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             verbose=verbose,
             dino_lock=dino_lock,
             dino_substeps=dino_substeps,
+            dino_foundation_cap=dino_foundation_cap,
             tqdm_desc="Sampling texture SLat (MultiView)",
         ).samples
         
@@ -2860,6 +2920,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         verbose: bool = False,
         dino_lock: float = 0.0,
         dino_substeps: int = 4,
+        dino_foundation_cap: float = 0.92
     ):
         self.switch_samplers(sampler)
         
@@ -2894,7 +2955,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                 shape_slat, tex_slat_sampler_params,
                 verbose = verbose,
                 dino_lock = dino_lock,
-                dino_substeps = dino_substeps
+                dino_substeps = dino_substeps,
+                dino_foundation_cap = dino_foundation_cap
             )
             
             if not self.keep_models_loaded:
@@ -2909,7 +2971,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                 shape_slat, tex_slat_sampler_params,
                 verbose = verbose,
                 dino_lock = dino_lock,
-                dino_substeps = dino_substeps                
+                dino_substeps = dino_substeps,
+                dino_foundation_cap = dino_foundation_cap
             )
             
             if not self.keep_models_loaded:
@@ -2946,6 +3009,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         verbose: bool = False,
         dino_lock: float = 0.0,
         dino_substeps: int = 4,
+        dino_foundation_cap: float = 0.92
     ):
         self.switch_samplers(sampler)
         
@@ -2995,7 +3059,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                 blend_temperature=blend_temperature,
                 verbose=verbose,
                 dino_lock=dino_lock,
-                dino_substeps=dino_substeps
+                dino_substeps=dino_substeps,
+                dino_foundation_cap=dino_foundation_cap
             )            
             
             if not self.keep_models_loaded:
@@ -3014,7 +3079,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                 blend_temperature=blend_temperature,
                 verbose=verbose,
                 dino_lock=dino_lock,
-                dino_substeps=dino_substeps                
+                dino_substeps=dino_substeps,
+                dino_foundation_cap=dino_foundation_cap
             )                          
             
             if not self.keep_models_loaded:
@@ -3067,6 +3133,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         verbose: bool = False,
         dino_lock: float = 0.0,
         dino_substeps: int = 4,
+        dino_foundation_cap: float = 0.92
     ) -> SparseTensor:
         # Upsample       
         self.load_shape_slat_decoder()
@@ -3128,6 +3195,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             verbose=verbose,
             dino_lock=dino_lock,
             dino_substeps=dino_substeps,
+            dino_foundation_cap=dino_foundation_cap,
             tqdm_desc="Sampling shape SLat",
         ).samples
         if self.low_vram:
@@ -3163,7 +3231,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         sampler: str = 'euler',
         verbose: bool = False,
         dino_lock: float = 0.0,
-        dino_substeps: int = 4,        
+        dino_substeps: int = 4,
+        dino_foundation_cap: float = 0.92
     ):
         self.switch_samplers(sampler)
         
@@ -3200,7 +3269,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                 downsampling,
                 verbose = verbose,
                 dino_lock=dino_lock,
-                dino_substeps=dino_substeps
+                dino_substeps=dino_substeps,
+                dino_foundation_cap=dino_foundation_cap
             )
             
             if not self.keep_models_loaded:
@@ -3214,7 +3284,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                     shape_slat, tex_slat_sampler_params,
                     verbose = verbose,
                     dino_lock=dino_lock,
-                    dino_substeps=dino_substeps                    
+                    dino_substeps=dino_substeps,
+                    dino_foundation_cap=dino_foundation_cap
                 )
             
             if not self.keep_models_loaded:
@@ -3232,7 +3303,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                 downsampling,
                 verbose = verbose,
                 dino_lock=dino_lock,
-                dino_substeps=dino_substeps                
+                dino_substeps=dino_substeps,
+                dino_foundation_cap=dino_foundation_cap
             )
             
             if not self.keep_models_loaded:
@@ -3246,7 +3318,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                     shape_slat, tex_slat_sampler_params,
                     verbose = verbose,
                     dino_lock=dino_lock,
-                    dino_substeps=dino_substeps                    
+                    dino_substeps=dino_substeps,
+                    dino_foundation_cap=dino_foundation_cap
                 )
             
             if not self.keep_models_loaded:
@@ -3264,7 +3337,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                 downsampling,
                 verbose = verbose,
                 dino_lock=dino_lock,
-                dino_substeps=dino_substeps                
+                dino_substeps=dino_substeps,
+                dino_foundation_cap=dino_foundation_cap
             )
             
             if not self.keep_models_loaded:
@@ -3278,7 +3352,8 @@ class Trellis2ImageTo3DPipeline(Pipeline):
                     shape_slat, tex_slat_sampler_params,
                     verbose = verbose,
                     dino_lock=dino_lock,
-                    dino_substeps=dino_substeps                    
+                    dino_substeps=dino_substeps,
+                    dino_foundation_cap=dino_foundation_cap
                 )
             
             if not self.keep_models_loaded:

@@ -510,7 +510,8 @@ class Trellis2MeshWithVoxelGenerator:
                 "sampler": (["euler", "heun", "rk4", "rk5"], {"default": "euler"}),
                 "fill_holes":("BOOLEAN",{"default":True}),
                 "hole_iterations": ("INT",{"default":1,"min":1,"max":9,"step":1}),
-                "hole_fill_algorithm": (["morphological_closing","flood_fill","remove_small_holes"],{"default":"remove_small_holes"}),
+                "hole_fill_algorithm": (["morphological_closing","flood_fill","remove_small_holes"],{"default":"flood_fill"}),
+                "keep_only_shell": ("BOOLEAN",{"default":True}),
             },
         }
 
@@ -520,7 +521,7 @@ class Trellis2MeshWithVoxelGenerator:
     CATEGORY = "Trellis2Wrapper"
     OUTPUT_NODE = True
 
-    def process(self, pipeline, image, seed, pipeline_type, sparse_structure_steps, shape_steps, texture_steps, max_num_tokens, max_views, sparse_structure_resolution, generate_texture_slat, use_tiled_decoder, sampler, fill_holes, hole_iterations, hole_fill_algorithm):
+    def process(self, pipeline, image, seed, pipeline_type, sparse_structure_steps, shape_steps, texture_steps, max_num_tokens, max_views, sparse_structure_resolution, generate_texture_slat, use_tiled_decoder, sampler, fill_holes, hole_iterations, hole_fill_algorithm, keep_only_shell):
         reset_cuda()
         
         images = tensor_batch_to_pil_list(image, max_views=max_views)
@@ -552,7 +553,8 @@ class Trellis2MeshWithVoxelGenerator:
                             sampler=sampler,
                             fill_holes=fill_holes,
                             hole_iterations=hole_iterations,
-                            hole_fill_algorithm=hole_fill_algorithm)[0]
+                            hole_fill_algorithm=hole_fill_algorithm,
+                            keep_only_shell=keep_only_shell)[0]
         
         vertices = mesh.vertices.cuda()
         faces = mesh.faces.cuda()        
@@ -1354,7 +1356,9 @@ class Trellis2MeshWithVoxelAdvancedGenerator:
                 "verbose": ("BOOLEAN",{"default":False}),
                 "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
                 "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),
-                "hole_fill_algorithm": (["morphological_closing","flood_fill","remove_small_holes"],{"default":"remove_small_holes"}),
+                "hole_fill_algorithm": (["morphological_closing","flood_fill","remove_small_holes"],{"default":"flood_fill"}),
+                "dino_foundation_cap": ("FLOAT",{"default":1.00,"min":0.01,"max":1.00,"step":0.01}),
+                "keep_only_shell": ("BOOLEAN",{"default":True}),
             },
         }
 
@@ -1393,7 +1397,9 @@ class Trellis2MeshWithVoxelAdvancedGenerator:
         verbose,
         dino_lock,
         dino_substeps,
-        hole_fill_algorithm
+        hole_fill_algorithm,
+        dino_foundation_cap,
+        keep_only_shell
         ):
         reset_cuda()
         
@@ -1433,7 +1439,9 @@ class Trellis2MeshWithVoxelAdvancedGenerator:
                             verbose = verbose,
                             dino_lock = dino_lock,
                             dino_substeps = dino_substeps,
-                            hole_fill_algorithm=hole_fill_algorithm)[0]         
+                            hole_fill_algorithm=hole_fill_algorithm,
+                            dino_foundation_cap=dino_foundation_cap,
+                            keep_only_shell=keep_only_shell)[0]         
         
         vertices = mesh.vertices.cuda()
         faces = mesh.faces.cuda()                
@@ -1489,7 +1497,9 @@ class Trellis2MeshWithVoxelMultiViewGenerator:
                 "verbose": ("BOOLEAN",{"default":False}),
                 "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
                 "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),
-                "hole_fill_algorithm": (["morphological_closing","flood_fill","remove_small_holes"],{"default":"remove_small_holes"}),
+                "hole_fill_algorithm": (["morphological_closing","flood_fill","remove_small_holes"],{"default":"flood_fill"}),
+                "dino_foundation_cap": ("FLOAT",{"default":1.00,"min":0.01,"max":1.00,"step":0.01}),
+                "keep_only_shell": ("BOOLEAN",{"default":True}),
             },
             "optional": {
                 "back_image": ("IMAGE",),
@@ -1535,6 +1545,8 @@ class Trellis2MeshWithVoxelMultiViewGenerator:
         dino_lock,
         dino_substeps,
         hole_fill_algorithm,
+        dino_foundation_cap,
+        keep_only_shell,
         back_image=None,
         left_image=None,
         right_image=None):
@@ -1587,7 +1599,9 @@ class Trellis2MeshWithVoxelMultiViewGenerator:
             verbose=verbose,
             dino_lock=dino_lock,
             dino_substeps=dino_substeps,
-            hole_fill_algorithm=hole_fill_algorithm
+            hole_fill_algorithm=hole_fill_algorithm,
+            dino_foundation_cap=dino_foundation_cap,
+            keep_only_shell=keep_only_shell
         )[0]         
         
         vertices = mesh.vertices.cuda()
@@ -2264,7 +2278,8 @@ class Trellis2MeshTexturing:
                 "inpainting": (["telea","ns"],{"default":"telea"}),
                 "verbose": ("BOOLEAN",{"default":False}),
                 "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
-                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),                
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),
+                "dino_foundation_cap": ("FLOAT",{"default":1.00,"min":0.01,"max":1.00,"step":0.01}),                
             },
         }
 
@@ -2275,7 +2290,7 @@ class Trellis2MeshTexturing:
     OUTPUT_NODE = True
 
     def process(self, pipeline, image, trimesh, seed, texture_steps, texture_guidance_strength, texture_guidance_rescale, texture_rescale_t, resolution, texture_size, texture_alpha_mode, double_side_material, texture_guidance_interval_start, texture_guidance_interval_end, max_views,bake_on_vertices,use_custom_normals,mesh_cluster_threshold_cone_half_angle_rad, sampler, inpainting,
-        verbose, dino_lock, dino_substeps):
+        verbose, dino_lock, dino_substeps, dino_foundation_cap):
             
         images = tensor_batch_to_pil_list(image, max_views=max_views)
         image_in = images[0] if len(images) == 1 else images
@@ -2302,7 +2317,8 @@ class Trellis2MeshTexturing:
             inpainting = inpainting,
             verbose = verbose,
             dino_lock = dino_lock,
-            dino_substeps = dino_substeps
+            dino_substeps = dino_substeps,
+            dino_foundation_cap = dino_foundation_cap
         )            
 
         baseColorTexture = pil2tensor(baseColorTexture_np)
@@ -2338,7 +2354,8 @@ class Trellis2MeshTexturingMultiView:
                 "inpainting": (["telea","ns"],{"default":"telea"}),
                 "verbose": ("BOOLEAN",{"default":False}),
                 "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
-                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),                
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}), 
+                "dino_foundation_cap": ("FLOAT",{"default":1.00,"min":0.01,"max":1.00,"step":0.01}),
             },
             "optional": {
                 "back_image": ("IMAGE",),
@@ -2378,6 +2395,7 @@ class Trellis2MeshTexturingMultiView:
         verbose,
         dino_lock,
         dino_substeps,
+        dino_foundation_cap,
         back_image = None,
         left_image = None,
         right_image = None):
@@ -2416,7 +2434,8 @@ class Trellis2MeshTexturingMultiView:
             inpainting = inpainting,
             verbose = verbose,
             dino_lock = dino_lock,
-            dino_substeps = dino_substeps
+            dino_substeps = dino_substeps,
+            dino_foundation_cap = dino_foundation_cap
         )            
 
         baseColorTexture = pil2tensor(baseColorTexture_np)
@@ -2604,7 +2623,8 @@ class Trellis2MeshRefiner:
                 "sampler": (["euler", "heun", "rk4", "rk5"], {"default": "euler"}),
                 "verbose": ("BOOLEAN",{"default":False}),
                 "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
-                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),                
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),
+                "dino_foundation_cap": ("FLOAT",{"default":1.00,"min":0.01,"max":1.00,"step":0.01}),
             },
         }
 
@@ -2635,7 +2655,8 @@ class Trellis2MeshRefiner:
         sampler,
         verbose,
         dino_lock,
-        dino_substeps):
+        dino_substeps,
+        dino_foundation_cap):
 
         reset_cuda()
 
@@ -2662,7 +2683,8 @@ class Trellis2MeshRefiner:
                                     sampler = sampler,
                                     verbose = verbose,
                                     dino_lock = dino_lock,
-                                    dino_substeps = dino_substeps)[0]         
+                                    dino_substeps = dino_substeps,
+                                    dino_foundation_cap = dino_foundation_cap)[0]         
         
         vertices = mesh.vertices.cuda()
         faces = mesh.faces.cuda()        
@@ -3560,7 +3582,9 @@ class Trellis2MeshWithVoxelCascadeGenerator:
                 "verbose": ("BOOLEAN",{"default":False}),
                 "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
                 "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),      
-                "hole_fill_algorithm": (["morphological_closing","flood_fill","remove_small_holes"],{"default":"remove_small_holes"}),                
+                "hole_fill_algorithm": (["morphological_closing","flood_fill","remove_small_holes"],{"default":"flood_fill"}),
+                "dino_foundation_cap": ("FLOAT",{"default":1.00,"min":0.01,"max":1.00,"step":0.01}),
+                "keep_only_shell": ("BOOLEAN",{"default":True}),
             },
         }
 
@@ -3614,7 +3638,9 @@ class Trellis2MeshWithVoxelCascadeGenerator:
         verbose,
         dino_lock,
         dino_substeps,
-        hole_fill_algorithm
+        hole_fill_algorithm,
+        dino_foundation_cap,
+        keep_only_shell
         ):
             
         reset_cuda()
@@ -3661,7 +3687,9 @@ class Trellis2MeshWithVoxelCascadeGenerator:
                                     verbose = verbose,
                                     dino_lock = dino_lock,
                                     dino_substeps = dino_substeps,
-                                    hole_fill_algorithm = hole_fill_algorithm
+                                    hole_fill_algorithm = hole_fill_algorithm,
+                                    dino_foundation_cap = dino_foundation_cap,
+                                    keep_only_shell = keep_only_shell
                                     )[0]         
         
         vertices = mesh.vertices.cuda()
@@ -3736,7 +3764,9 @@ class Trellis2SparseGenerator:
                 "verbose": ("BOOLEAN",{"default":False}),
                 "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
                 "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),
-                "hole_fill_algorithm": (["morphological_closing","flood_fill","remove_small_holes"],{"default":"remove_small_holes"}),
+                "hole_fill_algorithm": (["morphological_closing","flood_fill","remove_small_holes"],{"default":"flood_fill"}),
+                "dino_foundation_cap": ("FLOAT",{"default":1.00,"min":0.01,"max":1.00,"step":0.01}),
+                "keep_only_shell": ("BOOLEAN",{"default":True}),
             },
         }
 
@@ -3761,7 +3791,9 @@ class Trellis2SparseGenerator:
         verbose,
         dino_lock,
         dino_substeps,
-        hole_fill_algorithm
+        hole_fill_algorithm,
+        dino_foundation_cap,
+        keep_only_shell
         ):
         
         self.seed_all(seed)
@@ -3781,7 +3813,9 @@ class Trellis2SparseGenerator:
             verbose=verbose,
             dino_lock=dino_lock,
             dino_substeps=dino_substeps,
-            hole_fill_algorithm=hole_fill_algorithm
+            hole_fill_algorithm=hole_fill_algorithm,
+            dino_foundation_cap=dino_foundation_cap,
+            keep_only_shell=keep_only_shell
         )
         
         if not pipeline.keep_models_loaded:
@@ -3817,7 +3851,8 @@ class Trellis2ShapeGenerator:
                 "shape_guidance_interval_end": ("FLOAT",{"default":1.00,"min":0.00,"max":1.00,"step":0.01}),
                 "verbose": ("BOOLEAN",{"default":False}),
                 "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
-                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),                
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),
+                "dino_foundation_cap": ("FLOAT",{"default":1.00,"min":0.01,"max":1.00,"step":0.01}),                
             },
         }
 
@@ -3838,7 +3873,8 @@ class Trellis2ShapeGenerator:
         shape_guidance_interval_end,
         verbose,
         dino_lock,
-        dino_substeps
+        dino_substeps,
+        dino_foundation_cap
         ):
             
         shape_guidance_interval = [shape_guidance_interval_start, shape_guidance_interval_end]        
@@ -3856,7 +3892,8 @@ class Trellis2ShapeGenerator:
                 coords, shape_slat_sampler_params,
                 verbose = verbose,
                 dino_lock = dino_lock,
-                dino_substeps = dino_substeps
+                dino_substeps = dino_substeps,
+                dino_foundation_cap = dino_foundation_cap
             )
             
             if not pipeline.keep_models_loaded:
@@ -3869,7 +3906,8 @@ class Trellis2ShapeGenerator:
                 coords, shape_slat_sampler_params,
                 verbose = verbose,
                 dino_lock = dino_lock,
-                dino_substeps = dino_substeps                
+                dino_substeps = dino_substeps,
+                dino_foundation_cap = dino_foundation_cap
             )
             
             if not pipeline.keep_models_loaded:
@@ -3898,7 +3936,8 @@ class Trellis2ShapeCascadeGenerator:
                 "shape_guidance_interval_end": ("FLOAT",{"default":1.00,"min":0.00,"max":1.00,"step":0.01}),
                 "verbose": ("BOOLEAN",{"default":False}),
                 "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
-                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),                   
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),
+                "dino_foundation_cap": ("FLOAT",{"default":1.00,"min":0.01,"max":1.00,"step":0.01}),
             },
         }
 
@@ -3920,6 +3959,7 @@ class Trellis2ShapeCascadeGenerator:
         verbose,
         dino_lock,
         dino_substeps,
+        dino_foundation_cap
         ):
             
         shape_guidance_interval = [shape_guidance_interval_start, shape_guidance_interval_end]        
@@ -3929,14 +3969,14 @@ class Trellis2ShapeCascadeGenerator:
         shape_sampler_prefix = pipeline.GetSamplerName(shape_sampler)
         pipeline.shape_slat_sampler = getattr(samplers, f"Flow{shape_sampler_prefix}GuidanceIntervalSampler")(**args['shape_slat_sampler']['args'])
         pipeline.load_shape_slat_flow_model_1024()           
-        slat, hr_resolution = self.sample(pipeline, shape_slat, from_resolution, to_resolution, sparse_structure_resolution, max_num_tokens, image_cond, shape_slat_sampler_params, pipeline.models['shape_slat_flow_model_1024'], verbose, dino_lock, dino_substeps)
+        slat, hr_resolution = self.sample(pipeline, shape_slat, from_resolution, to_resolution, sparse_structure_resolution, max_num_tokens, image_cond, shape_slat_sampler_params, pipeline.models['shape_slat_flow_model_1024'], verbose, dino_lock, dino_substeps, dino_foundation_cap)
         
         if not pipeline.keep_models_loaded:
             pipeline.unload_shape_slat_flow_model_1024()              
         
         return (slat, hr_resolution, pipeline,)         
         
-    def sample(self, pipeline, slat, lr_resolution, resolution, sparse_structure_resolution, max_num_tokens, cond, sampler_params, flow_model, verbose, dino_lock, dino_substeps):
+    def sample(self, pipeline, slat, lr_resolution, resolution, sparse_structure_resolution, max_num_tokens, cond, sampler_params, flow_model, verbose, dino_lock, dino_substeps, dino_foundation_cap):
         # Upsample       
         pipeline.load_shape_slat_decoder()
         if pipeline.low_vram:
@@ -3995,6 +4035,7 @@ class Trellis2ShapeCascadeGenerator:
             verbose=verbose,
             dino_lock=dino_lock,
             dino_substeps=dino_substeps,
+            dino_foundation_cap=dino_foundation_cap,
             tqdm_desc="Sampling shape SLat (HR)",
         ).samples
         if pipeline.low_vram:
@@ -4030,7 +4071,8 @@ class Trellis2TexSlatGenerator:
                 "texture_guidance_interval_end": ("FLOAT",{"default":0.90,"min":0.00,"max":1.00,"step":0.01}),
                 "verbose": ("BOOLEAN",{"default":False}),
                 "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
-                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),                
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),
+                "dino_foundation_cap": ("FLOAT",{"default":1.00,"min":0.01,"max":1.00,"step":0.01}),
             },
         }
 
@@ -4052,6 +4094,7 @@ class Trellis2TexSlatGenerator:
         verbose,
         dino_lock,
         dino_substeps,
+        dino_foundation_cap
         ):
 
         texture_guidance_interval = [texture_guidance_interval_start,texture_guidance_interval_end]
@@ -4065,7 +4108,8 @@ class Trellis2TexSlatGenerator:
                 shape_slat, tex_slat_sampler_params, texture_sampler,
                 verbose = verbose,
                 dino_lock = dino_lock,
-                dino_substeps = dino_substeps
+                dino_substeps = dino_substeps,
+                dino_foundation_cap = dino_foundation_cap
             )
             if not pipeline.keep_models_loaded:
                 pipeline.unload_tex_slat_flow_model_512()
@@ -4078,7 +4122,8 @@ class Trellis2TexSlatGenerator:
                 shape_slat, tex_slat_sampler_params, texture_sampler,
                 verbose = verbose,
                 dino_lock = dino_lock,
-                dino_substeps = dino_substeps                
+                dino_substeps = dino_substeps,
+                dino_foundation_cap = dino_foundation_cap
             )
             
             if not pipeline.keep_models_loaded:
@@ -4977,7 +5022,12 @@ class Trellis2SparseGeneratorWithReconViaGen:
                 "sparse_structure_guidance_interval_end": ("FLOAT",{"default":1.00,"min":0.00,"max":1.00,"step":0.01}),
                 "verbose": ("BOOLEAN",{"default":False}),
                 "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
-                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1})
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":9,"step":1}),
+                "dino_foundation_cap": ("FLOAT",{"default":1.00,"min":0.01,"max":1.00,"step":0.01}),
+                "fill_holes":("BOOLEAN",{"default":True}),
+                "hole_iterations": ("INT",{"default":1,"min":1,"max":9,"step":1}),
+                "hole_fill_algorithm": (["morphological_closing","flood_fill","remove_small_holes"],{"default":"flood_fill"}),
+                "keep_only_shell": ("BOOLEAN",{"default":True}),
             },
         }
 
@@ -4999,7 +5049,12 @@ class Trellis2SparseGeneratorWithReconViaGen:
         sparse_structure_guidance_interval_end,
         verbose,
         dino_lock,
-        dino_substeps
+        dino_substeps,
+        dino_foundation_cap,
+        fill_holes,
+        hole_iterations,
+        hole_fill_algorithm,
+        keep_only_shell
         ):
         
         self.seed_all(seed)
@@ -5018,7 +5073,18 @@ class Trellis2SparseGeneratorWithReconViaGen:
         if images.ndim == 3:
             images = images.unsqueeze(0)
         
-        coords = self._run_ss_stage_direct(pipeline, images, sparse_structure_resolution, sparse_structure_sampler_params, verbose, dino_lock, dino_substeps)
+        coords = self._run_ss_stage_direct(pipeline = pipeline, 
+                                           images = images, 
+                                           sparse_structure_resolution = sparse_structure_resolution, 
+                                           sparse_structure_sampler_params = sparse_structure_sampler_params, 
+                                           verbose = verbose, 
+                                           dino_lock = dino_lock, 
+                                           dino_substeps = dino_substeps, 
+                                           dino_foundation_cap = dino_foundation_cap, 
+                                           fill_holes = fill_holes, 
+                                           hole_iterations = hole_iterations, 
+                                           hole_fill_algorithm = hole_fill_algorithm, 
+                                           keep_only_shell = keep_only_shell)
         
         if not pipeline.keep_models_loaded:
             pipeline.unload_sparse_structure_vggt_model()            
@@ -5073,11 +5139,15 @@ class Trellis2SparseGeneratorWithReconViaGen:
         images,
         target_ss_res: int,
         ss_sampler_params: dict,
-        fill_holes: bool,
-        hole_iterations: int,
         verbose: bool,
         dino_lock: float,
-        dino_substeps: int
+        dino_substeps: int,
+        dino_foundation_cap: float,
+        fill_holes: bool,
+        hole_iterations: int,
+        hole_fill_algorithm: str,
+        hole_structure: int = 1,
+        keep_only_shell: bool = True        
     ) -> torch.Tensor:
         """
         Run only ReconViaGen's sparse structure diffusion stage to obtain coords
@@ -5112,7 +5182,8 @@ class Trellis2SparseGeneratorWithReconViaGen:
                 **sampler_params,
                 verbose=verbose,
                 dino_lock=dino_lock,
-                dino_substeps=dino_substeps
+                dino_substeps=dino_substeps,
+                dino_foundation_cap=dino_foundation_cap
             ).samples
 
         decoder = pipeline.models['sparse_structure_decoder']
@@ -5120,7 +5191,114 @@ class Trellis2SparseGeneratorWithReconViaGen:
         if target_ss_res != decoded.shape[2]:
             ratio = decoded.shape[2] // target_ss_res
             decoded = torch.nn.functional.max_pool3d(decoded.float(), ratio, ratio, 0) > 0.5
-        coords = torch.argwhere(decoded)[:, [0, 2, 3, 4]].int()
+        
+        # Optionally fill holes in the sparse voxel grid using the selected algorithm
+        if fill_holes:
+            try:
+                from scipy.ndimage import binary_closing, label, binary_fill_holes
+                arr = decoded.cpu().numpy()
+                if arr.ndim == 5:
+                    arr = arr[:, 0]
+                closed = np.zeros_like(arr)
+                for b in range(arr.shape[0]):
+                    filled = arr[b].astype(np.bool_)
+                    inv = ~filled
+                    labeled, num_features = label(inv)
+                    border_mask = np.zeros_like(inv)
+                    border_mask[0,:,:] = border_mask[-1,:,:] = 1
+                    border_mask[:,0,:] = border_mask[:,-1,:] = 1
+                    border_mask[:,:,0] = border_mask[:,:,-1] = 1
+                    border_labels = np.unique(labeled[border_mask==1])
+                    holes = np.isin(labeled, border_labels, invert=True) & (labeled > 0)
+                    n_holes = np.unique(labeled[holes]).size
+                    print(f"[Sparse HoleFill] Batch {b}: Found {n_holes} holes before filling.")
+                    if hole_fill_algorithm == "morphological_closing":
+                        closed[b] = binary_closing(arr[b], structure=np.ones((hole_structure,)*3), iterations=hole_iterations)
+                    elif hole_fill_algorithm == "flood_fill":
+                        # Robust structure-preserving hole filling:
+                        # 1. Morphological closing to connect small gaps
+                        # 2. Fill internal holes
+                        # 3. Keep only the largest connected component
+                        from scipy.ndimage import binary_closing, label, binary_fill_holes
+                        # Step 1: Morphological closing (small structure, 1 iter)
+                        closed1 = binary_closing(arr[b], structure=np.ones((hole_structure,)*3), iterations=hole_iterations)
+                        # Step 2: Fill internal holes
+                        filled = binary_fill_holes(closed1)
+                        # Step 3: Keep only the largest connected component
+                        labeled, num = label(filled)
+                        if num > 0:
+                            sizes = np.bincount(labeled.ravel())
+                            sizes[0] = 0  # background
+                            largest = sizes.argmax()
+                            closed[b] = (labeled == largest)
+                        else:
+                            closed[b] = filled                      
+                    elif hole_fill_algorithm == "remove_small_holes":
+                        # Remove small holes by area (2D slices)
+                        from skimage.morphology import remove_small_holes
+                        # Apply per-slice (z axis)
+                        temp = np.copy(arr[b])
+                        for z in range(temp.shape[0]):
+                            temp[z] = remove_small_holes(temp[z].astype(bool), area_threshold=hole_structure**2)
+                        closed[b] = temp
+                    else:
+                        print(f"[Sparse HoleFill] Unknown algorithm: {hole_fill_algorithm}, skipping.")
+                        closed[b] = arr[b]
+                    # Count holes after filling
+                    filled2 = closed[b].astype(np.bool_)
+                    inv2 = ~filled2
+                    labeled2, num_features2 = label(inv2)
+                    border_labels2 = np.unique(labeled2[border_mask==1])
+                    holes2 = np.isin(labeled2, border_labels2, invert=True) & (labeled2 > 0)
+                    n_holes2 = np.unique(labeled2[holes2]).size
+                    print(f"[Sparse HoleFill] Batch {b}: {n_holes-n_holes2} holes filled, {n_holes2} remain after filling.")
+
+                    # Optionally remove deeply interior voxels, keeping surface and near-surface structure
+                    if keep_only_shell:
+                        from scipy.ndimage import binary_erosion
+
+                        filled = closed[b].astype(np.bool_)
+                        before_count = int(filled.sum())
+                        struct = np.ones((3, 3, 3), dtype=bool)
+                        # Erode twice: only voxels surviving 2 erosion passes are >=2 layers deep
+                        # This preserves thin structures (e.g. necks with 3x3 cross-section)
+                        eroded = binary_erosion(filled, structure=struct, border_value=0)
+                        eroded = binary_erosion(eroded, structure=struct, border_value=0)
+                        # Remove only deeply interior voxels (>=2 layers from any surface)
+                        shell = filled & ~eroded
+                        closed[b] = shell
+                        after_count = int(shell.sum())
+                        if verbose:
+                            print(f"[Sparse Shell] Batch {b}: {before_count} -> {after_count} voxels (removed {before_count - after_count} deeply interior)")
+
+                decoded = torch.from_numpy(closed).to(decoded.device)
+
+
+                # Debug: print tensor info before extracting coordinates
+                if verbose:
+                    print(f"[Sparse HoleFill] decoded shape: {decoded.shape}, dtype: {decoded.dtype}, device: {decoded.device}")
+                    print(f"[Sparse HoleFill] decoded min: {decoded.min().item()}, max: {decoded.max().item()}, unique: {torch.unique(decoded)}")
+                # Safety: ensure tensor is contiguous and on CPU for argwhere
+                decoded = decoded.contiguous().cpu()
+
+            except ImportError:
+                print("[Warning] scipy or skimage not installed, skipping hole filling.")
+            except Exception as e:
+                print(f"[Warning] Hole filling failed: {e}")
+
+            try:
+                coords = torch.argwhere(decoded)[:, [0, 1, 2, 3]].int()
+            except Exception as e:
+                print(f"[Sparse HoleFill] Error in torch.argwhere: {e}")
+                raise
+
+            if verbose:
+                print(f"[Sparse HoleFill] coords shape: {coords.shape}, min: {coords.min(dim=0).values.tolist() if coords.numel()>0 else 'empty'}, max: {coords.max(dim=0).values.tolist() if coords.numel()>0 else 'empty'}")
+
+            if coords.numel() == 0:
+                raise RuntimeError("No voxels remain after hole filling/shell extraction. The mask is empty. Adjust your input, mask, or hole filling parameters.")
+        else:
+            coords = torch.argwhere(decoded)[:, [0, 2, 3, 4]].int()
 
         if pipeline.low_vram:
             pipeline.VGGT_model.to('cpu')
@@ -5129,6 +5307,7 @@ class Trellis2SparseGeneratorWithReconViaGen:
             torch.cuda.empty_cache()
 
         return coords
+        
         
     @torch.no_grad()
     def _run_ss_stage(

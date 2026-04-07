@@ -127,23 +127,23 @@ class DinoLockMixin:
                        "v_ema": new_v_ema})
 
     @staticmethod
-    def _compute_lock_strength(step_idx, total_steps, base_strength):
+    def _compute_lock_strength(step_idx, total_steps, base_strength, foundation_cap = 0.92):
         """
         DINO Foundation schedule:
         - Steps  0 – 40 %:  0.92  (near-full DINO, 8 % CFG on-distribution).
         - Steps 40 – 70 %:  cosine ramp 0.92 → base_strength.
         - Steps 70 – 100 %: base_strength (residual guardrail).
         """
-        FOUNDATION_CAP = 0.92
+        #FOUNDATION_CAP = 0.92
         foundation_end = int(total_steps * 0.4)
         ramp_end = int(total_steps * 0.7)
         if step_idx < foundation_end:
-            return FOUNDATION_CAP
+            return foundation_cap
         if step_idx >= ramp_end:
             return base_strength
         progress = (step_idx - foundation_end) / max(1, ramp_end - foundation_end)
         blend = 0.5 * (1.0 - np.cos(np.pi * progress))
-        return float(FOUNDATION_CAP + (base_strength - FOUNDATION_CAP) * blend)
+        return float(foundation_cap + (base_strength - foundation_cap) * blend)
 
     # ------------------------------------------------------------------ #
     #  sample() override                                                  #
@@ -164,6 +164,7 @@ class DinoLockMixin:
         tqdm_desc: str = "Sampling",
         dino_lock: float = 0.0,
         dino_substeps: int = 4,
+        dino_foundation_cap: float = 0.92,
         **kwargs
     ):
         # Strip keys that must not reach the model
@@ -205,7 +206,7 @@ class DinoLockMixin:
         v_ema = None
         ret = edict({"samples": None, "pred_x_t": [], "pred_x_0": []})
         for i, (t, t_prev) in enumerate(tqdm(t_pairs, desc=tqdm_desc)):
-            s = self._compute_lock_strength(i, steps, dino_lock)
+            s = self._compute_lock_strength(i, steps, dino_lock, dino_foundation_cap)
             n_sub = dino_substeps if (s >= 0.9 and dino_substeps > 1) else 1
             out = self._dino_lock_step(model, sample, t, t_prev, cond,
                                         lock_strength=s,
