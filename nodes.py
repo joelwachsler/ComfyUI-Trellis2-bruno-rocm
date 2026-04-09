@@ -5075,8 +5075,8 @@ class Trellis2SparseGeneratorWithReconViaGen:
         
         coords = self._run_ss_stage_direct(pipeline = pipeline, 
                                            images = images, 
-                                           sparse_structure_resolution = sparse_structure_resolution, 
-                                           sparse_structure_sampler_params = sparse_structure_sampler_params, 
+                                           target_ss_res = sparse_structure_resolution, 
+                                           ss_sampler_params = sparse_structure_sampler_params, 
                                            verbose = verbose, 
                                            dino_lock = dino_lock, 
                                            dino_substeps = dino_substeps, 
@@ -5508,6 +5508,33 @@ class Trellis2ExtractImagesFromVideo:
         
         return (tensor_frames,)
         
+class Trellis2MaxTokensCalculator:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "default_max_tokens": ("INT",{"default":999999,"min":1,"max":999999,"step":1}),
+            },
+        }
+
+    RETURN_TYPES = ("INT",)
+    RETURN_NAMES = ("max_tokens",)
+    FUNCTION = "process"
+    CATEGORY = "Trellis2Wrapper"
+    OUTPUT_NODE = True
+
+    def process(self, default_max_tokens):
+        device = mm.get_torch_device()
+        try:
+            total_vram_bytes = mm.get_total_memory(device)
+            total_vram_gb = total_vram_bytes / (1024 ** 3)
+            max_tokens = int(2600 * total_vram_gb)
+        except Exception as e:
+            print(f"Error, cannot get VRAM size : {e}")
+            max_tokens = default_max_tokens
+        
+        return (max_tokens,)        
+        
 NODE_CLASS_MAPPINGS = {
     "Trellis2LoadModel": Trellis2LoadModel,
     "Trellis2MeshWithVoxelGenerator": Trellis2MeshWithVoxelGenerator,
@@ -5566,6 +5593,7 @@ NODE_CLASS_MAPPINGS = {
     "Trellis2UnloadAllModels": Trellis2UnloadAllModels,
     "Trellis2SparseGeneratorWithReconViaGen": Trellis2SparseGeneratorWithReconViaGen,
     "Trellis2ExtractImagesFromVideo": Trellis2ExtractImagesFromVideo,
+    "Trellis2MaxTokensCalculator": Trellis2MaxTokensCalculator,
     }
     
 
@@ -5626,5 +5654,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Trellis2VoxelToMesh": "Trellis2 - Voxel to Mesh",
     "Trellis2UnloadAllModels": "Trellis2 - Unload All ComfyUI Models",
     "Trellis2SparseGeneratorWithReconViaGen": "Trellis2 - Sparse Generator with ReconViaGen",
-    "Trellis2ExtractImagesFromVideo": "Trellis 2 - Extract Images from Video",
+    "Trellis2ExtractImagesFromVideo": "Trellis2 - Extract Images from Video",
+    "Trellis2MaxTokensCalculator": "Trellis2 - Max Tokens Calculator",
     }
