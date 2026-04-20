@@ -1,5 +1,6 @@
 import os
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
 import torchvision.transforms as transforms
 from PIL import Image, ImageSequence, ImageOps
@@ -5609,7 +5610,816 @@ class Trellis2MaxTokensCalculator:
             print(f"Error, cannot get VRAM size : {e}")
             max_tokens = default_max_tokens
         
-        return (max_tokens,)        
+        return (max_tokens,)  
+        
+class Trellis2ImageCondMultiViewGenerator:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "pipeline": ("TRELLIS2PIPELINE",),
+                "front_image": ("IMAGE",)
+            },
+            "optional": {
+                "back_image": ("IMAGE",),
+                "left_image": ("IMAGE",),
+                "right_image": ("IMAGE",),
+            },            
+        }
+
+    RETURN_TYPES = ("IMAGE_CONDS", "IMAGE_CONDS", "VIEWS_LIST", "TRELLIS2PIPELINE",)
+    RETURN_NAMES = ("conds_512", "conds_1024", "views_list", "pipeline",)
+    FUNCTION = "process"
+    CATEGORY = "Trellis2Wrapper"
+    OUTPUT_NODE = True
+
+    def process(self, 
+        pipeline, 
+        front_image, 
+        back_image = None,
+        left_image = None,
+        right_image = None):
+
+        front_pil = tensor2pil(front_image)
+        
+        # Convert optional view image tensors to PIL
+        back_pil = tensor2pil(back_image) if back_image is not None else None
+        left_pil = tensor2pil(left_image) if left_image is not None else None
+        right_pil = tensor2pil(right_image) if right_image is not None else None           
+            
+        # Collect views
+        views_dict = {'front': front_pil}
+        if back_pil is not None: views_dict['back'] = back_pil
+        if left_pil is not None: views_dict['left'] = left_pil
+        if right_pil is not None: views_dict['right'] = right_pil
+        
+        views_list = list(views_dict.keys())            
+        
+        # Calculate conditioning per view
+        conds_512 = {}
+        conds_1024 = {}
+        
+        pipeline.load_image_cond_model() 
+
+        for v, img in views_dict.items():
+            c512 = pipeline.get_cond([img], 512)
+            c1024 = pipeline.get_cond([img], 1024)
+            conds_512[v] = c512
+            conds_1024[v] = c1024
+            
+        if not pipeline.keep_models_loaded:
+            pipeline.unload_image_cond_model()              
+
+        return (conds_512, conds_1024, views_list, pipeline,)          
+
+class Trellis2SparseMultiViewGenerator:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "pipeline": ("TRELLIS2PIPELINE",),
+                "image_conds": ("IMAGE_CONDS",),
+                "views_list": ("VIEWS_LIST",),
+                "seed": ("INT", {"default": 0, "min": 0, "max": 0x7fffffff}),
+                "sparse_structure_steps": ("INT",{"default":12, "min":1, "max":100},),
+                "sparse_structure_guidance_strength": ("FLOAT",{"default":6.50,"min":0.00,"max":99.99,"step":0.01}),
+                "sparse_structure_guidance_rescale": ("FLOAT",{"default":0.05,"min":0.00,"max":1.00,"step":0.01}),
+                "sparse_structure_rescale_t": ("FLOAT",{"default":4.00,"min":0.00,"max":9.99,"step":0.01}),
+                "sparse_structure_sampler": (["euler", "heun", "rk4", "rk5"], {"default": "euler"}),
+                "sparse_structure_resolution": ("INT", {"default":32,"min":32,"max":128,"step":4}),
+                "sparse_structure_guidance_interval_start": ("FLOAT",{"default":0.10,"min":0.00,"max":1.00,"step":0.01}),
+                "sparse_structure_guidance_interval_end": ("FLOAT",{"default":1.00,"min":0.00,"max":1.00,"step":0.01}),
+                "fill_holes":("BOOLEAN",{"default":True}),
+                "hole_iterations": ("INT",{"default":1,"min":1,"max":9,"step":1}),
+                "verbose": ("BOOLEAN",{"default":False}),
+                "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":99,"step":1}),
+                "hole_fill_algorithm": (["morphological_closing","flood_fill","remove_small_holes"],{"default":"flood_fill"}),
+                "dino_foundation_cap": ("FLOAT",{"default":1.00,"min":0.01,"max":1.00,"step":0.01}),
+                "keep_only_shell": ("BOOLEAN",{"default":True}),
+                "front_axis": (["z", "x"], {"default": "z"}),
+                "blend_temperature": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 10.0, "step": 0.1}),
+            },
+        }
+
+    RETURN_TYPES = ("COORDS", "INT", "VIEWS_LIST", "TRELLIS2PIPELINE",)
+    RETURN_NAMES = ("coords", "sparse_structure_resolution", "views_list", "pipeline",)
+    FUNCTION = "process"
+    CATEGORY = "Trellis2Wrapper"
+    OUTPUT_NODE = True
+
+    def process(self, pipeline, image_conds, views_list, seed, 
+        # sparse
+        sparse_structure_steps, 
+        sparse_structure_guidance_strength, 
+        sparse_structure_guidance_rescale,
+        sparse_structure_rescale_t,
+        sparse_structure_sampler,
+        sparse_structure_resolution,
+        sparse_structure_guidance_interval_start,
+        sparse_structure_guidance_interval_end,
+        fill_holes,
+        hole_iterations,
+        verbose,
+        dino_lock,
+        dino_substeps,
+        hole_fill_algorithm,
+        dino_foundation_cap,
+        keep_only_shell,
+        front_axis,
+        blend_temperature
+        ):
+        
+        self.seed_all(seed)
+        
+        sparse_structure_guidance_interval = [sparse_structure_guidance_interval_start,sparse_structure_guidance_interval_end]        
+        sparse_structure_sampler_params = {"steps":sparse_structure_steps,"guidance_strength":sparse_structure_guidance_strength,"guidance_rescale":sparse_structure_guidance_rescale,"guidance_interval":sparse_structure_guidance_interval,"rescale_t":sparse_structure_rescale_t}                    
+
+        sparse_sampler_prefix = pipeline.GetSamplerName(sparse_structure_sampler)
+        pipeline.load_sparse_structure_model()                
+            
+        if pipeline.low_vram:
+            for v in image_conds:
+                image_conds[v] = pipeline._cond_to(image_conds[v], pipeline.device)
+                
+        # Sample sparse structure latent
+        flow_model = pipeline.models['sparse_structure_flow_model']
+        reso = flow_model.resolution
+        in_channels = flow_model.in_channels
+        noise = torch.randn(1, in_channels, reso, reso, reso).to(pipeline.device)
+        
+        sampler_class = getattr(samplers, f"Flow{sparse_sampler_prefix}MultiViewGuidanceIntervalSampler", samplers.FlowEulerMultiViewGuidanceIntervalSampler)
+        sampler = sampler_class(
+            sigma_min=1e-5,
+            resolution=flow_model.resolution if hasattr(flow_model, 'resolution') else flow_model[0].resolution
+        )        
+        
+        sparse_structure_sampler_params = {**pipeline.sparse_structure_sampler_params, **sparse_structure_sampler_params}
+        
+        if pipeline.low_vram:
+            flow_model.to(pipeline.device)
+            
+        z_s = sampler.sample(
+            flow_model,
+            noise,
+            conds=image_conds,            
+            **sparse_structure_sampler_params,            
+            views=views_list,
+            front_axis=front_axis,
+            blend_temperature=blend_temperature,            
+            verbose=verbose,
+            dino_lock=dino_lock,
+            dino_substeps=dino_substeps,
+            dino_foundation_cap=dino_foundation_cap,
+            tqdm_desc="Sampling sparse structure (MultiView)",
+        ).samples
+        
+        if pipeline.low_vram:
+            flow_model.cpu()
+            pipeline._cleanup_cuda()
+            
+        # Decode sparse structure latent
+        decoder = pipeline.models['sparse_structure_decoder']
+        if pipeline.low_vram:
+            decoder.to(pipeline.device)
+            
+        # Standard decoding logic from sample_sparse_structure
+        decoded = decoder(z_s) > 0
+        
+        if pipeline.low_vram:
+            decoder.cpu()
+            pipeline._cleanup_cuda()
+            
+        # if resolution != decoded.shape[2]:
+            # ratio = decoded.shape[2] // resolution
+            # decoded = torch.nn.functional.max_pool3d(decoded.float(), ratio, ratio, 0) > 0.5
+        if sparse_structure_resolution != decoded.shape[2]:
+            if sparse_structure_resolution < decoded.shape[2]:
+                ratio = decoded.shape[2] // sparse_structure_resolution
+                decoded = torch.nn.functional.max_pool3d(decoded.float(), ratio, ratio, 0) > 0.5
+            else:
+                decoded = torch.nn.functional.interpolate(decoded.float(), size=(sparse_structure_resolution, sparse_structure_resolution, sparse_structure_resolution), mode='nearest') > 0.5            
+
+        # Optionally fill holes in the sparse voxel grid using the selected algorithm
+        if fill_holes:
+            hole_structure = 1
+            try:
+                from scipy.ndimage import binary_closing, label, binary_fill_holes
+                arr = decoded.cpu().numpy()
+                if arr.ndim == 5:
+                    arr = arr[:, 0]
+                closed = np.zeros_like(arr)
+                for b in range(arr.shape[0]):
+                    filled = arr[b].astype(np.bool_)
+                    inv = ~filled
+                    labeled, num_features = label(inv)
+                    border_mask = np.zeros_like(inv)
+                    border_mask[0,:,:] = border_mask[-1,:,:] = 1
+                    border_mask[:,0,:] = border_mask[:,-1,:] = 1
+                    border_mask[:,:,0] = border_mask[:,:,-1] = 1
+                    border_labels = np.unique(labeled[border_mask==1])
+                    holes = np.isin(labeled, border_labels, invert=True) & (labeled > 0)
+                    n_holes = np.unique(labeled[holes]).size
+                    print(f"[Sparse HoleFill] Batch {b}: Found {n_holes} holes before filling.")
+                    if hole_fill_algorithm == "morphological_closing":
+                        closed[b] = binary_closing(arr[b], structure=np.ones((hole_structure,)*3), iterations=hole_iterations)
+                    elif hole_fill_algorithm == "flood_fill":
+                        # Robust structure-preserving hole filling:
+                        # 1. Morphological closing to connect small gaps
+                        # 2. Fill internal holes
+                        # 3. Keep only the largest connected component
+                        from scipy.ndimage import binary_closing, label, binary_fill_holes
+                        # Step 1: Morphological closing (small structure, 1 iter)
+                        closed1 = binary_closing(arr[b], structure=np.ones((hole_structure,)*3), iterations=hole_iterations)
+                        # Step 2: Fill internal holes
+                        filled = binary_fill_holes(closed1)
+                        # Step 3: Keep only the largest connected component
+                        labeled, num = label(filled)
+                        if num > 0:
+                            sizes = np.bincount(labeled.ravel())
+                            sizes[0] = 0  # background
+                            largest = sizes.argmax()
+                            closed[b] = (labeled == largest)
+                        else:
+                            closed[b] = filled                      
+                    elif hole_fill_algorithm == "remove_small_holes":
+                        # Remove small holes by area (2D slices)
+                        from skimage.morphology import remove_small_holes
+                        # Apply per-slice (z axis)
+                        temp = np.copy(arr[b])
+                        for z in range(temp.shape[0]):
+                            temp[z] = remove_small_holes(temp[z].astype(bool), area_threshold=hole_structure**2)
+                        closed[b] = temp
+                    else:
+                        print(f"[Sparse HoleFill] Unknown algorithm: {hole_fill_algorithm}, skipping.")
+                        closed[b] = arr[b]
+                    # Count holes after filling
+                    filled2 = closed[b].astype(np.bool_)
+                    inv2 = ~filled2
+                    labeled2, num_features2 = label(inv2)
+                    border_labels2 = np.unique(labeled2[border_mask==1])
+                    holes2 = np.isin(labeled2, border_labels2, invert=True) & (labeled2 > 0)
+                    n_holes2 = np.unique(labeled2[holes2]).size
+                    print(f"[Sparse HoleFill] Batch {b}: {n_holes-n_holes2} holes filled, {n_holes2} remain after filling.")
+
+                    # Optionally remove deeply interior voxels, keeping surface and near-surface structure
+                    if keep_only_shell:
+                        from scipy.ndimage import binary_erosion
+
+                        filled = closed[b].astype(np.bool_)
+                        before_count = int(filled.sum())
+                        struct = np.ones((3, 3, 3), dtype=bool)
+                        # Erode twice: only voxels surviving 2 erosion passes are >=2 layers deep
+                        # This preserves thin structures (e.g. necks with 3x3 cross-section)
+                        eroded = binary_erosion(filled, structure=struct, border_value=0)
+                        eroded = binary_erosion(eroded, structure=struct, border_value=0)
+                        # Remove only deeply interior voxels (>=2 layers from any surface)
+                        shell = filled & ~eroded
+                        closed[b] = shell
+                        after_count = int(shell.sum())
+                        if verbose:
+                            print(f"[Sparse Shell] Batch {b}: {before_count} -> {after_count} voxels (removed {before_count - after_count} deeply interior)")
+
+                decoded = torch.from_numpy(closed).to(decoded.device)
+
+
+                # Debug: print tensor info before extracting coordinates
+                if verbose:
+                    print(f"[Sparse HoleFill] decoded shape: {decoded.shape}, dtype: {decoded.dtype}, device: {decoded.device}")
+                    print(f"[Sparse HoleFill] decoded min: {decoded.min().item()}, max: {decoded.max().item()}, unique: {torch.unique(decoded)}")
+                # Safety: ensure tensor is contiguous and on CPU for argwhere
+                decoded = decoded.contiguous().cpu()
+
+            except ImportError:
+                print("[Warning] scipy or skimage not installed, skipping hole filling.")
+            except Exception as e:
+                print(f"[Warning] Hole filling failed: {e}")
+
+            try:
+                coords = torch.argwhere(decoded)[:, [0, 1, 2, 3]].int()
+            except Exception as e:
+                print(f"[Sparse HoleFill] Error in torch.argwhere: {e}")
+                raise
+
+            if verbose:
+                print(f"[Sparse HoleFill] coords shape: {coords.shape}, min: {coords.min(dim=0).values.tolist() if coords.numel()>0 else 'empty'}, max: {coords.max(dim=0).values.tolist() if coords.numel()>0 else 'empty'}")
+
+            if coords.numel() == 0:
+                raise RuntimeError("No voxels remain after hole filling/shell extraction. The mask is empty. Adjust your input, mask, or hole filling parameters.")
+        else:
+            coords = torch.argwhere(decoded)[:, [0, 2, 3, 4]].int()
+
+        coords = coords.cpu()
+
+        del decoded
+        del z_s
+        if pipeline.low_vram:
+            for v in image_conds:
+                image_conds[v] = pipeline._cond_cpu(image_conds[v])
+            pipeline._cleanup_cuda()
+
+        return (coords, sparse_structure_resolution, views_list, pipeline,)
+        
+    def seed_all(self, seed: int = 0):
+        import random
+        """
+        Set random seeds of all components.
+        """
+        random.seed(seed)
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)   
+
+class Trellis2ShapeMultiViewGenerator:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "pipeline": ("TRELLIS2PIPELINE",),
+                "image_conds": ("IMAGE_CONDS",),
+                "views_list": ("VIEWS_LIST",),
+                "coords": ("COORDS",),
+                "resolution": ([512,1024],{"default":1024}),                
+                "shape_steps": ("INT",{"default":12, "min":1, "max":100},),
+                "shape_guidance_strength": ("FLOAT",{"default":6.50,"min":0.00,"max":99.99,"step":0.01}),
+                "shape_guidance_rescale": ("FLOAT",{"default":0.05,"min":0.00,"max":1.00,"step":0.01}),
+                "shape_rescale_t": ("FLOAT",{"default":4.00,"min":0.00,"max":9.99,"step":0.01}),                
+                "shape_sampler": (["euler", "heun", "rk4", "rk5"], {"default": "euler"}),
+                "shape_guidance_interval_start": ("FLOAT",{"default":0.10,"min":0.00,"max":1.00,"step":0.01}),
+                "shape_guidance_interval_end": ("FLOAT",{"default":1.00,"min":0.00,"max":1.00,"step":0.01}),
+                "verbose": ("BOOLEAN",{"default":False}),
+                "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":99,"step":1}),
+                "dino_foundation_cap": ("FLOAT",{"default":1.00,"min":0.01,"max":1.00,"step":0.01}),  
+                "front_axis": (["z", "x"], {"default": "z"}),
+                "blend_temperature": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 10.0, "step": 0.1}),                
+            },
+        }
+
+    RETURN_TYPES = ("SHAPE_SLAT", "INT", "VIEWS_LIST", "TRELLIS2PIPELINE",)
+    RETURN_NAMES = ("shape_slat", "resolution", "views_list", "pipeline",)
+    FUNCTION = "process"
+    CATEGORY = "Trellis2Wrapper"
+    OUTPUT_NODE = True
+
+    def process(self, pipeline, image_conds, views_list, coords, resolution,      
+        # shape
+        shape_steps, 
+        shape_guidance_strength, 
+        shape_guidance_rescale,
+        shape_rescale_t,
+        shape_sampler,
+        shape_guidance_interval_start,
+        shape_guidance_interval_end,
+        verbose,
+        dino_lock,
+        dino_substeps,
+        dino_foundation_cap,
+        front_axis,
+        blend_temperature
+        ):
+            
+        shape_guidance_interval = [shape_guidance_interval_start, shape_guidance_interval_end]        
+        shape_slat_sampler_params = {"steps":shape_steps,"guidance_strength":shape_guidance_strength,"guidance_rescale":shape_guidance_rescale,"guidance_interval":shape_guidance_interval,"rescale_t":shape_rescale_t}            
+        
+        if resolution == 512:
+             pipeline.load_shape_slat_flow_model_512()
+             shape_slat = self.sample(
+                pipeline, shape_sampler,
+                image_conds, views_list,
+                pipeline.models['shape_slat_flow_model_512'],
+                coords, shape_slat_sampler_params,
+                front_axis=front_axis,
+                blend_temperature=blend_temperature,
+                verbose=verbose,
+                dino_lock=dino_lock,
+                dino_substeps=dino_substeps,
+                dino_foundation_cap=dino_foundation_cap
+             )
+             if not pipeline.keep_models_loaded:
+                 pipeline.unload_shape_slat_flow_model_512()
+                 
+        elif resolution == 1024:
+             pipeline.load_shape_slat_flow_model_1024()
+             shape_slat = self.sample(
+                pipeline, shape_sampler,
+                image_conds, views_list,
+                pipeline.models['shape_slat_flow_model_1024'],
+                coords, shape_slat_sampler_params,
+                front_axis=front_axis,
+                blend_temperature=blend_temperature,
+                verbose=verbose,
+                dino_lock=dino_lock,
+                dino_substeps=dino_substeps,
+                dino_foundation_cap=dino_foundation_cap
+             )
+             if not pipeline.keep_models_loaded:
+                 pipeline.unload_shape_slat_flow_model_1024()
+        
+        return (shape_slat, resolution, views_list, pipeline,)
+        
+    def sample(
+        self,
+        pipeline,
+        shape_sampler,
+        conds: dict,
+        views: list,
+        flow_model,
+        coords: torch.Tensor,
+        sampler_params: dict = {},
+        front_axis: str = 'z',
+        blend_temperature: float = 2.0,
+        verbose: bool = False,
+        dino_lock: float = 0.00,
+        dino_substeps: int = 4,
+        dino_foundation_cap: float = 0.92
+    ) -> SparseTensor:
+        if pipeline.low_vram:
+            for v in conds:
+                conds[v] = pipeline._cond_to(conds[v], pipeline.device)
+
+        coords_dev = coords.to(pipeline.device)                         
+        noise = SparseTensor(
+            feats=torch.randn(coords.shape[0], flow_model.in_channels, device=pipeline.device),
+            coords=coords_dev,
+        )
+        
+        # sampler = samplers.FlowEulerMultiViewGuidanceIntervalSampler(
+            # sigma_min=1e-5,
+            # resolution=flow_model.resolution,
+        # )
+        sampler_class = getattr(samplers, f"Flow{shape_sampler}MultiViewGuidanceIntervalSampler", samplers.FlowEulerMultiViewGuidanceIntervalSampler)
+        sampler = sampler_class(
+            sigma_min=1e-5,
+            resolution=flow_model.resolution if hasattr(flow_model, 'resolution') else flow_model[0].resolution
+        )        
+        
+        sampler_params = {**pipeline.shape_slat_sampler_params, **sampler_params}
+        
+        if pipeline.low_vram:
+            flow_model.to(pipeline.device)
+            
+        slat = sampler.sample(
+            flow_model,
+            noise,
+            conds=conds,            
+            **sampler_params,            
+            views=views,
+            front_axis=front_axis,
+            blend_temperature=blend_temperature,            
+            verbose=verbose,
+            dino_lock = dino_lock,
+            dino_substeps = dino_substeps,
+            dino_foundation_cap = dino_foundation_cap,
+            tqdm_desc="Sampling shape SLat (MultiView)",
+        ).samples
+        
+        if pipeline.low_vram:
+            flow_model.cpu()
+            pipeline._cleanup_cuda()                                
+
+        std = torch.tensor(pipeline.shape_slat_normalization['std'])[None].to(slat.device)
+        mean = torch.tensor(pipeline.shape_slat_normalization['mean'])[None].to(slat.device)
+        slat = slat * std + mean
+        
+        del coords_dev
+        if pipeline.low_vram:
+            for v in conds:
+                conds[v] = pipeline._cond_cpu(conds[v])
+            pipeline._cleanup_cuda()
+
+        return slat        
+        
+class Trellis2ShapeCascadeMultiViewGenerator:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "pipeline": ("TRELLIS2PIPELINE",),
+                "image_conds": ("IMAGE_CONDS",),
+                "views_list": ("VIEWS_LIST",),
+                "shape_slat": ("SHAPE_SLAT",),
+                "from_resolution": ("INT",),
+                "to_resolution": ([1024,1536,2048,2560,3072,3584,4096],{"default":1024}),
+                "sparse_structure_resolution": ("INT", {"default":32,"min":32,"max":128,"step":4}),
+                "max_num_tokens": ("INT",{"default":999999,"min":0,"max":999999}),
+                "shape_steps": ("INT",{"default":12, "min":1, "max":100},),
+                "shape_guidance_strength": ("FLOAT",{"default":6.50,"min":0.00,"max":99.99,"step":0.01}),
+                "shape_guidance_rescale": ("FLOAT",{"default":0.05,"min":0.00,"max":1.00,"step":0.01}),
+                "shape_rescale_t": ("FLOAT",{"default":4.00,"min":0.00,"max":9.99,"step":0.01}),                
+                "shape_sampler": (["euler", "heun", "rk4", "rk5"], {"default": "euler"}),
+                "shape_guidance_interval_start": ("FLOAT",{"default":0.10,"min":0.00,"max":1.00,"step":0.01}),
+                "shape_guidance_interval_end": ("FLOAT",{"default":1.00,"min":0.00,"max":1.00,"step":0.01}),
+                "verbose": ("BOOLEAN",{"default":False}),
+                "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":99,"step":1}),
+                "dino_foundation_cap": ("FLOAT",{"default":1.00,"min":0.01,"max":1.00,"step":0.01}),
+                "front_axis": (["z", "x"], {"default": "z"}),
+                "blend_temperature": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 10.0, "step": 0.1}),                   
+            },
+        }
+
+    RETURN_TYPES = ("SHAPE_SLAT","INT","VIEWS_LIST", "TRELLIS2PIPELINE","INT",)
+    RETURN_NAMES = ("shape_slat","resolution","views_list", "pipeline","num_tokens")
+    FUNCTION = "process"
+    CATEGORY = "Trellis2Wrapper"
+    OUTPUT_NODE = True
+
+    def process(self, pipeline, image_conds, views_list, shape_slat, from_resolution, to_resolution, sparse_structure_resolution, max_num_tokens,      
+        # shape
+        shape_steps, 
+        shape_guidance_strength, 
+        shape_guidance_rescale,
+        shape_rescale_t,
+        shape_sampler,
+        shape_guidance_interval_start,
+        shape_guidance_interval_end,
+        verbose,
+        dino_lock,
+        dino_substeps,
+        dino_foundation_cap,
+        front_axis,
+        blend_temperature
+        ):
+            
+        shape_guidance_interval = [shape_guidance_interval_start, shape_guidance_interval_end]        
+        shape_slat_sampler_params = {"steps":shape_steps,"guidance_strength":shape_guidance_strength,"guidance_rescale":shape_guidance_rescale,"guidance_interval":shape_guidance_interval,"rescale_t":shape_rescale_t}                    
+        
+        args = pipeline._pretrained_args
+        shape_sampler_prefix = pipeline.GetSamplerName(shape_sampler)
+        
+        pipeline.load_shape_slat_flow_model_1024()         
+        flow_model = pipeline.models['shape_slat_flow_model_1024']
+        
+        sampler_class = getattr(samplers, f"Flow{shape_sampler_prefix}MultiViewGuidanceIntervalSampler", samplers.FlowEulerMultiViewGuidanceIntervalSampler)
+        sampler = sampler_class(
+            sigma_min=1e-5,
+            resolution=flow_model.resolution if hasattr(flow_model, 'resolution') else flow_model[0].resolution
+        )
+        
+        pipeline.shape_slat_sampler = sampler
+
+        slat, hr_resolution, num_tokens = self.sample(pipeline, shape_slat, from_resolution, to_resolution, sparse_structure_resolution, max_num_tokens, image_conds, shape_slat_sampler_params, flow_model, verbose, dino_lock, dino_substeps, dino_foundation_cap, views_list, front_axis, blend_temperature)
+        
+        if not pipeline.keep_models_loaded:
+            pipeline.unload_shape_slat_flow_model_1024()              
+        
+        return (slat, hr_resolution, views_list, pipeline, num_tokens,)         
+        
+    def sample(self, pipeline, slat, lr_resolution, resolution, sparse_structure_resolution, max_num_tokens, conds, sampler_params, flow_model, verbose, dino_lock, dino_substeps, dino_foundation_cap, views, front_axis, blend_temperature):
+        # Upsample       
+        pipeline.load_shape_slat_decoder()
+        if pipeline.low_vram:
+            pipeline.models['shape_slat_decoder'].to(pipeline.device)
+            pipeline.models['shape_slat_decoder'].low_vram = True
+        hr_coords = pipeline.models['shape_slat_decoder'].upsample(slat, upsample_times=4)
+        if pipeline.low_vram:
+            pipeline.models['shape_slat_decoder'].cpu()
+            pipeline.models['shape_slat_decoder'].low_vram = False
+        
+        if not pipeline.keep_models_loaded:
+            pipeline.unload_shape_slat_decoder()
+        
+        hr_resolution = resolution
+        ratio = (sparse_structure_resolution / 32)
+        
+        while True:
+            quant_coords = torch.cat([
+                hr_coords[:, :1],
+                ((hr_coords[:, 1:] + 0.5) / (lr_resolution * ratio) * (hr_resolution // 16)).int(),
+            ], dim=1)
+            coords = quant_coords.unique(dim=0)
+            num_tokens = coords.shape[0]
+            if num_tokens < max_num_tokens:
+                if hr_resolution != resolution:
+                    print(f"Due to the limited number of tokens, the resolution is reduced to {hr_resolution}.")
+                print(f"Num Tokens: {num_tokens}")
+                break
+            hr_resolution -= 128
+            if hr_resolution < 1024 and resolution >= 1024:
+                print(f"Num Tokens: {num_tokens}")
+                hr_resolution = 1024
+                break
+            if hr_resolution < 512:
+                print(f"Num Tokens: {num_tokens}")
+                hr_resolution = 512
+                break
+                
+        if pipeline.low_vram:
+            for v in conds:
+                conds[v] = pipeline._cond_to(conds[v], pipeline.device)               
+        
+        coords_dev = coords.to(pipeline.device)                                           
+        # Sample structured latent
+        noise = SparseTensor(
+            feats=torch.randn(coords.shape[0], flow_model.in_channels, device=pipeline.device),
+            coords=coords_dev,
+        )
+        sampler_params = {**pipeline.shape_slat_sampler_params, **sampler_params}
+        if pipeline.low_vram:
+            flow_model.to(pipeline.device)
+        slat = pipeline.shape_slat_sampler.sample(
+            flow_model,
+            noise,
+            conds=conds,            
+            **sampler_params,            
+            views=views,
+            front_axis=front_axis,
+            blend_temperature=blend_temperature,            
+            verbose=verbose,
+            dino_lock=dino_lock,
+            dino_substeps=dino_substeps,
+            dino_foundation_cap=dino_foundation_cap,
+            tqdm_desc="Sampling shape SLat (MultiView HR)",
+        ).samples
+        
+        if pipeline.low_vram:
+            flow_model.cpu()
+            pipeline._cleanup_cuda()                                
+
+        std = torch.tensor(pipeline.shape_slat_normalization['std'])[None].to(slat.device)
+        mean = torch.tensor(pipeline.shape_slat_normalization['mean'])[None].to(slat.device)
+        slat = slat * std + mean
+        
+        del coords_dev
+        if pipeline.low_vram:
+            for v in conds:
+                conds[v] = pipeline._cond_cpu(conds[v])
+            pipeline._cleanup_cuda()
+
+        return slat, hr_resolution, num_tokens         
+        
+class Trellis2TexSlatMultiViewGenerator:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "pipeline": ("TRELLIS2PIPELINE",),
+                "image_conds": ("IMAGE_CONDS",),
+                "views_list": ("VIEWS_LIST",),
+                "shape_slat": ("SHAPE_SLAT",),
+                "resolution": ([512,1024],{"default":1024}),                
+                "texture_steps": ("INT",{"default":12, "min":1, "max":100},),
+                "texture_guidance_strength": ("FLOAT",{"default":6.50,"min":0.00,"max":99.99,"step":0.01}),
+                "texture_guidance_rescale": ("FLOAT",{"default":0.05,"min":0.00,"max":1.00,"step":0.01}),
+                "texture_rescale_t": ("FLOAT",{"default":4.00,"min":0.00,"max":9.99,"step":0.01}),         
+                "texture_sampler": (["euler", "heun", "rk4", "rk5"], {"default": "euler"}),                                                               
+                "texture_guidance_interval_start": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
+                "texture_guidance_interval_end": ("FLOAT",{"default":0.90,"min":0.00,"max":1.00,"step":0.01}),
+                "verbose": ("BOOLEAN",{"default":False}),
+                "dino_lock": ("FLOAT",{"default":0.00,"min":0.00,"max":1.00,"step":0.01}),
+                "dino_substeps": ("INT",{"default":4,"min":1,"max":99,"step":1}),
+                "dino_foundation_cap": ("FLOAT",{"default":1.00,"min":0.01,"max":1.00,"step":0.01}),
+                "front_axis": (["z", "x"], {"default": "z"}),
+                "blend_temperature": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 10.0, "step": 0.1}),                    
+            },
+        }
+
+    RETURN_TYPES = ("TEXTURE_SLAT", "VIEWS_LIST", "TRELLIS2PIPELINE",)
+    RETURN_NAMES = ("texture_slat", "views_list", "pipeline",)
+    FUNCTION = "process"
+    CATEGORY = "Trellis2Wrapper"
+    OUTPUT_NODE = True
+
+    def process(self, pipeline, image_conds, views_list, shape_slat, resolution,      
+        # shape
+        texture_steps, 
+        texture_guidance_strength, 
+        texture_guidance_rescale,
+        texture_rescale_t,
+        texture_sampler,
+        texture_guidance_interval_start,
+        texture_guidance_interval_end,
+        verbose,
+        dino_lock,
+        dino_substeps,
+        dino_foundation_cap,
+        front_axis,
+        blend_temperature
+        ):
+
+        texture_guidance_interval = [texture_guidance_interval_start,texture_guidance_interval_end]
+        tex_slat_sampler_params = {"steps":texture_steps,"guidance_strength":texture_guidance_strength,"guidance_rescale":texture_guidance_rescale,"guidance_interval":texture_guidance_interval,"rescale_t":texture_rescale_t}
+        
+        if resolution == 512:
+            pipeline.load_tex_slat_flow_model_512()
+            flow_model = pipeline.models['tex_slat_flow_model_512']
+        else:
+            pipeline.load_tex_slat_flow_model_1024()
+            flow_model = pipeline.models['tex_slat_flow_model_1024']
+        
+        tex_slat = self.sample(
+            pipeline,
+            texture_sampler,
+            image_conds, views_list,
+            shape_slat=shape_slat, 
+            flow_model=flow_model,
+            sampler_params=tex_slat_sampler_params,
+            front_axis=front_axis,
+            blend_temperature=blend_temperature,
+            verbose=verbose,
+            dino_lock=dino_lock,
+            dino_substeps=dino_substeps,
+            dino_foundation_cap=dino_foundation_cap
+        )  
+         
+        if not pipeline.keep_models_loaded:
+            if resolution == 512:
+                pipeline.unload_tex_slat_flow_model_512()
+            else:
+                pipeline.unload_tex_slat_flow_model_1024()
+        
+        return (tex_slat, views_list, pipeline,) 
+
+    def sample(
+        self,
+        pipeline,
+        sampler,
+        conds: dict,
+        views: list,
+        shape_slat: SparseTensor,
+        flow_model,
+        sampler_params: dict = {},
+        front_axis: str = 'z',
+        blend_temperature: float = 2.0,
+        verbose: bool = False,
+        dino_lock: float = 0.00,
+        dino_substeps: int = 4,
+        dino_foundation_cap: float = 0.92
+    ) -> SparseTensor:
+        """
+        Sample structured latent for texture with multi-view blending.
+        """
+        if pipeline.low_vram:
+            for v in conds:
+                conds[v] = pipeline._cond_to(conds[v], pipeline.device)
+
+        # Normalize shape slat for conditioning
+        std = torch.tensor(pipeline.shape_slat_normalization['std'])[None].to(shape_slat.device)
+        mean = torch.tensor(pipeline.shape_slat_normalization['mean'])[None].to(shape_slat.device)
+        shape_slat_normalized = (shape_slat - mean) / std
+
+        #coords = shape_slat.coords
+        #coords_dev = coords.to(pipeline.device)
+        
+        # Calculate noise channels: total input - concat cond channels
+        in_channels = flow_model.in_channels if isinstance(flow_model, nn.Module) else flow_model[0].in_channels
+        noise_channels = in_channels - shape_slat.feats.shape[1]
+        
+        # noise = SparseTensor(
+            # feats=torch.randn(coords.shape[0], noise_channels, device=pipeline.device),
+            # coords=coords_dev,
+        # )
+        noise = shape_slat.replace(feats=torch.randn(shape_slat.coords.shape[0], in_channels - shape_slat.feats.shape[1]).to(pipeline.device))
+        
+        sampler_params = {**pipeline.tex_slat_sampler_params, **sampler_params}
+        
+        # sampler = samplers.FlowEulerMultiViewGuidanceIntervalSampler(
+            # sigma_min=1e-5,
+            # resolution=flow_model.resolution,
+        # )
+        tex_sampler_prefix = pipeline.GetSamplerName(sampler)
+        
+        sampler_class = getattr(samplers, f"Flow{tex_sampler_prefix}MultiViewGuidanceIntervalSampler", samplers.FlowEulerMultiViewGuidanceIntervalSampler)
+        sampler = sampler_class(
+            sigma_min=1e-5,
+            resolution=flow_model.resolution if hasattr(flow_model, 'resolution') else flow_model[0].resolution
+        )          
+        
+        if pipeline.low_vram:
+            flow_model.to(pipeline.device)
+            
+        slat = sampler.sample(
+            flow_model,
+            noise,
+            conds=conds,
+            **sampler_params,
+            views=views,
+            front_axis=front_axis,
+            blend_temperature=blend_temperature,
+            concat_cond=shape_slat_normalized,            
+            verbose=verbose,
+            dino_lock=dino_lock,
+            dino_substeps=dino_substeps,
+            dino_foundation_cap=dino_foundation_cap,
+            tqdm_desc="Sampling texture SLat (MultiView)",
+        ).samples
+        
+        if pipeline.low_vram:
+            flow_model.cpu()
+            pipeline._cleanup_cuda()
+
+        std = torch.tensor(pipeline.tex_slat_normalization['std'])[None].to(slat.device)
+        mean = torch.tensor(pipeline.tex_slat_normalization['mean'])[None].to(slat.device)
+        slat = slat * std + mean
+        
+        #del coords_dev
+        if pipeline.low_vram:
+            for v in conds:
+                conds[v] = pipeline._cond_cpu(conds[v])
+            pipeline._cleanup_cuda()
+            
+        return slat        
         
 NODE_CLASS_MAPPINGS = {
     "Trellis2LoadModel": Trellis2LoadModel,
@@ -5671,6 +6481,11 @@ NODE_CLASS_MAPPINGS = {
     "Trellis2ExtractImagesFromVideo": Trellis2ExtractImagesFromVideo,
     "Trellis2MaxTokensCalculator": Trellis2MaxTokensCalculator,
     "Trellis2FillHolesNicelyWithMeshlib": Trellis2FillHolesNicelyWithMeshlib,
+    "Trellis2SparseMultiViewGenerator": Trellis2SparseMultiViewGenerator,
+    "Trellis2ImageCondMultiViewGenerator": Trellis2ImageCondMultiViewGenerator,
+    "Trellis2ShapeMultiViewGenerator": Trellis2ShapeMultiViewGenerator,
+    "Trellis2ShapeCascadeMultiViewGenerator": Trellis2ShapeCascadeMultiViewGenerator,
+    "Trellis2TexSlatMultiViewGenerator": Trellis2TexSlatMultiViewGenerator,
     }
     
 
@@ -5734,4 +6549,9 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Trellis2ExtractImagesFromVideo": "Trellis2 - Extract Images from Video",
     "Trellis2MaxTokensCalculator": "Trellis2 - Max Tokens Calculator",
     "Trellis2FillHolesNicelyWithMeshlib": "Trellis2 - Fill Holes Nicely With Meshlib",
+    "Trellis2SparseMultiViewGenerator": "Trellis2 - Sparse MultiView Generator",
+    "Trellis2ImageCondMultiViewGenerator": "Trellis2 - ImageCond MultiView Generator",
+    "Trellis2ShapeMultiViewGenerator": "Trellis2 - Shape MultiView Generator",
+    "Trellis2ShapeCascadeMultiViewGenerator": "Trellis2 - Shape Cascade MultiView Generator",
+    "Trellis2TexSlatMultiViewGenerator": "Trellis2 - Tex Slat MultiView Generator",
     }
