@@ -28,6 +28,41 @@ from comfy.utils import ProgressBar
 
 script_directory = os.path.dirname(os.path.abspath(__file__))
 
+PIXAL3D_IMAGE_COND_CONFIGS = {
+    "ss": {
+        "model_name": "facebook/dinov3-vitl16-pretrain-lvd1689m",
+        "image_size": 512,
+        "grid_resolution": 16,
+    },
+    "shape_512": {
+        "model_name": "facebook/dinov3-vitl16-pretrain-lvd1689m",
+        "image_size": 512,
+        "grid_resolution": 32,
+        "use_naf_upsample": True,
+        "naf_target_size": 512,
+    },
+    "shape_1024": {
+        "model_name": "facebook/dinov3-vitl16-pretrain-lvd1689m",
+        "image_size": 1024,
+        "grid_resolution": 64,
+        "use_naf_upsample": True,
+        "naf_target_size": 512,
+    },
+    "tex_1024": {
+        "model_name": "facebook/dinov3-vitl16-pretrain-lvd1689m",
+        "image_size": 1024,
+        "grid_resolution": 64,
+        "use_naf_upsample": True,
+        "naf_target_size": 1024,
+    },
+}
+
+def build_pixal3d_image_cond_model(config: dict):
+    from ..trainers.flow_matching.mixins.image_conditioned_proj import DinoV3ProjFeatureExtractor
+    model = DinoV3ProjFeatureExtractor(**config)
+    model.eval()
+    return model   
+
 def pil2tensor(image):
     return torch.from_numpy(np.array(image).astype(np.float32) / 255.0)[None,]
 
@@ -205,7 +240,100 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         facebook_model_path = os.path.join(folder_paths.models_dir,"facebook","dinov3-vitl16-pretrain-lvd1689m")
         pipeline._pretrained_args['image_cond_model']['args']['model_name'] = facebook_model_path           
 
+        PIXAL3D_IMAGE_COND_CONFIGS["ss"]["model_name"] = facebook_model_path
+        PIXAL3D_IMAGE_COND_CONFIGS["shape_512"]["model_name"] = facebook_model_path
+        PIXAL3D_IMAGE_COND_CONFIGS["shape_1024"]["model_name"] = facebook_model_path
+        PIXAL3D_IMAGE_COND_CONFIGS["tex_1024"]["model_name"] = facebook_model_path
+
         return pipeline
+        
+    def load_moge_model(self):
+        if hasattr(self,'moge_model') and self.moge_model is not None:
+            return self.moge_model
+        
+        model_name = "Ruicheng/moge-2-vitl"
+        moge_model_path = os.path.join(folder_paths.models_dir, "Ruicheng","moge-2-vitl")
+        
+        if not os.path.exists(moge_model_path):
+            print(f"Downloading MoGe model to: {moge_model_path}")
+            from huggingface_hub import snapshot_download
+            snapshot_download(
+                repo_id=model_name,
+                local_dir=moge_model_path,
+                local_dir_use_symlinks=False,
+            )
+        
+        moge_model_path = os.path.join(moge_model_path,'model.pt')
+        
+        print('Loading MoGe model ...')
+        from ...moge.model.v2 import MoGeModel
+        self.moge_model = MoGeModel.from_pretrained(moge_model_path).to(self.device)
+        self.moge_model.eval()
+
+    def unload_moge_model(self):
+        if hasattr(self,'moge_model') and self.moge_model is not None:
+            del self.moge_model
+            self.moge_model = None
+        
+    def load_pixal3d_image_cond_ss(self):    
+        if hasattr(self,'pixal3d_image_cond_ss') and self.pixal3d_image_cond_ss is not None:
+            return self.pixal3d_image_cond_ss
+        
+        print('Loading Pixal3D Image Cond SS Model ...')
+        model = build_pixal3d_image_cond_model(PIXAL3D_IMAGE_COND_CONFIGS["ss"])
+        self.pixal3d_image_cond_ss = model
+        return model
+        
+    def unload_pixal3d_image_cond_ss(self):
+        if hasattr(self,'pixal3d_image_cond_ss') and self.pixal3d_image_cond_ss is not None:
+            del self.pixal3d_image_cond_ss
+            self.pixal3d_image_cond_ss = None
+            gc.collect()        
+            
+    def load_pixal3d_image_cond_shape_512(self):    
+        if hasattr(self,'pixal3d_image_cond_shape_512') and self.pixal3d_image_cond_shape_512 is not None:
+            return self.pixal3d_image_cond_shape_512
+        
+        print('Loading Pixal3D Image Cond Shape 512 Model ...')
+        model = build_pixal3d_image_cond_model(PIXAL3D_IMAGE_COND_CONFIGS["shape_512"])
+        self.pixal3d_image_cond_shape_512 = model
+        return model
+        
+    def unload_pixal3d_image_cond_shape_512(self):
+        if hasattr(self,'pixal3d_image_cond_shape_512') and self.pixal3d_image_cond_shape_512 is not None:
+            del self.pixal3d_image_cond_shape_512
+            self.pixal3d_image_cond_shape_512 = None
+            gc.collect() 
+            
+    def load_pixal3d_image_cond_shape_1024(self):    
+        if hasattr(self,'pixal3d_image_cond_shape_1024') and self.pixal3d_image_cond_shape_1024 is not None:
+            return self.pixal3d_image_cond_shape_1024
+        
+        print('Loading Pixal3D Image Cond Shape 1024 Model ...')
+        model = build_pixal3d_image_cond_model(PIXAL3D_IMAGE_COND_CONFIGS["shape_1024"])
+        self.pixal3d_image_cond_shape_1024 = model
+        return model
+        
+    def unload_pixal3d_image_cond_shape_1024(self):
+        if hasattr(self,'pixal3d_image_cond_shape_1024') and self.pixal3d_image_cond_shape_1024 is not None:
+            del self.pixal3d_image_cond_shape_1024
+            self.pixal3d_image_cond_shape_1024 = None
+            gc.collect()
+
+    def load_pixal3d_image_cond_tex_1024(self):    
+        if hasattr(self,'pixal3d_image_cond_tex_1024') and self.pixal3d_image_cond_tex_1024 is not None:
+            return self.pixal3d_image_cond_tex_1024
+        
+        print('Loading Pixal3D Image Cond Tex 1024 Model ...')
+        model = build_pixal3d_image_cond_model(PIXAL3D_IMAGE_COND_CONFIGS["tex_1024"])
+        self.pixal3d_image_cond_tex_1024 = model
+        return model
+        
+    def unload_pixal3d_image_cond_tex_1024(self):
+        if hasattr(self,'pixal3d_image_cond_tex_1024') and self.pixal3d_image_cond_tex_1024 is not None:
+            del self.pixal3d_image_cond_tex_1024
+            self.pixal3d_image_cond_tex_1024 = None
+            gc.collect()          
         
     def load_sparse_structure_model(self):        
         if self.models['sparse_structure_flow_model'] is None:
@@ -373,7 +501,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             print('Loading Shape Slat Encoder model ...')
             if getattr(self, 'use_fp8', False):
                 self.models['shape_slat_encoder'] = models.from_pretrained(f"{self.path}/ckpts_fp8/shape_enc_next_dc_f16c32_fp8") 
-            else:
+            else:           
                 self.models['shape_slat_encoder'] = models.from_pretrained(f"{self.path}/ckpts/shape_enc_next_dc_f16c32_fp16")
             self.models['shape_slat_encoder'].eval()
             self.models['shape_slat_encoder'].to(self._device)
@@ -506,6 +634,14 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             'cond': {'global': z_global, 'proj': z_proj_st},
             'neg_cond': {'global': torch.zeros_like(z_global), 'proj': SparseTensor(feats=torch.zeros_like(z_proj_sparse), coords=coords)},
         }
+        
+    def get_moge_camera_config(self, image):
+        from ..utils.camera import get_camera_params_wild_moge
+            
+        camera_config = get_camera_params_wild_moge(image, self.moge_model)
+        print(camera_config)
+
+        return camera_config
 
     def preprocess_image(self, input: Image.Image) -> Image.Image:
         """
@@ -2754,7 +2890,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         Returns:
             SparseTensor: The encoded structured latent.
         """
-        print('Converting mesh to flexible dual grid ...')
+        print('Converting mesh to flexible dual grid ...')        
         vertices = torch.from_numpy(mesh.vertices).float()
         faces = torch.from_numpy(mesh.faces).long()
         
@@ -3063,7 +3199,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         
         shape_slat = self.encode_shape_slat(mesh, resolution)
         
-        if resolution==512:
+        if resolution==512:            
             self.unload_tex_slat_flow_model_1024()
             self.load_tex_slat_flow_model_512()
             tex_model = self.models['tex_slat_flow_model_512']
@@ -3082,7 +3218,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         else:
             self.unload_tex_slat_flow_model_512()
             self.load_tex_slat_flow_model_1024()
-            tex_model = self.models['tex_slat_flow_model_1024']
+            tex_model = self.models['tex_slat_flow_model_1024']           
             
             tex_slat = self.sample_tex_slat(
                 cond, tex_model,
