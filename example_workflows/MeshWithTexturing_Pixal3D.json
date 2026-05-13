@@ -1,612 +1,9 @@
 {
   "id": "0cc31dc7-54c1-494d-b20e-d9f4aabc66bc",
   "revision": 0,
-  "last_node_id": 290,
-  "last_link_id": 574,
+  "last_node_id": 296,
+  "last_link_id": 593,
   "nodes": [
-    {
-      "id": 6,
-      "type": "Trellis2LoadImageWithTransparency",
-      "pos": [
-        -1898.8408811895958,
-        425.13094800380867
-      ],
-      "size": [
-        631.9393495485403,
-        765.9737728955563
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "links": null
-        },
-        {
-          "name": "mask",
-          "type": "MASK",
-          "links": null
-        },
-        {
-          "name": "image_with_alpha",
-          "type": "IMAGE",
-          "links": [
-            344
-          ]
-        }
-      ],
-      "title": "Image with Transparency",
-      "properties": {
-        "aux_id": "visualbruno/ComfyUI-Trellis2",
-        "ver": "e7f9b30df7a09bcedf1c955e176754c73f983254",
-        "Node name for S&R": "Trellis2LoadImageWithTransparency",
-        "widget_ue_connectable": {}
-      },
-      "widgets_values": [
-        "DwarfSorcerer.png",
-        "image"
-      ]
-    },
-    {
-      "id": 209,
-      "type": "PrimitiveInt",
-      "pos": [
-        -1830.8929517313256,
-        263.9724281177611
-      ],
-      "size": [
-        270,
-        82
-      ],
-      "flags": {},
-      "order": 1,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "INT",
-          "type": "INT",
-          "links": [
-            454,
-            487
-          ]
-        }
-      ],
-      "title": "Target Face Number",
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.16.4",
-        "Node name for S&R": "PrimitiveInt"
-      },
-      "widgets_values": [
-        1000000,
-        "fixed"
-      ]
-    },
-    {
-      "id": 272,
-      "type": "Trellis2SparseGenerator",
-      "pos": [
-        -874.3328359531824,
-        351.98478429322415
-      ],
-      "size": [
-        395.65625,
-        526
-      ],
-      "flags": {},
-      "order": 6,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "pipeline",
-          "type": "TRELLIS2PIPELINE",
-          "link": 520
-        },
-        {
-          "name": "image_cond",
-          "type": "IMAGE_COND",
-          "link": 521
-        },
-        {
-          "name": "image",
-          "shape": 7,
-          "type": "IMAGE",
-          "link": 522
-        },
-        {
-          "name": "moge_camera_config",
-          "shape": 7,
-          "type": "MOGE_CAM_CONFIG",
-          "link": 523
-        }
-      ],
-      "outputs": [
-        {
-          "name": "coords",
-          "type": "COORDS",
-          "links": [
-            524
-          ]
-        },
-        {
-          "name": "sparse_structure_resolution",
-          "type": "INT",
-          "links": [
-            535
-          ]
-        },
-        {
-          "name": "pipeline",
-          "type": "TRELLIS2PIPELINE",
-          "links": [
-            525
-          ]
-        }
-      ],
-      "properties": {
-        "aux_id": "visualbruno/ComfyUI-Trellis2",
-        "ver": "86d13d9eac4a2bd4395954c7184d3aa4fa81a9d8",
-        "Node name for S&R": "Trellis2SparseGenerator"
-      },
-      "widgets_values": [
-        12345,
-        "fixed",
-        25,
-        7.5,
-        0.01,
-        5,
-        "heun",
-        32,
-        0.1,
-        1,
-        true,
-        1,
-        false,
-        0.65,
-        2,
-        "flood_fill",
-        0.92,
-        true
-      ]
-    },
-    {
-      "id": 215,
-      "type": "Trellis2ShapeGenerator",
-      "pos": [
-        -841.1718308975657,
-        945.0367148651351
-      ],
-      "size": [
-        335.24609375,
-        402
-      ],
-      "flags": {},
-      "order": 7,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "pipeline",
-          "type": "TRELLIS2PIPELINE",
-          "link": 525
-        },
-        {
-          "name": "image_cond",
-          "type": "IMAGE_COND",
-          "link": 526
-        },
-        {
-          "name": "coords",
-          "type": "COORDS",
-          "link": 524
-        },
-        {
-          "name": "image",
-          "shape": 7,
-          "type": "IMAGE",
-          "link": 515
-        },
-        {
-          "name": "moge_camera_config",
-          "shape": 7,
-          "type": "MOGE_CAM_CONFIG",
-          "link": 516
-        }
-      ],
-      "outputs": [
-        {
-          "name": "shape_slat",
-          "type": "SHAPE_SLAT",
-          "links": [
-            531
-          ]
-        },
-        {
-          "name": "resolution",
-          "type": "INT",
-          "links": [
-            534
-          ]
-        },
-        {
-          "name": "pipeline",
-          "type": "TRELLIS2PIPELINE",
-          "links": [
-            529
-          ]
-        }
-      ],
-      "properties": {
-        "aux_id": "visualbruno/ComfyUI-Trellis2",
-        "ver": "ef2286b47ce0ef0e681dffe0209aadd96de50f72",
-        "Node name for S&R": "Trellis2ShapeGenerator"
-      },
-      "widgets_values": [
-        512,
-        25,
-        7.5,
-        0.01,
-        3,
-        "euler",
-        0.1,
-        1,
-        false,
-        0.65,
-        2,
-        0.92
-      ]
-    },
-    {
-      "id": 39,
-      "type": "Trellis2LoadModel",
-      "pos": [
-        -1230.97479805832,
-        117.1260927127055
-      ],
-      "size": [
-        303.21076796905936,
-        226
-      ],
-      "flags": {
-        "collapsed": false
-      },
-      "order": 2,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "pipeline",
-          "type": "TRELLIS2PIPELINE",
-          "links": [
-            395
-          ]
-        }
-      ],
-      "properties": {
-        "aux_id": "visualbruno/ComfyUI-Trellis2",
-        "ver": "c5d66aa46bf1bbf903fd4fe9ff086ac774bb7e03",
-        "Node name for S&R": "Trellis2LoadModel",
-        "widget_ue_connectable": {}
-      },
-      "widgets_values": [
-        "TencentARC/Pixal3D-T",
-        "flash_attn",
-        "cuda",
-        true,
-        false,
-        "flex_gemm",
-        "flash_attn",
-        false
-      ]
-    },
-    {
-      "id": 274,
-      "type": "Trellis2ShapeCascadeGenerator",
-      "pos": [
-        -420.008261589595,
-        174.50398195526927
-      ],
-      "size": [
-        335.9791015625,
-        474
-      ],
-      "flags": {},
-      "order": 8,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "pipeline",
-          "type": "TRELLIS2PIPELINE",
-          "link": 529
-        },
-        {
-          "name": "image_cond",
-          "type": "IMAGE_COND",
-          "link": 530
-        },
-        {
-          "name": "shape_slat",
-          "type": "SHAPE_SLAT",
-          "link": 531
-        },
-        {
-          "name": "image",
-          "shape": 7,
-          "type": "IMAGE",
-          "link": 532
-        },
-        {
-          "name": "moge_camera_config",
-          "shape": 7,
-          "type": "MOGE_CAM_CONFIG",
-          "link": 533
-        },
-        {
-          "name": "from_resolution",
-          "type": "INT",
-          "widget": {
-            "name": "from_resolution"
-          },
-          "link": 534
-        },
-        {
-          "name": "sparse_structure_resolution",
-          "type": "INT",
-          "widget": {
-            "name": "sparse_structure_resolution"
-          },
-          "link": 535
-        }
-      ],
-      "outputs": [
-        {
-          "name": "shape_slat",
-          "type": "SHAPE_SLAT",
-          "links": [
-            536,
-            567
-          ]
-        },
-        {
-          "name": "resolution",
-          "type": "INT",
-          "links": [
-            538
-          ]
-        },
-        {
-          "name": "pipeline",
-          "type": "TRELLIS2PIPELINE",
-          "links": [
-            565
-          ]
-        },
-        {
-          "name": "num_tokens",
-          "type": "INT",
-          "links": null
-        }
-      ],
-      "properties": {
-        "aux_id": "visualbruno/ComfyUI-Trellis2",
-        "ver": "86d13d9eac4a2bd4395954c7184d3aa4fa81a9d8",
-        "Node name for S&R": "Trellis2ShapeCascadeGenerator"
-      },
-      "widgets_values": [
-        0,
-        1024,
-        32,
-        999999,
-        25,
-        7.5,
-        0.01,
-        3,
-        "heun",
-        0.1,
-        1,
-        false,
-        0.65,
-        2,
-        0.92
-      ]
-    },
-    {
-      "id": 194,
-      "type": "Trellis2PreProcessImage",
-      "pos": [
-        -1218.495705914309,
-        437.03938555658084
-      ],
-      "size": [
-        281.7837890625,
-        106
-      ],
-      "flags": {},
-      "order": 4,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 344
-        }
-      ],
-      "outputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "links": [
-            394,
-            515,
-            522,
-            532,
-            568
-          ]
-        }
-      ],
-      "properties": {
-        "aux_id": "visualbruno/ComfyUI-Trellis2",
-        "ver": "7ce26deae425d114f3deb78e802d6196e5987a4a",
-        "Node name for S&R": "Trellis2PreProcessImage"
-      },
-      "widgets_values": [
-        5,
-        false,
-        1024
-      ]
-    },
-    {
-      "id": 213,
-      "type": "Trellis2ImageCondGenerator",
-      "pos": [
-        -873.6756939901774,
-        155.23142744547695
-      ],
-      "size": [
-        308.0748046875,
-        118
-      ],
-      "flags": {},
-      "order": 5,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "pipeline",
-          "type": "TRELLIS2PIPELINE",
-          "link": 395
-        },
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 394
-        }
-      ],
-      "outputs": [
-        {
-          "name": "cond_512",
-          "type": "IMAGE_COND",
-          "links": [
-            521,
-            526
-          ]
-        },
-        {
-          "name": "cond_1024",
-          "type": "IMAGE_COND",
-          "links": [
-            530,
-            566
-          ]
-        },
-        {
-          "name": "pipeline",
-          "type": "TRELLIS2PIPELINE",
-          "links": [
-            520
-          ]
-        },
-        {
-          "name": "moge_camera_config",
-          "type": "MOGE_CAM_CONFIG",
-          "links": [
-            516,
-            523,
-            533,
-            569
-          ]
-        }
-      ],
-      "properties": {
-        "aux_id": "visualbruno/ComfyUI-Trellis2",
-        "ver": "ef2286b47ce0ef0e681dffe0209aadd96de50f72",
-        "Node name for S&R": "Trellis2ImageCondGenerator"
-      },
-      "widgets_values": [
-        1
-      ]
-    },
-    {
-      "id": 289,
-      "type": "Trellis2TexSlatGenerator",
-      "pos": [
-        -410.72426621796166,
-        724.3885535781652
-      ],
-      "size": [
-        340.390625,
-        402
-      ],
-      "flags": {},
-      "order": 9,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "pipeline",
-          "type": "TRELLIS2PIPELINE",
-          "link": 565
-        },
-        {
-          "name": "image_cond",
-          "type": "IMAGE_COND",
-          "link": 566
-        },
-        {
-          "name": "shape_slat",
-          "type": "SHAPE_SLAT",
-          "link": 567
-        },
-        {
-          "name": "image",
-          "shape": 7,
-          "type": "IMAGE",
-          "link": 568
-        },
-        {
-          "name": "moge_camera_config",
-          "shape": 7,
-          "type": "MOGE_CAM_CONFIG",
-          "link": 569
-        }
-      ],
-      "outputs": [
-        {
-          "name": "texture_slat",
-          "type": "TEXTURE_SLAT",
-          "links": [
-            570
-          ]
-        },
-        {
-          "name": "pipeline",
-          "type": "TRELLIS2PIPELINE",
-          "links": [
-            571
-          ]
-        }
-      ],
-      "properties": {
-        "aux_id": "visualbruno/ComfyUI-Trellis2",
-        "ver": "86d13d9eac4a2bd4395954c7184d3aa4fa81a9d8",
-        "Node name for S&R": "Trellis2TexSlatGenerator"
-      },
-      "widgets_values": [
-        1024,
-        25,
-        7.5,
-        0,
-        3,
-        "euler",
-        0,
-        0.9,
-        false,
-        0.65,
-        2,
-        0.92
-      ]
-    },
     {
       "id": 193,
       "type": "Trellis2FillHolesWithCuMesh",
@@ -898,7 +295,7 @@
         {
           "name": "pipeline",
           "type": "TRELLIS2PIPELINE",
-          "link": 571
+          "link": 592
         },
         {
           "name": "shape_slat",
@@ -909,7 +306,7 @@
           "name": "texture_slat",
           "shape": 7,
           "type": "TEXTURE_SLAT",
-          "link": 570
+          "link": 591
         },
         {
           "name": "resolution",
@@ -1016,6 +413,76 @@
       ]
     },
     {
+      "id": 213,
+      "type": "Trellis2ImageCondGenerator",
+      "pos": [
+        -849.0669045834996,
+        149.20431628502502
+      ],
+      "size": [
+        308.0748046875,
+        118
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "pipeline",
+          "type": "TRELLIS2PIPELINE",
+          "link": 395
+        },
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 394
+        }
+      ],
+      "outputs": [
+        {
+          "name": "cond_512",
+          "type": "IMAGE_COND",
+          "links": [
+            521,
+            526
+          ]
+        },
+        {
+          "name": "cond_1024",
+          "type": "IMAGE_COND",
+          "links": [
+            530,
+            587
+          ]
+        },
+        {
+          "name": "pipeline",
+          "type": "TRELLIS2PIPELINE",
+          "links": [
+            520
+          ]
+        },
+        {
+          "name": "moge_camera_config",
+          "type": "MOGE_CAM_CONFIG",
+          "links": [
+            579,
+            580,
+            582,
+            590
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "visualbruno/ComfyUI-Trellis2",
+        "ver": "ef2286b47ce0ef0e681dffe0209aadd96de50f72",
+        "Node name for S&R": "Trellis2ImageCondGenerator"
+      },
+      "widgets_values": [
+        1
+      ]
+    },
+    {
       "id": 232,
       "type": "Preview3D",
       "pos": [
@@ -1023,8 +490,8 @@
         118.27654774792936
       ],
       "size": [
-        1197.5811272300746,
-        1196.1310737028766
+        1196.026883643203,
+        1247.4148518428156
       ],
       "flags": {},
       "order": 18,
@@ -1056,7 +523,7 @@
         "cnr_id": "comfy-core",
         "ver": "0.16.4",
         "Node name for S&R": "Preview3D",
-        "Last Time Model File": "C:/Git/ComfyUI/output/Pixal3D_Textured_00001_.glb",
+        "Last Time Model File": "C:/Git/ComfyUI/output/Cyberman_P3D_00001_.glb",
         "Resource Folder": "Git/ComfyUI/output",
         "Scene Config": {
           "showGrid": true,
@@ -1066,41 +533,391 @@
         },
         "Camera Config": {
           "cameraType": "perspective",
-          "fov": 35,
+          "fov": 37,
           "state": {
             "position": {
-              "x": 0.2051689293676939,
-              "y": 4.275591363360545,
-              "z": 9.50787749809354
+              "x": -0.797953149079233,
+              "y": 2.996032511737236,
+              "z": 7.973882397278798
             },
             "target": {
-              "x": 0,
-              "y": 2.5,
-              "z": 0
+              "x": 0.2576038454794706,
+              "y": 2.541570255543307,
+              "z": -0.43926597484543517
             },
             "zoom": 1,
             "cameraType": "perspective"
           }
         },
         "Light Config": {
-          "intensity": 3
+          "intensity": 4.16
         },
         "Model Config": {
           "upDirection": "original",
-          "materialMode": "original",
+          "materialMode": "normal",
           "showSkeleton": false
         }
       },
       "widgets_values": [
-        "C:/Git/ComfyUI/output/Pixal3D_Textured_00001_.glb",
+        "C:/Git/ComfyUI/output/Cyberman_P3D_00001_.glb",
         ""
+      ]
+    },
+    {
+      "id": 39,
+      "type": "Trellis2LoadModel",
+      "pos": [
+        -1211.6820347555356,
+        127.65276754712623
+      ],
+      "size": [
+        303.21076796905936,
+        226
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "pixal3d_image_cond_config",
+          "shape": 7,
+          "type": "PIXAL3D_IMAGE_COND_CONFIG",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "pipeline",
+          "type": "TRELLIS2PIPELINE",
+          "links": [
+            395
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "visualbruno/ComfyUI-Trellis2",
+        "ver": "c5d66aa46bf1bbf903fd4fe9ff086ac774bb7e03",
+        "Node name for S&R": "Trellis2LoadModel",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "TencentARC/Pixal3D-T",
+        "flash_attn",
+        "cuda",
+        true,
+        false,
+        "flex_gemm",
+        "flash_attn",
+        false
+      ]
+    },
+    {
+      "id": 194,
+      "type": "Trellis2PreProcessImage",
+      "pos": [
+        -1218.495705914309,
+        437.03938555658084
+      ],
+      "size": [
+        281.7837890625,
+        106
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 344
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            394,
+            515,
+            522,
+            532,
+            589
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "visualbruno/ComfyUI-Trellis2",
+        "ver": "7ce26deae425d114f3deb78e802d6196e5987a4a",
+        "Node name for S&R": "Trellis2PreProcessImage"
+      },
+      "widgets_values": [
+        5,
+        false,
+        1024
+      ]
+    },
+    {
+      "id": 272,
+      "type": "Trellis2SparseGenerator",
+      "pos": [
+        -874.3328359531824,
+        351.98478429322415
+      ],
+      "size": [
+        395.65625,
+        526
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "pipeline",
+          "type": "TRELLIS2PIPELINE",
+          "link": 520
+        },
+        {
+          "name": "image_cond",
+          "type": "IMAGE_COND",
+          "link": 521
+        },
+        {
+          "name": "image",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 522
+        },
+        {
+          "name": "moge_camera_config",
+          "shape": 7,
+          "type": "MOGE_CAM_CONFIG",
+          "link": 580
+        }
+      ],
+      "outputs": [
+        {
+          "name": "coords",
+          "type": "COORDS",
+          "links": [
+            524
+          ]
+        },
+        {
+          "name": "sparse_structure_resolution",
+          "type": "INT",
+          "links": [
+            535
+          ]
+        },
+        {
+          "name": "pipeline",
+          "type": "TRELLIS2PIPELINE",
+          "links": [
+            525
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "visualbruno/ComfyUI-Trellis2",
+        "ver": "86d13d9eac4a2bd4395954c7184d3aa4fa81a9d8",
+        "Node name for S&R": "Trellis2SparseGenerator"
+      },
+      "widgets_values": [
+        1000,
+        "fixed",
+        50,
+        7.5,
+        0.01,
+        5,
+        "heun",
+        32,
+        0.1,
+        1,
+        true,
+        1,
+        false,
+        0.65,
+        2,
+        "flood_fill",
+        0.92,
+        true
+      ]
+    },
+    {
+      "id": 215,
+      "type": "Trellis2ShapeGenerator",
+      "pos": [
+        -841.1718308975657,
+        945.0367148651351
+      ],
+      "size": [
+        335.24609375,
+        402
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "pipeline",
+          "type": "TRELLIS2PIPELINE",
+          "link": 525
+        },
+        {
+          "name": "image_cond",
+          "type": "IMAGE_COND",
+          "link": 526
+        },
+        {
+          "name": "coords",
+          "type": "COORDS",
+          "link": 524
+        },
+        {
+          "name": "image",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 515
+        },
+        {
+          "name": "moge_camera_config",
+          "shape": 7,
+          "type": "MOGE_CAM_CONFIG",
+          "link": 582
+        }
+      ],
+      "outputs": [
+        {
+          "name": "shape_slat",
+          "type": "SHAPE_SLAT",
+          "links": [
+            531
+          ]
+        },
+        {
+          "name": "resolution",
+          "type": "INT",
+          "links": [
+            534
+          ]
+        },
+        {
+          "name": "pipeline",
+          "type": "TRELLIS2PIPELINE",
+          "links": [
+            529
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "visualbruno/ComfyUI-Trellis2",
+        "ver": "ef2286b47ce0ef0e681dffe0209aadd96de50f72",
+        "Node name for S&R": "Trellis2ShapeGenerator"
+      },
+      "widgets_values": [
+        512,
+        25,
+        7.5,
+        0.01,
+        3,
+        "heun",
+        0.1,
+        1,
+        false,
+        0.65,
+        2,
+        0.92
+      ]
+    },
+    {
+      "id": 209,
+      "type": "PrimitiveInt",
+      "pos": [
+        -1845.7531239022012,
+        263.9724281177611
+      ],
+      "size": [
+        270,
+        82
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": [
+            454,
+            487
+          ]
+        }
+      ],
+      "title": "Target Face Number",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.16.4",
+        "Node name for S&R": "PrimitiveInt"
+      },
+      "widgets_values": [
+        500000,
+        "fixed"
+      ]
+    },
+    {
+      "id": 6,
+      "type": "Trellis2LoadImageWithTransparency",
+      "pos": [
+        -1898.8408811895958,
+        425.13094800380867
+      ],
+      "size": [
+        631.9393495485403,
+        765.9737728955563
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": null
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "links": null
+        },
+        {
+          "name": "image_with_alpha",
+          "type": "IMAGE",
+          "links": [
+            344
+          ]
+        }
+      ],
+      "title": "Image with Transparency",
+      "properties": {
+        "aux_id": "visualbruno/ComfyUI-Trellis2",
+        "ver": "e7f9b30df7a09bcedf1c955e176754c73f983254",
+        "Node name for S&R": "Trellis2LoadImageWithTransparency",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "Image_1024_00163_.png",
+        "image"
       ]
     },
     {
       "id": 219,
       "type": "PrimitiveString",
       "pos": [
-        -1830.5311181322465,
+        -1858.1285668527714,
         133.64378105828288
       ],
       "size": [
@@ -1127,7 +944,208 @@
         "Node name for S&R": "PrimitiveString"
       },
       "widgets_values": [
-        "Pixal3D_Textured"
+        "Cyberman_P3D"
+      ]
+    },
+    {
+      "id": 274,
+      "type": "Trellis2ShapeCascadeGenerator",
+      "pos": [
+        -420.008261589595,
+        174.50398195526927
+      ],
+      "size": [
+        335.9791015625,
+        474
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "pipeline",
+          "type": "TRELLIS2PIPELINE",
+          "link": 529
+        },
+        {
+          "name": "image_cond",
+          "type": "IMAGE_COND",
+          "link": 530
+        },
+        {
+          "name": "shape_slat",
+          "type": "SHAPE_SLAT",
+          "link": 531
+        },
+        {
+          "name": "image",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 532
+        },
+        {
+          "name": "moge_camera_config",
+          "shape": 7,
+          "type": "MOGE_CAM_CONFIG",
+          "link": 579
+        },
+        {
+          "name": "from_resolution",
+          "type": "INT",
+          "widget": {
+            "name": "from_resolution"
+          },
+          "link": 534
+        },
+        {
+          "name": "sparse_structure_resolution",
+          "type": "INT",
+          "widget": {
+            "name": "sparse_structure_resolution"
+          },
+          "link": 535
+        }
+      ],
+      "outputs": [
+        {
+          "name": "shape_slat",
+          "type": "SHAPE_SLAT",
+          "links": [
+            536,
+            588
+          ]
+        },
+        {
+          "name": "resolution",
+          "type": "INT",
+          "links": [
+            538,
+            593
+          ]
+        },
+        {
+          "name": "pipeline",
+          "type": "TRELLIS2PIPELINE",
+          "links": [
+            586
+          ]
+        },
+        {
+          "name": "num_tokens",
+          "type": "INT",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "visualbruno/ComfyUI-Trellis2",
+        "ver": "86d13d9eac4a2bd4395954c7184d3aa4fa81a9d8",
+        "Node name for S&R": "Trellis2ShapeCascadeGenerator"
+      },
+      "widgets_values": [
+        0,
+        1536,
+        32,
+        999999,
+        12,
+        7.5,
+        0.01,
+        3,
+        "heun",
+        0.1,
+        1,
+        false,
+        0.65,
+        2,
+        0.92
+      ]
+    },
+    {
+      "id": 296,
+      "type": "Trellis2TexSlatGenerator",
+      "pos": [
+        -403.3454100534395,
+        722.8973335388696
+      ],
+      "size": [
+        346.18029615893147,
+        426
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "pipeline",
+          "type": "TRELLIS2PIPELINE",
+          "link": 586
+        },
+        {
+          "name": "image_cond",
+          "type": "IMAGE_COND",
+          "link": 587
+        },
+        {
+          "name": "shape_slat",
+          "type": "SHAPE_SLAT",
+          "link": 588
+        },
+        {
+          "name": "image",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 589
+        },
+        {
+          "name": "moge_camera_config",
+          "shape": 7,
+          "type": "MOGE_CAM_CONFIG",
+          "link": 590
+        },
+        {
+          "name": "from_resolution",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "from_resolution"
+          },
+          "link": 593
+        }
+      ],
+      "outputs": [
+        {
+          "name": "texture_slat",
+          "type": "TEXTURE_SLAT",
+          "links": [
+            591
+          ]
+        },
+        {
+          "name": "pipeline",
+          "type": "TRELLIS2PIPELINE",
+          "links": [
+            592
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "visualbruno/ComfyUI-Trellis2",
+        "ver": "fe543271876ff0db265c7b5989a1060362476696",
+        "Node name for S&R": "Trellis2TexSlatGenerator"
+      },
+      "widgets_values": [
+        1024,
+        12,
+        7.5,
+        0,
+        3,
+        "heun",
+        0,
+        0.9,
+        false,
+        0.65,
+        2,
+        0.92,
+        0
       ]
     }
   ],
@@ -1237,14 +1255,6 @@
       "IMAGE"
     ],
     [
-      516,
-      213,
-      3,
-      215,
-      4,
-      "MOGE_CAM_CONFIG"
-    ],
-    [
       520,
       213,
       2,
@@ -1267,14 +1277,6 @@
       272,
       2,
       "IMAGE"
-    ],
-    [
-      523,
-      213,
-      3,
-      272,
-      3,
-      "MOGE_CAM_CONFIG"
     ],
     [
       524,
@@ -1333,14 +1335,6 @@
       "IMAGE"
     ],
     [
-      533,
-      213,
-      3,
-      274,
-      4,
-      "MOGE_CAM_CONFIG"
-    ],
-    [
       534,
       215,
       1,
@@ -1373,62 +1367,6 @@
       "INT"
     ],
     [
-      565,
-      274,
-      2,
-      289,
-      0,
-      "TRELLIS2PIPELINE"
-    ],
-    [
-      566,
-      213,
-      1,
-      289,
-      1,
-      "IMAGE_COND"
-    ],
-    [
-      567,
-      274,
-      0,
-      289,
-      2,
-      "SHAPE_SLAT"
-    ],
-    [
-      568,
-      194,
-      0,
-      289,
-      3,
-      "IMAGE"
-    ],
-    [
-      569,
-      213,
-      3,
-      289,
-      4,
-      "MOGE_CAM_CONFIG"
-    ],
-    [
-      570,
-      289,
-      0,
-      217,
-      2,
-      "TEXTURE_SLAT"
-    ],
-    [
-      571,
-      289,
-      1,
-      217,
-      0,
-      "TRELLIS2PIPELINE"
-    ],
-    [
       572,
       257,
       0,
@@ -1451,6 +1389,94 @@
       203,
       0,
       "TRIMESH"
+    ],
+    [
+      579,
+      213,
+      3,
+      274,
+      4,
+      "MOGE_CAM_CONFIG"
+    ],
+    [
+      580,
+      213,
+      3,
+      272,
+      3,
+      "MOGE_CAM_CONFIG"
+    ],
+    [
+      582,
+      213,
+      3,
+      215,
+      4,
+      "MOGE_CAM_CONFIG"
+    ],
+    [
+      586,
+      274,
+      2,
+      296,
+      0,
+      "TRELLIS2PIPELINE"
+    ],
+    [
+      587,
+      213,
+      1,
+      296,
+      1,
+      "IMAGE_COND"
+    ],
+    [
+      588,
+      274,
+      0,
+      296,
+      2,
+      "SHAPE_SLAT"
+    ],
+    [
+      589,
+      194,
+      0,
+      296,
+      3,
+      "IMAGE"
+    ],
+    [
+      590,
+      213,
+      3,
+      296,
+      4,
+      "MOGE_CAM_CONFIG"
+    ],
+    [
+      591,
+      296,
+      0,
+      217,
+      2,
+      "TEXTURE_SLAT"
+    ],
+    [
+      592,
+      296,
+      1,
+      217,
+      0,
+      "TRELLIS2PIPELINE"
+    ],
+    [
+      593,
+      274,
+      1,
+      296,
+      5,
+      "INT"
     ]
   ],
   "groups": [
@@ -1484,10 +1510,10 @@
     "workflowRendererVersion": "LG",
     "ue_links": [],
     "ds": {
-      "scale": 0.4718841099024524,
+      "scale": 0.5709797729819821,
       "offset": [
-        1731.2302331480612,
-        289.8930889868392
+        1772.9050677529558,
+        122.45414639513807
       ]
     },
     "links_added_by_ue": [],

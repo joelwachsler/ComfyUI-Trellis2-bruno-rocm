@@ -4244,11 +4244,14 @@ class Trellis2ShapeCascadeGenerator:
             
             image_cond_model = pipeline.load_pixal3d_image_cond_shape_1024()
                 
+            actual_grid_res = hr_resolution // 16
+                
             cond = pipeline.get_proj_cond_shape(
                 image_cond_model, images, coords,
                 camera_angle_x=camera_angle_x,
                 distance=distance,
                 mesh_scale=mesh_scale,
+                grid_resolution_override=actual_grid_res,
             )
             
             if not pipeline.keep_models_loaded:
@@ -4320,6 +4323,7 @@ class Trellis2TexSlatGenerator:
             {
                 "image": ("IMAGE",),
                 "moge_camera_config": ("MOGE_CAM_CONFIG",),
+                "from_resolution": ("INT",),
             }            
         }
 
@@ -4343,7 +4347,8 @@ class Trellis2TexSlatGenerator:
         dino_substeps,
         dino_foundation_cap,
         image = None,
-        moge_camera_config = None
+        moge_camera_config = None,
+        from_resolution = None
         ):
 
         texture_guidance_interval = [texture_guidance_interval_start,texture_guidance_interval_end]
@@ -4386,7 +4391,7 @@ class Trellis2TexSlatGenerator:
                 
                 image_cond_model = pipeline.load_pixal3d_image_cond_tex_1024()
                 
-                tex_grid_res = resolution // 16
+                tex_grid_res = from_resolution // 16
                 
                 image_cond = pipeline.get_proj_cond_shape(
                     image_cond_model, images, shape_slat.coords,

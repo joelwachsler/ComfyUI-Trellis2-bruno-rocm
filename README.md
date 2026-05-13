@@ -14,6 +14,7 @@
 
 | Date | Description |
 | --- | --- |
+| **2026-05-13** | Added support for Pixal3D-T model<br>It's not compatible with all nodes<br>Check in the folder example_workflows |
 | **2026-04-20** | Recreated all Workflows |
 | **2026-04-20** | Added node "Sparse MultiView Generator"<br>Added node "ImageCond MultiView Generator"<br>Added node "Shape MultiView Generator"<br>Added node "Shape Cascade MultiView Generator"<br>Added node "Tex Slat MultiView Generator" |
 | **2026-04-20** | Added node "Fill Holes Nicely with Meshlib"<br>Fixed DinoV3 Features Extractor |
@@ -74,6 +75,8 @@ You need to have access to facebook dinov3 models in order to use Trellis.2
 Clone the repository in ComfyUI models folder under "facebook/dinov3-vitl16-pretrain-lvd1689m"
 
 So in ComfyUI/models/facebook/dinov3-vitl16-pretrain-lvd1689m
+
+To use **TencentARC/Pixal3D-T** model, it's required to install **natten** package : https://github.com/SHI-Labs/NATTEN
 
 ---
 
@@ -144,6 +147,10 @@ Use my own version of Cumesh here: https://github.com/visualbruno/CuMesh
 ### FlexGEMM
 
 Use my own version of FlexGEMM here: https://github.com/visualbruno/FlexGEMM
+
+### natten (only used for TencentARC/Pixal3D-T model)
+
+https://github.com/SHI-Labs/NATTEN
 
 ---
 

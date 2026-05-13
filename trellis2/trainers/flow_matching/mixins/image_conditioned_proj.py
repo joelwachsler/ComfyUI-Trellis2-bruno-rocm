@@ -404,7 +404,13 @@ class DinoV3ProjFeatureExtractor(nn.Module):
         
         # NAF upsampler (frozen, no trainable params)
         self.naf_model = None  # Lazy-loaded on first use to avoid import if not needed
-        
+
+        # Per-axis spatial tile factor for the NAF + proj_grid streaming path. 1 = un-tiled
+        # (current behavior, default). >1 enables a streaming wrapper that tiles NAF and
+        # the projection together, capping the transient HR-feature-map peak. Set transiently
+        # by the pipeline (see Pixal3DImageTo3DPipeline.get_proj_cond_shape).
+        self.naf_tile_factor: int = 4
+
         # proj_channels: the output dimension of proj features
         # Without NAF: embed_dim (e.g. 1024)
         # With NAF: embed_dim * 2 (e.g. 2048, concat of lr and hr)
@@ -538,20 +544,33 @@ class DinoV3ProjFeatureExtractor(nn.Module):
                 self._load_naf()
                 # NAF expects: guide [B, 3, H, W], lr_features [B, C, h, w], target_size (H', W')
                 lr_features_bchw = z_patchtokens_spatial.permute(0, 3, 1, 2)  # [B, D, h, w]
-                hr_features = self.naf_model(
-                    image_for_naf, lr_features_bchw, self.naf_target_size
-                )  # [B, D, H', W']
-                
-                # Sample from high-res feature map using same projection coordinates
-                z_proj_hr = self.proj_grid(
-                    hr_features,
-                    camera_angle_x,
-                    distance,
-                    mesh_scale,
-                    transform_matrix,
-                    BHWC=False  # hr_features is [B, C, H', W']
-                )  # [B, grid_res³, D]
-                
+
+                K = getattr(self, 'naf_tile_factor', 1) or 1
+                if K <= 1:
+                    # Un-tiled path (default, unchanged behavior).
+                    hr_features = self.naf_model(
+                        image_for_naf, lr_features_bchw, self.naf_target_size
+                    )  # [B, D, H', W']
+
+                    # Sample from high-res feature map using same projection coordinates
+                    z_proj_hr = self.proj_grid(
+                        hr_features,
+                        camera_angle_x,
+                        distance,
+                        mesh_scale,
+                        transform_matrix,
+                        BHWC=False  # hr_features is [B, C, H', W']
+                    )  # [B, grid_res³, D]
+                    del hr_features
+                else:
+                    # Tiled streaming path: bound the transient HR feature map by running
+                    # NAF and the projection sample one image-space tile at a time.
+                    z_proj_hr = self._proj_naf_tiled(
+                        image_for_naf, lr_features_bchw,
+                        camera_angle_x, distance, mesh_scale, transform_matrix,
+                        tile_factor=int(K),
+                    )
+
                 # Concatenate lr and hr: [B, grid_res³, D*2]
                 z_proj = torch.cat([z_proj_lr, z_proj_hr], dim=-1)
             else:
@@ -564,7 +583,145 @@ class DinoV3ProjFeatureExtractor(nn.Module):
         # z_proj stays in proj_channels, each block will project independently
         
         return z_global, z_proj
-    
+
+    @torch.no_grad()
+    def _proj_naf_tiled(
+        self,
+        image_for_naf: torch.Tensor,
+        lr_features_bchw: torch.Tensor,
+        camera_angle_x: torch.Tensor,
+        distance: torch.Tensor,
+        mesh_scale: torch.Tensor,
+        transform_matrix: Optional[torch.Tensor],
+        tile_factor: int,
+    ) -> torch.Tensor:
+        """Streaming NAF + grid_sample. Materialises only one image-space tile of the NAF
+        output at a time, capping the transient HR-feature-map peak. Returns the same
+        [B, grid_res^3, embed_dim] tensor that proj_grid(naf_model(...)) would produce in
+        the un-tiled path.
+
+        Each 3D grid point is routed to exactly one tile (the tile its projection falls in).
+        Halo at the NAF output scale = kernel_size//2 (4 for kernel=9) + 2 px safety for the
+        2-layer image encoder receptive field. Off-image grid points are clamped to the
+        boundary tile so grid_sample's padding_mode='border' recovers the un-tiled border
+        behaviour for them.
+
+        adaptive_avg_pool inside NAF re-buckets when called per-tile, so the output is
+        near-equivalent to (not bit-equivalent with) the un-tiled call. Boundary diffs are
+        small in practice; if they manifest, fall back to naf_tile_factor=1.
+        """
+        K = int(tile_factor)
+        naf_h, naf_w = self.naf_target_size  # always a 2-tuple of ints
+        img_size = self.image_size
+        img_res = self.proj_grid.image_resolution  # equals image_size for the configured stages
+
+        # Halo at output (NAF) scale, then converted to image scale by the resolution ratio.
+        # NAF: single CrossAttention with kernel_size=9 -> 4 px, plus 2 px safety for the
+        # 2-conv image encoder. Negligible relative to tile size at K<=8.
+        HALO_OUT = 6
+        halo_img = max(1, int(round(HALO_OUT * img_size / max(naf_h, naf_w))))
+
+        B = image_for_naf.shape[0]
+        device = image_for_naf.device
+
+        # Project all 3D grid points once. The output tensor is small (R^3 * 2 floats).
+        grid_pts = self.proj_grid.grid_points.to(device)  # [R^3, 3]
+        grid_pts_b = grid_pts.unsqueeze(0).expand(B, -1, -1)
+        grid_pts_b = grid_pts_b / mesh_scale.unsqueeze(-1).unsqueeze(-1) / 2
+
+        if transform_matrix is None:
+            tm = self.proj_grid.front_view_transform_matrix.to(device)
+            tm = tm.unsqueeze(0).expand(B, -1, -1).clone()
+            tm[:, 1, 3] = -distance
+        else:
+            tm = transform_matrix
+
+        image_points, _, _ = project_points_to_image_batch(
+            grid_pts_b, tm, camera_angle_x, img_res
+        )  # [B, R^3, 2] in pixel coords
+        image_points_norm = (image_points + 0.5) / img_res * 2 - 1  # [B, R^3, 2] in [-1, 1]
+
+        # Clamp off-image points to the boundary so they get routed to a boundary tile and
+        # produce the same border-feature value as padding_mode='border' would in the
+        # un-tiled call.
+        image_points_norm = image_points_norm.clamp(-1.0, 1.0)
+
+        u_global = image_points_norm[..., 0]  # [B, R^3]
+        v_global = image_points_norm[..., 1]
+
+        R3 = grid_pts.shape[0]
+        embed_dim = lr_features_bchw.shape[1]
+        z_proj_hr: Optional[torch.Tensor] = None
+
+        for ti in range(K):
+            for tj in range(K):
+                u_lo = -1.0 + 2.0 * tj / K
+                u_hi = -1.0 + 2.0 * (tj + 1) / K
+                v_lo = -1.0 + 2.0 * ti / K
+                v_hi = -1.0 + 2.0 * (ti + 1) / K
+
+                # Half-open partition with the last tile inclusive on the right/bottom.
+                u_in = (u_global >= u_lo) & (u_global <= u_hi if tj == K - 1 else u_global < u_hi)
+                v_in = (v_global >= v_lo) & (v_global <= v_hi if ti == K - 1 else v_global < v_hi)
+                core_mask = u_in & v_in  # [B, R^3]
+                if not core_mask.any():
+                    continue
+
+                # Output (NAF) tile pixel bounds with halo, clamped to the full extent.
+                out_lo_y = max(0, int(round(naf_h * ti / K)) - HALO_OUT)
+                out_hi_y = min(naf_h, int(round(naf_h * (ti + 1) / K)) + HALO_OUT)
+                out_lo_x = max(0, int(round(naf_w * tj / K)) - HALO_OUT)
+                out_hi_x = min(naf_w, int(round(naf_w * (tj + 1) / K)) + HALO_OUT)
+                tile_out_h = out_hi_y - out_lo_y
+                tile_out_w = out_hi_x - out_lo_x
+
+                # Image (guide) tile pixel bounds with halo, clamped to the full extent.
+                img_lo_y = max(0, int(round(img_size * ti / K)) - halo_img)
+                img_hi_y = min(img_size, int(round(img_size * (ti + 1) / K)) + halo_img)
+                img_lo_x = max(0, int(round(img_size * tj / K)) - halo_img)
+                img_hi_x = min(img_size, int(round(img_size * (tj + 1) / K)) + halo_img)
+                image_tile = image_for_naf[:, :, img_lo_y:img_hi_y, img_lo_x:img_hi_x].contiguous()
+
+                tile_hr = self.naf_model(
+                    image_tile, lr_features_bchw, (tile_out_h, tile_out_w)
+                )  # [B, embed_dim, tile_out_h, tile_out_w]
+
+                if z_proj_hr is None:
+                    z_proj_hr = torch.zeros(
+                        B, R3, embed_dim,
+                        device=tile_hr.device, dtype=tile_hr.dtype,
+                    )
+
+                # Tile's normalised bounds in the FULL feature map's [-1, 1] coord system.
+                tile_v_lo_n = 2.0 * out_lo_y / naf_h - 1.0
+                tile_v_hi_n = 2.0 * out_hi_y / naf_h - 1.0
+                tile_u_lo_n = 2.0 * out_lo_x / naf_w - 1.0
+                tile_u_hi_n = 2.0 * out_hi_x / naf_w - 1.0
+
+                # Per-batch sampling — core_mask varies across batch so we can't share an index.
+                for b in range(B):
+                    mask_b = core_mask[b]
+                    if not mask_b.any():
+                        continue
+                    pts = image_points_norm[b][mask_b]  # [N_core, 2] in global [-1, 1]
+                    local_u = 2.0 * (pts[..., 0] - tile_u_lo_n) / (tile_u_hi_n - tile_u_lo_n) - 1.0
+                    local_v = 2.0 * (pts[..., 1] - tile_v_lo_n) / (tile_v_hi_n - tile_v_lo_n) - 1.0
+                    local_pts = torch.stack([local_u, local_v], dim=-1).unsqueeze(0)  # [1, N_core, 2]
+
+                    feats = sample_features(tile_hr[b:b + 1], local_pts)  # [1, C, N_core]
+                    z_proj_hr[b][mask_b] = feats.squeeze(0).transpose(0, 1).to(z_proj_hr.dtype)
+
+                del tile_hr, image_tile
+
+        if z_proj_hr is None:
+            # No grid point projected on-image at all (degenerate). Return zeros — same shape
+            # as the un-tiled call would produce.
+            z_proj_hr = torch.zeros(
+                B, R3, embed_dim,
+                device=lr_features_bchw.device, dtype=lr_features_bchw.dtype,
+            )
+        return z_proj_hr
+
     @torch.no_grad()
     def visualize_projection(
         self,
@@ -631,7 +788,7 @@ class DinoV3VaeProjFeatureExtractor(nn.Module):
         dino_model_name: str,
         vae_model_name: str = "black-forest-labs/FLUX.1-dev",
         image_size: int = 512,
-        grid_resolution: int = 16
+        grid_resolution: int = 16,
     ):
         super().__init__()
         self.image_size = image_size
