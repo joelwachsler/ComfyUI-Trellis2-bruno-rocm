@@ -28,35 +28,6 @@ from comfy.utils import ProgressBar
 
 script_directory = os.path.dirname(os.path.abspath(__file__))
 
-PIXAL3D_IMAGE_COND_CONFIGS = {
-    "ss": {
-        "model_name": "facebook/dinov3-vitl16-pretrain-lvd1689m",
-        "image_size": 512,
-        "grid_resolution": 16,
-    },
-    "shape_512": {
-        "model_name": "facebook/dinov3-vitl16-pretrain-lvd1689m",
-        "image_size": 512,
-        "grid_resolution": 32,
-        "use_naf_upsample": True,
-        "naf_target_size": 512,
-    },
-    "shape_1024": {
-        "model_name": "facebook/dinov3-vitl16-pretrain-lvd1689m",
-        "image_size": 1024,
-        "grid_resolution": 64,
-        "use_naf_upsample": True,
-        "naf_target_size": 512,
-    },
-    "tex_1024": {
-        "model_name": "facebook/dinov3-vitl16-pretrain-lvd1689m",
-        "image_size": 1024,
-        "grid_resolution": 64,
-        "use_naf_upsample": True,
-        "naf_target_size": 1024,
-    },
-}
-
 def build_pixal3d_image_cond_model(config: dict):
     from ..trainers.flow_matching.mixins.image_conditioned_proj import DinoV3ProjFeatureExtractor
     model = DinoV3ProjFeatureExtractor(**config)
@@ -143,6 +114,35 @@ class Trellis2ImageTo3DPipeline(Pipeline):
             'alpha': slice(5, 6),
         }
         self._device = 'cpu'
+        
+        self.PIXAL3D_IMAGE_COND_CONFIGS = {
+            "ss": {
+                "model_name": "facebook/dinov3-vitl16-pretrain-lvd1689m",
+                "image_size": 512,
+                "grid_resolution": 16,
+            },
+            "shape_512": {
+                "model_name": "facebook/dinov3-vitl16-pretrain-lvd1689m",
+                "image_size": 512,
+                "grid_resolution": 32,
+                "use_naf_upsample": True,
+                "naf_target_size": 512,
+            },
+            "shape_1024": {
+                "model_name": "facebook/dinov3-vitl16-pretrain-lvd1689m",
+                "image_size": 1024,
+                "grid_resolution": 64,
+                "use_naf_upsample": True,
+                "naf_target_size": 512,
+            },
+            "tex_1024": {
+                "model_name": "facebook/dinov3-vitl16-pretrain-lvd1689m",
+                "image_size": 1024,
+                "grid_resolution": 64,
+                "use_naf_upsample": True,
+                "naf_target_size": 1024,
+            },
+        }        
         
     def switch_samplers(self, sampler_type: str = "euler"):
         """Dynamically switches the sampler instances based on user selection."""
@@ -240,10 +240,10 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         facebook_model_path = os.path.join(folder_paths.models_dir,"facebook","dinov3-vitl16-pretrain-lvd1689m")
         pipeline._pretrained_args['image_cond_model']['args']['model_name'] = facebook_model_path           
 
-        PIXAL3D_IMAGE_COND_CONFIGS["ss"]["model_name"] = facebook_model_path
-        PIXAL3D_IMAGE_COND_CONFIGS["shape_512"]["model_name"] = facebook_model_path
-        PIXAL3D_IMAGE_COND_CONFIGS["shape_1024"]["model_name"] = facebook_model_path
-        PIXAL3D_IMAGE_COND_CONFIGS["tex_1024"]["model_name"] = facebook_model_path
+        pipeline.PIXAL3D_IMAGE_COND_CONFIGS["ss"]["model_name"] = facebook_model_path
+        pipeline.PIXAL3D_IMAGE_COND_CONFIGS["shape_512"]["model_name"] = facebook_model_path
+        pipeline.PIXAL3D_IMAGE_COND_CONFIGS["shape_1024"]["model_name"] = facebook_model_path
+        pipeline.PIXAL3D_IMAGE_COND_CONFIGS["tex_1024"]["model_name"] = facebook_model_path
 
         return pipeline
         
@@ -274,13 +274,14 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         if hasattr(self,'moge_model') and self.moge_model is not None:
             del self.moge_model
             self.moge_model = None
+            self._cleanup_cuda() 
         
     def load_pixal3d_image_cond_ss(self):    
         if hasattr(self,'pixal3d_image_cond_ss') and self.pixal3d_image_cond_ss is not None:
             return self.pixal3d_image_cond_ss
         
         print('Loading Pixal3D Image Cond SS Model ...')
-        model = build_pixal3d_image_cond_model(PIXAL3D_IMAGE_COND_CONFIGS["ss"])
+        model = build_pixal3d_image_cond_model(self.PIXAL3D_IMAGE_COND_CONFIGS["ss"])
         self.pixal3d_image_cond_ss = model
         return model
         
@@ -288,14 +289,14 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         if hasattr(self,'pixal3d_image_cond_ss') and self.pixal3d_image_cond_ss is not None:
             del self.pixal3d_image_cond_ss
             self.pixal3d_image_cond_ss = None
-            gc.collect()        
+            self._cleanup_cuda() 
             
     def load_pixal3d_image_cond_shape_512(self):    
         if hasattr(self,'pixal3d_image_cond_shape_512') and self.pixal3d_image_cond_shape_512 is not None:
             return self.pixal3d_image_cond_shape_512
         
         print('Loading Pixal3D Image Cond Shape 512 Model ...')
-        model = build_pixal3d_image_cond_model(PIXAL3D_IMAGE_COND_CONFIGS["shape_512"])
+        model = build_pixal3d_image_cond_model(self.PIXAL3D_IMAGE_COND_CONFIGS["shape_512"])
         self.pixal3d_image_cond_shape_512 = model
         return model
         
@@ -303,14 +304,14 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         if hasattr(self,'pixal3d_image_cond_shape_512') and self.pixal3d_image_cond_shape_512 is not None:
             del self.pixal3d_image_cond_shape_512
             self.pixal3d_image_cond_shape_512 = None
-            gc.collect() 
+            self._cleanup_cuda() 
             
     def load_pixal3d_image_cond_shape_1024(self):    
         if hasattr(self,'pixal3d_image_cond_shape_1024') and self.pixal3d_image_cond_shape_1024 is not None:
             return self.pixal3d_image_cond_shape_1024
         
         print('Loading Pixal3D Image Cond Shape 1024 Model ...')
-        model = build_pixal3d_image_cond_model(PIXAL3D_IMAGE_COND_CONFIGS["shape_1024"])
+        model = build_pixal3d_image_cond_model(self.PIXAL3D_IMAGE_COND_CONFIGS["shape_1024"])
         self.pixal3d_image_cond_shape_1024 = model
         return model
         
@@ -318,14 +319,14 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         if hasattr(self,'pixal3d_image_cond_shape_1024') and self.pixal3d_image_cond_shape_1024 is not None:
             del self.pixal3d_image_cond_shape_1024
             self.pixal3d_image_cond_shape_1024 = None
-            gc.collect()
+            self._cleanup_cuda() 
 
     def load_pixal3d_image_cond_tex_1024(self):    
         if hasattr(self,'pixal3d_image_cond_tex_1024') and self.pixal3d_image_cond_tex_1024 is not None:
             return self.pixal3d_image_cond_tex_1024
         
         print('Loading Pixal3D Image Cond Tex 1024 Model ...')
-        model = build_pixal3d_image_cond_model(PIXAL3D_IMAGE_COND_CONFIGS["tex_1024"])
+        model = build_pixal3d_image_cond_model(self.PIXAL3D_IMAGE_COND_CONFIGS["tex_1024"])
         self.pixal3d_image_cond_tex_1024 = model
         return model
         
@@ -333,7 +334,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         if hasattr(self,'pixal3d_image_cond_tex_1024') and self.pixal3d_image_cond_tex_1024 is not None:
             del self.pixal3d_image_cond_tex_1024
             self.pixal3d_image_cond_tex_1024 = None
-            gc.collect()          
+            self._cleanup_cuda()         
         
     def load_sparse_structure_model(self):        
         if self.models['sparse_structure_flow_model'] is None:
@@ -388,8 +389,7 @@ class Trellis2ImageTo3DPipeline(Pipeline):
         if self.models['sparse_structure_vggt_cond']:
             del self.models['sparse_structure_vggt_cond']
             self.models['sparse_structure_vggt_cond'] = None
-        
-        self._cleanup_cuda()            
+            self._cleanup_cuda() 
     
     def unload_sparse_structure_model(self):
         if self.models['sparse_structure_flow_model']:
