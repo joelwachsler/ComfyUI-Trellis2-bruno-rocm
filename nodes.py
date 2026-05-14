@@ -2215,12 +2215,17 @@ class Trellis2ReconstructMesh:
         
         mesh_copy = copy.deepcopy(mesh)
         
-        vertices = mesh_copy.vertices.cuda()
-        faces = mesh_copy.faces.cuda()
+        vertices = mesh_copy.vertices.cuda().float()
+        faces = mesh_copy.faces.cuda().int()
         
         # Perform Dual Contouring remeshing (rebuilds topology)
         print('Reconstructing mesh ...')
-        vertices, faces = CuMesh.remeshing.reconstruct_mesh_dc(vertices, faces, resolution, verbose=True)
+        center = vertices.mean(dim=0)
+        scale = (vertices.max(dim=0).values - vertices.min(dim=0).values).max().item()
+        vertices, faces = CuMesh.remeshing.remesh_narrow_band_dc(
+            vertices, faces, center=center, scale=scale,
+            resolution=resolution, band=remesh_band, verbose=True,
+        )
         
         print(f"After reconstruction: {len(vertices)} vertices, {len(faces)} faces")                                 
         
@@ -2253,12 +2258,17 @@ class Trellis2ReconstructMeshWithQuad:
         
         mesh_copy = copy.deepcopy(mesh)
         
-        vertices = mesh_copy.vertices.cuda()
-        faces = mesh_copy.faces.cuda()
+        vertices = mesh_copy.vertices.cuda().float()
+        faces = mesh_copy.faces.cuda().int()
         
         # Perform Dual Contouring remeshing (rebuilds topology)
         print('Reconstructing mesh ...')
-        vertices, faces = CuMesh.remeshing.reconstruct_mesh_dc(vertices, faces, resolution, verbose=True)
+        center = vertices.mean(dim=0)
+        scale = (vertices.max(dim=0).values - vertices.min(dim=0).values).max().item()
+        vertices, faces = CuMesh.remeshing.remesh_narrow_band_dc(
+            vertices, faces, center=center, scale=scale,
+            resolution=resolution, band=remesh_band, verbose=True,
+        )
         
         if remove_floaters:
             vertices, faces = remove_floater2(vertices.cpu().numpy(),faces.cpu().numpy())
