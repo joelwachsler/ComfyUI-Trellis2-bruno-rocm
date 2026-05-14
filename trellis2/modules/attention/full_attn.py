@@ -118,7 +118,11 @@ def scaled_dot_product_attention(*args, **kwargs):
                 q, k, v = qkv.unbind(dim=2)
             elif num_all_args == 2:
                 k, v = kv.unbind(dim=2)
-            out = sdpa(q, k, v).transpose(1, 2)
+            q = q.permute(0, 2, 1, 3)
+            k = k.permute(0, 2, 1, 3)
+            v = v.permute(0, 2, 1, 3)
+            out = sdpa(q, k, v)
+            out = out.permute(0, 2, 1, 3)
     elif config.BACKEND == 'flash_attn_3':
         try:
             if 'flash_attn_3' not in globals():
@@ -136,7 +140,11 @@ def scaled_dot_product_attention(*args, **kwargs):
                 q, k, v = qkv.unbind(dim=2)
             elif num_all_args == 2:
                 k, v = kv.unbind(dim=2)
-            out = sdpa(q, k, v).transpose(1, 2)
+            q = q.permute(0, 2, 1, 3)
+            k = k.permute(0, 2, 1, 3)
+            v = v.permute(0, 2, 1, 3)
+            out = sdpa(q, k, v)
+            out = out.permute(0, 2, 1, 3)
     elif config.BACKEND == 'sdpa':
         if 'sdpa' not in globals():
             from torch.nn.functional import scaled_dot_product_attention as sdpa
