@@ -2258,7 +2258,7 @@ class Trellis2ReconstructMeshWithQuad:
         
         # Perform Dual Contouring remeshing (rebuilds topology)
         print('Reconstructing mesh ...')
-        vertices, faces = CuMesh.remeshing.reconstruct_mesh_dc_quad(vertices, faces, resolution, verbose=True, remove_inner_faces = remove_inner_faces)
+        vertices, faces = CuMesh.remeshing.reconstruct_mesh_dc(vertices, faces, resolution, verbose=True)
         
         if remove_floaters:
             vertices, faces = remove_floater2(vertices.cpu().numpy(),faces.cpu().numpy())
