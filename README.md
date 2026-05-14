@@ -175,3 +175,29 @@ python_embeded\python.exe -m pip install -r ComfyUI\custom_nodes\ComfyUI-Trellis
 Discord community
 
 "Blackwell Fix" from https://github.com/ThatButters/trellis2-blackwell-fix
+
+## ROCm (AMD GPU) Setup
+
+Tested on **AMD Radeon 8060S** (gfx1151) with ROCm 7.2 / PyTorch 2.12.0+rocm7.2.
+
+This fork replaces the CUDA-only `nvdiffrast` library with a pure-PyTorch implementation so all 65 nodes load on AMD GPUs.
+
+```bash
+cd ComfyUI/custom_nodes
+git clone https://github.com/joelwachsler/ComfyUI-Trellis2-bruno-rocm.git
+cd ComfyUI-Trellis2-bruno-rocm
+pip install -r requirements.txt --upgrade
+```
+
+No additional build steps needed — the nvdiffrast shim is pure Python/PyTorch.
+
+### Known Limitations
+- **nvdiffrast shim is slower** than the native CUDA rasterizer — block-based barycentric (32x32 blocks) instead of hardware rasterization
+- **Multi-layer depth peeling** uses iterative z-buffer passes rather than true A-buffer
+- **Texture mipmapping** is simplified to single-level bilinear sampling
+
+### Environment Variables
+```bash
+FLEX_GEMM_USE_AUTOTUNE_CACHE=0
+FLEX_GEMM_AUTOSAVE_AUTOTUNE_CACHE=0
+```
