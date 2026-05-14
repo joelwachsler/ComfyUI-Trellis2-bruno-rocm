@@ -2603,17 +2603,23 @@ class Trellis2PreProcessImage:
             # if self.low_vram:
                 # self.rembg_model.cpu()
         output = input
-        output_np = np.array(output)
+        output_np = np.array(output).astype(np.float32) / 255
+        if output_np.ndim == 2:
+            output_np = np.stack([output_np, output_np, output_np, np.ones_like(output_np)], axis=2)
+        elif output_np.shape[2] == 3:
+            output_np = np.concatenate([output_np, np.ones((*output_np.shape[:2], 1), dtype=output_np.dtype)], axis=2)
         alpha = output_np[:, :, 3]
-        bbox = np.argwhere(alpha > 0.8 * 255)
-        bbox = np.min(bbox[:, 1]), np.min(bbox[:, 0]), np.max(bbox[:, 1]), np.max(bbox[:, 0])
-        center = (bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2
-        size = max(bbox[2] - bbox[0], bbox[3] - bbox[1])
-        size = int(size * 1)
-        bbox = center[0] - size // 2, center[1] - size // 2, center[0] + size // 2, center[1] + size // 2
-        output = output.crop(bbox)  # type: ignore
-        output = np.array(output).astype(np.float32) / 255
-        output = output[:, :, :3] * output[:, :, 3:4]
+        bbox = np.argwhere(alpha > 0.8)
+        if bbox.size == 0:
+            bbox = 0, 0, output_np.shape[1], output_np.shape[0]
+        else:
+            bbox = np.min(bbox[:, 1]), np.min(bbox[:, 0]), np.max(bbox[:, 1]), np.max(bbox[:, 0])
+            center = (bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2
+            size = max(bbox[2] - bbox[0], bbox[3] - bbox[1])
+            size = int(size * 1)
+            bbox = int(center[0] - size // 2), int(center[1] - size // 2), int(center[0] + size // 2), int(center[1] + size // 2)
+        output_np = output_np[bbox[1]:bbox[3], bbox[0]:bbox[2]]
+        output = output_np[:, :, :3] * output_np[:, :, 3:4]
         output = Image.fromarray((output * 255).astype(np.uint8))
         return output    
 
