@@ -25,7 +25,10 @@ import copy
 import pymeshlab
 
 import cumesh as CuMesh
+import sys
+sys.modules['cumesh_vb'] = sys.modules['cumesh']
 import o_voxel
+sys.modules['o_voxel_vb_ap'] = sys.modules['o_voxel']
 
 import meshlib.mrmeshnumpy as mrmeshnumpy
 import meshlib.mrmeshpy as mrmeshpy
